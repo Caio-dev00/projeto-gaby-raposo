@@ -1,6 +1,6 @@
 
 
-export function Produto() {
+export function ProductDetail() {
   return (
     <div>produto</div>
   )
