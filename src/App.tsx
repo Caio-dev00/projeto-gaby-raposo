@@ -1,9 +1,45 @@
-function App() {
-  return(
-    <div>
-      <h1>Projeto - Gabi Raposo</h1>
-    </div>
-  )
-}
+import { createBrowserRouter } from "react-router-dom";
 
-export default App
+import { Home } from "./pages/home";
+import { ProductDetail } from "./pages/product";
+import { Dashboard } from "./pages/dashboard";
+import { New } from "./pages/dashboard/new";
+import { Login } from "./pages/login"; 
+import { Register } from "./pages/register";
+
+import { Layout } from "./components/layout";
+import { Private } from "./routes/Private";
+
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />
+      },
+      {
+        path: "/product/:id",
+        element: <ProductDetail />
+      },
+      {
+        path: "/dashboard",
+        element: <Private><Dashboard /></Private>
+      },
+      {
+        path: "/dashboard/new",
+        element: <Private><New /></Private>
+      },
+    ]
+  },
+  {
+    path: "/login",
+    element: <Private><Login /></Private>
+  },
+  {
+    path: "/register",
+    element: <Private><Register /></Private>
+  },
+])
+
+export { router }
