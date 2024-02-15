@@ -6,8 +6,8 @@ interface PrivateProps{
 }
 
 export function Private({children} : PrivateProps){
-    const signed = false;
-    const loadingAuth = true;
+    const signed = true;
+    const loadingAuth = false;
 
     if(loadingAuth){
         return <div></div>
