@@ -23,7 +23,7 @@ export default function Header() {
           
 
             <button>
-              <FaShoppingBag size={25} color="#000"/>
+              <FaShoppingBag size={26} color="#000"/>
             </button>
             
           
