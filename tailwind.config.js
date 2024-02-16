@@ -8,7 +8,6 @@ export default {
       extend: {
         colors: {
          'salmon': "#F5D8DA",
-         
         }
       },    
     }
