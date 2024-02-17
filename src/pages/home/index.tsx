@@ -5,6 +5,7 @@ import { Slider } from "../../components/slideBanner/Slider"
 import banner from '../../assets/bannerBlackFriday.jpg'
 import banner2 from '../../assets/bannerSale.jpg'
 import Dropdown from "../../components/dropdown"
+import Catalogo from "../../components/catalogo"
 
 export function Home() {
   const settings: SwiperProps = {
@@ -17,8 +18,13 @@ export function Home() {
   }
 
   const settings2: SwiperProps = {
-    spaceBetween: 40,
-    slidesPerView: 10,
+    spaceBetween: 10,
+    slidesPerView: 8,
+  }
+
+  const settings3: SwiperProps = {
+    spaceBetween: 10,
+    slidesPerView: 4,
   }
 
   return (
@@ -35,50 +41,95 @@ export function Home() {
        </div>
 
        <div className="mt-20 max-md:mt-10 mb-[-90px]">
-        <h1 className="text-center font-bold text-xl">CATEGORIAS</h1>
+        <h1 className="text-center font-bold text-xl max-md:text-lg">CATEGORIAS</h1>
+        <div className="max-md:hidden">
         <Slider settings={settings2}>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
-         <SwiperSlide>
-          <Dropdown name="Babydoll"/>
-         </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
+          <SwiperSlide>
+            <Dropdown name="Babydoll"/>
+          </SwiperSlide>
         </Slider>
+        </div>
        </div>
+
+       <div className="mt-20 max-md:mt-10 mb-[-90px] md:hidden">
+        <Slider settings={settings3}>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <Dropdown name="Babydoll"/>
+            </SwiperSlide>
+          </Slider>
+         </div> 
 
        <div>
         <h1 className="text-center font-bold text-xl">CATALOGO</h1>
        </div>
+
+       <Catalogo/>
     </Container>
   )
 }
