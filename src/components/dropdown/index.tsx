@@ -14,7 +14,7 @@ export default function Dropdown({name}: Categoryprops){
         <div className="w-[60px] h-[60px] bg-black rounded-full hover:bg-salmon duration-300"></div>
         {
           
-            <button onClick={() => setIsOpen((prev) => !prev)} className="pt-2 w-full flex items-center justify-center tracking-wider active:text-salmon duration-300">
+            <button onClick={() => setIsOpen((prev) => !prev)} className="pt-2 w-full flex items-center justify-center tracking-wider active:text-salmon duration-300 max-md:text-[0.8rem]">
                 {name}
                 {isOpen ? (
                     <AiOutlineCaretDown className="h-8" />
