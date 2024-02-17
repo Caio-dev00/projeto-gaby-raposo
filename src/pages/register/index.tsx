@@ -1,7 +1,8 @@
 
 export function Register() {
     return (
-      <div>Register</div>
+      <div className="">
+        Register</div>
     )
   }
   
