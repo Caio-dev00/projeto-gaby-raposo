@@ -83,7 +83,7 @@ export function Home() {
         </div>
        </div>
 
-       <div className="mt-20 max-md:mt-10 mb-[-90px]">
+       <div className="mt-20 max-md:mt-10 mb-[-90px] md:hidden">
         <Slider settings={settings3}>
             <SwiperSlide>
               <Dropdown name="Babydoll"/>

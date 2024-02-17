@@ -11,7 +11,7 @@ export default function Dropdown({name}: Categoryprops){
 
   return(
     <div className="relative flex flex-col items-center w-[340px] h-[340px] rounded-lg mt-20">
-        <div className="w-[60px] h-[60px] bg-black rounded-full hover:bg-salmon duration-300"></div>
+        <div className="w-[60px] h-[60px] max-md:w-[50px] max-md:h-[50px] bg-black rounded-full hover:bg-salmon duration-300"></div>
         {
           
             <button onClick={() => setIsOpen((prev) => !prev)} className="pt-2 w-full flex items-center justify-center tracking-wider active:text-salmon duration-300 max-md:text-[0.8rem]">
