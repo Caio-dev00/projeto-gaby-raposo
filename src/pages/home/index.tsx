@@ -5,6 +5,7 @@ import { Slider } from "../../components/slideBanner/Slider"
 import banner from '../../assets/bannerBlackFriday.jpg'
 import banner2 from '../../assets/bannerSale.jpg'
 import Dropdown from "../../components/dropdown"
+import Catalogo from "../../components/catalogo"
 
 export function Home() {
   const settings: SwiperProps = {
@@ -18,7 +19,7 @@ export function Home() {
 
   const settings2: SwiperProps = {
     spaceBetween: 10,
-    slidesPerView: 7,
+    slidesPerView: 8,
   }
 
   const settings3: SwiperProps = {
@@ -127,6 +128,8 @@ export function Home() {
        <div>
         <h1 className="text-center font-bold text-xl">CATALOGO</h1>
        </div>
+
+       <Catalogo/>
     </Container>
   )
 }
