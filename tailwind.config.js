@@ -11,10 +11,9 @@ export default {
         'vinho-principal': '#A66576',
         'gray-princpial': '#505050',
         'gray-white-1': '#d9d9d9',
-        'gray-white-2': '#f5f5f5'
-
+        'gray-white-2': '#f5f5f5',
     },
   },
   plugins: [],
 }
-
+}
