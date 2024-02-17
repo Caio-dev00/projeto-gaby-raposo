@@ -18,7 +18,7 @@ export function Home() {
 
   const settings2: SwiperProps = {
     spaceBetween: 40,
-    slidesPerView: "auto",
+    slidesPerView: 10,
   }
 
   return (
