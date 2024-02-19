@@ -39,7 +39,6 @@ export function ProductDetail() {
                 <button className="font-bold">+</button>
               </div>
             </div>
-
         </div>
       </div>
       <div className="mt-20">

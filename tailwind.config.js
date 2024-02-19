@@ -5,14 +5,6 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-<<<<<<< HEAD
-      extend: {
-        colors: {
-         'salmon': "#F5D8DA",
-        }
-      },    
-    }
-=======
     extend: {
       colors: {
         'salmon-light': '#F5D8DA',
@@ -23,6 +15,5 @@ export default {
     },
   },
   plugins: [],
->>>>>>> page-register
 }
 }
