@@ -10,7 +10,7 @@ export default function Dropdown({name}: Categoryprops){
     const [isOpen, setIsOpen] = useState(false)
 
   return(
-    <div className="relative flex flex-col items-center w-[340px] h-[340px] rounded-lg mt-20">
+    <div className="relative flex flex-col items-center w-[340px] rounded-lg mt-20">
         <div className="w-[60px] h-[60px] max-md:w-[50px] max-md:h-[50px] bg-black rounded-full hover:bg-salmon duration-300"></div>
         {
           

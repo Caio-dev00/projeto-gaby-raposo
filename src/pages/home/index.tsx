@@ -41,7 +41,7 @@ export function Home() {
        </div>
 
        <div className="mt-20 max-md:mt-10 mb-[-90px]">
-        <h1 className="text-center font-bold text-xl max-md:text-lg">CATEGORIAS</h1>
+        <h1 className="text-center font-extrabold text-xl max-md:text-lg">CATEGORIAS</h1>
         <div className="max-md:hidden">
         <Slider settings={settings2}>
           <SwiperSlide>
@@ -84,7 +84,7 @@ export function Home() {
         </div>
        </div>
 
-       <div className="mt-20 max-md:mt-10 mb-[-90px] md:hidden">
+       <div className="mt-20 max-md:mt-14 mb-[-90px] md:hidden">
         <Slider settings={settings3}>
             <SwiperSlide>
               <Dropdown name="Babydoll"/>
@@ -126,10 +126,20 @@ export function Home() {
          </div> 
 
        <div>
-        <h1 className="text-center font-bold text-xl">CATALOGO</h1>
+        <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5">CATÁLOGO</h1>
        </div>
 
-       <Catalogo/>
+      <div className="flex justify-center">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+          <Catalogo/>
+          <Catalogo/>
+          <Catalogo/>
+          <Catalogo/>
+          <Catalogo/>
+        </div>
+      </div>
+
+       
     </Container>
   )
 }
