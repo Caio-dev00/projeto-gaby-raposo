@@ -13,7 +13,7 @@ export function Home() {
     slidesPerView: 1,
     navigation: true,
     pagination: {
-      clickable: true,
+    clickable: true,
     }
   }
 
