@@ -8,6 +8,9 @@ export default {
       extend: {
         colors: {
          'salmon': "#F5D8DA",
+         'gray-500': '#505050',
+         'wine-light': '#A66576',
+         'wine-black': '#995A6A',
         }
       },    
     }
