@@ -12,7 +12,7 @@ export default {
          'wine-light': '#A66576',
          'wine-black': '#995A6A',
          'gray-white-1': '#d9d9d9',
-        'gray-white-2': '#f5f5f5',
+         'gray-white-2': '#f5f5f5',
         }
       },    
     }
