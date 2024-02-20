@@ -12,13 +12,13 @@ export default function Catalogo() {
         <span className='text-gray-500 pl-4 pt-2 font-semibold max-md:text-[0.80rem] max-md:pb-1'>PRODUTO MODELO 1</span>
         <div className='flex'>
         {promotional ? (
-            <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] line-through max-md:text-[0.80rem]'>R$99,90</span>
+            <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] line-through max-md:text-[0.85rem]'>R$99,90</span>
         ):(
-            <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[0.80rem]'>R$99,90</span>
+            <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[1rem]'>R$99,90</span>
         )}
             {
                 promotional && (
-                    <span className='text-green-400 pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[0.80rem]'>R$88,90</span>
+                    <span className='text-green-400 pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[1rem]'>R$88,90</span>
                 )
             }
         </div>

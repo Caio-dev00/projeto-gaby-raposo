@@ -126,7 +126,7 @@ export function Home() {
          </div> 
 
        <div>
-        <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5">CATÁLOGO</h1>
+        <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5 max-md:mt-32">CATÁLOGO</h1>
        </div>
 
       <div className="flex justify-center">
