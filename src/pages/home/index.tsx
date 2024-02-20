@@ -6,6 +6,7 @@ import banner from '../../assets/bannerBlackFriday.jpg'
 import banner2 from '../../assets/bannerSale.jpg'
 import Dropdown from "../../components/dropdown"
 import Catalogo from "../../components/catalogo"
+import Pagination from "../../components/pagination"
 
 export function Home() {
   const settings: SwiperProps = {
@@ -139,7 +140,8 @@ export function Home() {
         </div>
       </div>
 
-       
+      <Pagination />
+
     </Container>
   )
 }
