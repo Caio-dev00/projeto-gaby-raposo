@@ -1,14 +1,33 @@
 import ReactPaginate from 'react-paginate'
 import { BsChevronLeft, BsChevronRight } from 'react-icons/bs'
+import { motion } from 'framer-motion'
 
 export default function Pagination() {
-
-   const pageCount = 10;
+    const paginationVariants = {
+        hidden: {
+            opacity: 0,
+            y: 100,
+        },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                duration: 2
+            },
+        }
+    }
+    const pageCount = 10;
 
   return (
-    <div>
+    <motion.div 
+        variants={paginationVariants} 
+        initial="hidden" 
+        animate="visible">
         <ReactPaginate
-             breakLabel="..."
+             breakLabel={<span className='mr-4'>...</span>}
              nextLabel={
                 <span className='w-10 h-10 flex items-center justify-center bg-wine-light rounded-md'>
                     <BsChevronRight size={26} color="#FFF"/>
@@ -22,9 +41,11 @@ export default function Pagination() {
                     <BsChevronLeft size={26} color="#FFF"/>
                 </span>
              }
-             containerClassName='flex items-center justify-center gap-10 mt-8'
+             containerClassName='flex items-center justify-center gap-5 mt-8'
              renderOnZeroPageCount={null}
+             pageClassName='block boder-solid hover:bg-wine-light w-10 h-10 flex items-center justify-center hover:text-white rounded-md'
+             activeClassName='bg-wine-light text-white'
         />
-    </div>
+    </motion.div>
   )
 }
