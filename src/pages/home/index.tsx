@@ -8,6 +8,7 @@ import Dropdown from "../../components/dropdown"
 import Catalogo from "../../components/catalogo"
 import Pagination from "../../components/pagination"
 
+
 export function Home() {
   const settings: SwiperProps = {
     spaceBetween: 50,
