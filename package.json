@@ -12,8 +12,10 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@hookform/resolvers": "^3.3.4",
     "@mui/material": "^5.15.10",
     "@types/react-paginate": "^7.1.4",
+    "axios": "^1.6.7",
     "framer-motion": "^11.0.5",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
