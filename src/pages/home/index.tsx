@@ -6,6 +6,8 @@ import banner from '../../assets/bannerBlackFriday.jpg'
 import banner2 from '../../assets/bannerSale.jpg'
 import Dropdown from "../../components/dropdown"
 import Catalogo from "../../components/catalogo"
+import Pagination from "../../components/pagination"
+
 
 export function Home() {
   const settings: SwiperProps = {
@@ -126,7 +128,7 @@ export function Home() {
          </div> 
 
        <div>
-        <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5">CATÁLOGO</h1>
+        <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5 max-md:mt-32">CATÁLOGO</h1>
        </div>
 
       <div className="flex justify-center">
@@ -139,7 +141,8 @@ export function Home() {
         </div>
       </div>
 
-       
+      <Pagination />
+
     </Container>
   )
 }
