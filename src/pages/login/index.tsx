@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 export function Login() {
   return (
@@ -10,7 +11,7 @@ export function Login() {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xl">
         <form className="space-y-6" action="#" method="POST">
           <div>
-            <label htmlFor="email" className="block text-sm font-bold leading-6 text-gray-500">Digite seu usuário</label>
+            <label htmlFor="email" className="block text-sm font-bold leading-6 text-gray-500">Digite seu Email</label>
             <div className="mt-2">
               <input type="email" name="email" id="email" required className="block w-full rounded-md border-2 border-gray-400 py-1 px-2 text-gray-600 md:text-sm"/>
             </div>
@@ -18,10 +19,10 @@ export function Login() {
 
           <div>
             <div className="flex items-center justify-between mt-2">
-              <label htmlFor="pw" className="block text-sm font-bold text-gray-500">Digite sua senha</label>
+              <label htmlFor="pw" className="block text-sm font-bold text-gray-500">Digite sua Senha</label>
             </div>
             <div className="mt-2">
-              <input type="pw" name="pw" id="pw" autoComplete="show-password" required className="block w-full rounded-md border-2 border-gray-400 py-1 px-2 text-gray-600 md:text-sm" />
+              <input type="password" name="pw" id="pw" autoComplete="show-password" required className="block w-full rounded-md border-2 border-gray-400 py-1 px-2 text-gray-600 md:text-sm" />
             </div>
           </div>
 
@@ -30,6 +31,9 @@ export function Login() {
           </div>
         </form>
       </div>
+      <Link to="/register">
+          <p className="my-2 flex justify-center">Não possui uma conta? Cadastre-se agora!</p>
+      </Link>
     </div>
   )
 }
