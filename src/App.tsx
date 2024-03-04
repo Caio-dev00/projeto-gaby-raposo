@@ -22,14 +22,7 @@ const router = createBrowserRouter([
         path: "/product/:id",
         element: <ProductDetail />
       },
-      {
-        path: "/dashboard",
-        element: <Private><Dashboard /></Private>
-      },
-      {
-        path: "/dashboard/new",
-        element: <Private><New /></Private>
-      },
+      
     ]
   },
   {
@@ -39,6 +32,14 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Private><Register /></Private>
+  },
+  {
+    path: "/dashboard",
+    element: <Private><Dashboard /></Private>
+  },
+  {
+    path: "/dashboard/new",
+    element: <Private><New /></Private>
   },
 ])
 
