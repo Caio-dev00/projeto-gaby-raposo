@@ -9,17 +9,16 @@ interface InputProps {
   rules?: RegisterOptions;
 }
 
-export default function Input({ name, placeholder, register, type, error, rules }: InputProps) {
+export default function Input({ name, register, type, error, rules }: InputProps) {
   return (
     <div>
       <input
-        className="mt-2 w-full border-none rounded-md h-10 px-3 text-1xl"
+        className="block w-full rounded-md border-2 border-gray-400 py-1 px-2 text-gray-600 md:text-sm"
         type={type}
-        placeholder={placeholder}
         {...register(name, rules)}
         id={name}
       />
-      {error && <p className='my-1 text-yellow-300'>{error}</p>}
+      {error && <p className='my-1 text-red-500'>{error}</p>}
     </div>
   )
 }

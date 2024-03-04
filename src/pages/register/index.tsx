@@ -1,6 +1,52 @@
 import { Link } from "react-router-dom";
+import { useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom"; 
+
+import Input from "../../components/input";
+import { useForm } from 'react-hook-form';
+import { z } from "zod"; 
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { auth } from "../../services/firebaseConnection";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
+import { AuthContext } from "../../contexts/AuthContext";
+
+const schema = z.object({
+  name: z.string().min(4, "O Campo nome é obrigatorio!"),
+  email: z.string().email("Insira um email valido").min(0, "O campo email é obrigatorio!"),
+  password: z.string().min(6, "A senha deve ter no minimo 6 caracteres").min(0, "O campo senha é obrigatorio")
+})
+
+type FormaData = z.infer<typeof schema>
 
 export function Register() {
+    const navigate = useNavigate();
+    const { handleInfoUser } = useContext(AuthContext);
+    const { register, handleSubmit, formState: { errors } } = useForm<FormaData>({
+      resolver: zodResolver(schema),
+      mode: 'onChange'
+    })
+
+    async function onSubmit(data: FormaData){
+      createUserWithEmailAndPassword(auth, data.email, data.password)
+      .then(async (user) => {
+        await updateProfile(user.user, {
+          displayName: data.name
+        })
+        handleInfoUser({
+          name: data.name,
+          email: data.email,
+          uid: user.user.uid
+        })
+        console.log("CADASTRO COM SUCESSO")
+        navigate("/dashboard", {replace: true})
+      })
+      .catch((error) => {
+        console.error("ERRO AO CADASTRAR")
+        console.error(error)
+      })
+    }
+
     return (
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -9,18 +55,32 @@ export function Register() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xl">
-        <form className="space-y-6" action="#" method="POST">
+        <form 
+        onSubmit={handleSubmit(onSubmit)}
+        >
           <div>
             <label htmlFor="email" className="block text-sm font-bold leading-6 text-gray-500">Digite seu Nome Completo</label>
             <div className="mt-2">
-              <input type="text" name="email" id="email" required className="block w-full rounded-md border-2 border-gray-400 py-1 px-2 text-gray-600 md:text-sm"/>
+              <Input
+                placeholder=""
+                type="text"
+                name="name"
+                error={errors.name?.message}
+                register={register}
+              />
             </div>
           </div>
 
           <div>
             <label htmlFor="email" className="block text-sm font-bold leading-6 text-gray-500">Digite seu email</label>
             <div className="mt-2">
-              <input type="email" name="email" id="email" required className="block w-full rounded-md border-2 border-gray-400 py-1 px-2 text-gray-600 md:text-sm"/>
+            <Input
+                placeholder=""
+                type="email"
+                name="email"
+                error={errors.email?.message}
+                register={register}
+              />
             </div>
           </div>
 
@@ -29,11 +89,17 @@ export function Register() {
               <label htmlFor="pw" className="block text-sm font-bold text-gray-500">Digite sua senha</label>
             </div>
             <div className="mt-2">
-              <input type="password" name="pw" id="pw" autoComplete="show-password" required className="block w-full rounded-md border-2 border-gray-400 py-1 px-2 text-gray-600 md:text-sm" />
+            <Input
+                placeholder=""
+                type="password"
+                name="password"
+                error={errors.password?.message}
+                register={register}
+              />
             </div>
           </div>
 
-          <div>
+          <div className="my-5">
             <button type="submit" className="flex w-full justify-center rounded-lg bg-wine-black px-4 py-2 text-sm font-semibold text-white hover:bg-opacity-95 hover:shadow-lg hover:border-black ">Cadastrar</button>
           </div>
         </form>
