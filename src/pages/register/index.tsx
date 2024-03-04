@@ -17,17 +17,17 @@ const schema = z.object({
   password: z.string().min(6, "A senha deve ter no minimo 6 caracteres").min(0, "O campo senha é obrigatorio")
 })
 
-type FormaData = z.infer<typeof schema>
+type FormData = z.infer<typeof schema>
 
 export function Register() {
     const navigate = useNavigate();
     const { handleInfoUser } = useContext(AuthContext);
-    const { register, handleSubmit, formState: { errors } } = useForm<FormaData>({
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
       resolver: zodResolver(schema),
       mode: 'onChange'
     })
 
-    async function onSubmit(data: FormaData){
+    async function onSubmit(data: FormData){
       createUserWithEmailAndPassword(auth, data.email, data.password)
       .then(async (user) => {
         await updateProfile(user.user, {
