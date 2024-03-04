@@ -8,11 +8,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { auth } from "../../services/firebaseConnection";
-import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../../contexts/AuthContext";
+import { FaYCombinator } from "react-icons/fa";
 
 const schema = z.object({
-  name: z.string().min(4, "O Campo nome é obrigatorio!"),
   email: z.string().email("Insira um email valido").min(0, "O campo email é obrigatorio!"),
   password: z.string().min(6, "A senha deve ter no minimo 6 caracteres").min(0, "O campo senha é obrigatorio")
 })
@@ -27,6 +27,24 @@ export function Login() {
       mode: 'onChange'
     })
 
+    useEffect(() => {
+      async function handleLogOut(){
+        await signOut(auth)
+      }
+      handleLogOut()
+    },[])
+
+    async function onSubmit (data: FormaData){
+      signInWithEmailAndPassword(auth, data.email, data.password)
+      .then(async () => {
+        console.log("LOGIN REALIZADO")
+        navigate("/dashboard", {replace: true})
+      })
+      .catch((error) => {
+          console.error("ERRO AO REALIZAR LOGIN")
+          console.error(error)
+      })
+    }
     return (
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -36,9 +54,7 @@ export function Login() {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xl">
         <form 
-        onSubmit={handleSubmit(onsubmit)}
-        
-        >
+        onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label htmlFor="email" className="block text-sm font-bold leading-6 text-gray-500">Digite seu email</label>
             <div className="mt-2">
@@ -46,7 +62,7 @@ export function Login() {
                 placeholder=""
                 type="email"
                 name="email"
-                error={errors.name?.message}
+                error={errors.email?.message}
                 register={register}
               />
             </div>
@@ -61,7 +77,7 @@ export function Login() {
                 placeholder=""
                 type="password"
                 name="password"
-                error={errors.name?.message}
+                error={errors.password?.message}
                 register={register}
               />
             </div>
