@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useContext } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 
 import Input from "../../components/input";
@@ -8,8 +8,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { auth } from "../../services/firebaseConnection";
-import { signInWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
-import { AuthContext } from "../../contexts/AuthContext";
+import { signOut, signInWithEmailAndPassword } from "firebase/auth";
+
 
 const schema = z.object({
   email: z.string().email("Insira um email valido").min(0, "O campo email é obrigatorio!"),
@@ -20,15 +20,29 @@ type FormaData = z.infer<typeof schema>
 
 export function Login() {
     const navigate = useNavigate();
-    const { handleInfoUser } = useContext(AuthContext);
     const { register, handleSubmit, formState: { errors } } = useForm<FormaData>({
       resolver: zodResolver(schema),
       mode: 'onChange'
     })
 
-    
+    useEffect(() => {
+      async function handleLogOut(){
+        await signOut(auth)
+      }
+      handleLogOut()
+    },[])
 
-   
+    async function onSubmit (data: FormaData){
+      signInWithEmailAndPassword(auth, data.email, data.password)
+      .then(async () => {
+        console.log("LOGIN REALIZADO")
+        navigate("/dashboard", {replace: true})
+      })
+      .catch((error) => {
+          console.error("ERRO AO REALIZAR LOGIN")
+          console.error(error)
+      })
+    }
     return (
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -38,9 +52,7 @@ export function Login() {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xl">
         <form 
-        onSubmit={handleSubmit(onSubmit)}
-        
-        >
+        onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label htmlFor="email" className="block text-sm font-bold leading-6 text-gray-500">Digite seu email</label>
             <div className="mt-2">
