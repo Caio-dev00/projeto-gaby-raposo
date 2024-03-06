@@ -4,6 +4,7 @@ import { Home } from "./pages/home";
 import { ProductDetail } from "./pages/product";
 import { Dashboard } from "./pages/dashboard";
 import { New } from "./pages/dashboard/new";
+import { Categorias } from "./pages/dashboard/categorias"
 import { Login } from "./pages/login"; 
 import { Register } from "./pages/register";
 
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
     path: "/dashboard/new",
     element: <Private><New /></Private>
   },
+  {
+    path: "/dashboard/categorias",
+    element: <Private><Categorias /></Private>
+  }
 ])
 
 export { router }
