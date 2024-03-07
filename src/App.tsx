@@ -43,6 +43,10 @@ const router = createBrowserRouter([
     element: <Private><New /></Private>
   },
   {
+    path: "/dashboard/new:id",
+    element: <Private><New /></Private>
+  },
+  {
     path: "/dashboard/categorias",
     element: <Private><Categorias /></Private>
   }
