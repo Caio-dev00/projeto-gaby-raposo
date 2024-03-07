@@ -4,7 +4,7 @@ import { HeaderDashboard } from "../../components/headerDashboard"
 import Title from "../../components/titleDahsboard"
 import { Link } from "react-router-dom"
 
-
+import './dashboard.css'
 
 
 export function Dashboard() {
@@ -23,14 +23,14 @@ export function Dashboard() {
 
 
                 <button className="mb-4 flex justify-center items-center w-[250px] h-[40px] float-right ml-2 bg-wine-black rounded-full hover:scale-105 duration-300 max-sm:w-[180px]">
-                    <Link to="/dashboard/new" >
+                    <Link to="/dashboard/new">
                         <span className="text-white text-[0.8rem] p-1 font-semibold max-sm:text-[12px]">CADASTRAR PRODUTO</span>
                     </Link>
                 </button>
-                <div className="flex justify-center items-center mb-5 mr-4 w-full">
+                <div className="flex justify-center items-center mb-5 mr-4 w-full max-sm:text-[0.9rem]">
                     <input
                         placeholder="Buscar Produtos"
-                        className="w-full p-3 rounded-full border-2"
+                        className="w-full p-3 rounded-full border-2 max-sm:p-1"
                         type="text" />
                 </div>
                 <table className="w-full text-center border-solid border m-0 p-0 table-fixed border-collapse max-sm:border-0">
@@ -46,7 +46,7 @@ export function Dashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-white border border-solid text-[14px] border-zinc-500 max-sm:text-[12px]">
+                        <tr className="bg-white border border-solid text-[14px] border-zinc-500 max-sm:text-[12px] max-sm:p-1">
                             <td className="border-0 rounded-[4px] py-2" data-label="código">01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="produto">Produto Modelo 01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="categoria">Conjunto</td>
@@ -61,7 +61,7 @@ export function Dashboard() {
                                 </button>
                             </td>
                         </tr>
-                        <tr className="bg-white border border-solid text-[14px] border-zinc-500 max-sm:text-[12px]">
+                        <tr className="bg-white border border-solid text-[14px] border-zinc-500 max-sm:text-[12px] max-sm:p-1">
                             <td className="border-0 rounded-[4px] py-2" data-label="código">01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="produto">Produto Modelo 01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="categoria">Conjunto</td>
@@ -69,21 +69,6 @@ export function Dashboard() {
                             <td className="border-0 rounded-[4px] py-2" data-label="estoque">54</td>
                             <td className="border-0 p-[3px]" data-label="status">
                                 <span className=" p-2 text-[12px] text-white rounded-full bg-red-500 max-sm:text-[10px]">INATIVO</span>
-                            </td>
-                            <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                <button>
-                                    <FiEdit2 size={15} color="#000" />
-                                </button>
-                            </td>
-                        </tr>
-                        <tr className="bg-white border border-solid text-[14px] border-zinc-500 max-sm:text-[12px]">
-                            <td className="border-0 rounded-[4px] py-2" data-label="código">01</td>
-                            <td className="border-0 rounded-[4px] py-2" data-label="produto">Produto Modelo 01</td>
-                            <td className="border-0 rounded-[4px] py-2" data-label="categoria">Conjunto</td>
-                            <td className="border-0 rounded-[4px] py-2" data-label="preco">R$ 99,90</td>
-                            <td className="border-0 rounded-[4px] py-2" data-label="estoque">54</td>
-                            <td className="border-0 p-[3px]" data-label="status">
-                                <span className=" p-2 text-[12px] text-white rounded-full bg-green-500 max-sm:text-[10px]">ATIVO</span>
                             </td>
                             <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                 <button>
