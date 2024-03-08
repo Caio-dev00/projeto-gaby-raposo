@@ -25,7 +25,7 @@ export function HeaderDashboard() {
           <Link to='/dashboard/new' className="mb- pl-4 text-white">
             Lista de produtos
           </Link>
-          <Link to='/dashboard/new' className="mb-2 pl-4 text-white">
+          <Link to='/dashboard/categorias' className="mb-2 pl-4 text-white">
             Categorias
           </Link>
 
