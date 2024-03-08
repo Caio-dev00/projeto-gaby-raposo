@@ -22,7 +22,7 @@ export function HeaderDashboard() {
 
       <div className="flex flex-col justify-start pt-8 pl-2 max-md:items-center max-md:pl-0">
           <span className="font-semibold text-white">PRODUTOS</span>
-          <Link to='/dashboard/new' className="mb- pl-4 text-white">
+          <Link to='/dashboard' className="mb- pl-4 text-white">
             Lista de produtos
           </Link>
           <Link to='/dashboard/categorias' className="mb-2 pl-4 text-white">
@@ -31,7 +31,7 @@ export function HeaderDashboard() {
 
 
           <span className="font-semibold text-white mt-2">MARKETING</span>
-          <Link to='/dashboard/new' className="mb-2 pl-4 text-white">
+          <Link to='/dashboard/banners' className="mb-2 pl-4 text-white">
             Banners
           </Link>
       </div>
