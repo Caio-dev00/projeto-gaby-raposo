@@ -6,9 +6,7 @@ import { Link } from "react-router-dom"
 
 import '../dashboard.css'
 
-
 export function Categorias() {
-
     return (
         <div>
             <HeaderDashboard />
@@ -18,9 +16,6 @@ export function Categorias() {
                 <Title name="Categorias">
                     <FaUser size={25} color="#FFF" />
                 </Title>
-
-
-
 
                 <button className="mb-4 flex justify-center items-center w-[250px] h-[40px] float-right ml-2 bg-wine-black rounded-full hover:scale-105 duration-300 max-sm:w-[180px]">
                     <Link to="/dashboard/new">
@@ -46,7 +41,8 @@ export function Categorias() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
+                       
+                            <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
                             <td className="border-0 rounded-[4px] py-2" data-label="código">01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="produto">Produto Modelo 01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="categoria">Conjunto</td>
@@ -63,6 +59,7 @@ export function Categorias() {
                                </button>
                             </td>
                         </tr>
+                       
                         <tr className="bg-white border border-solid text-[14px] border-zinc-5300 max-sm:text-[12px] max-sm:p-1">
                             <td className="border-0 rounded-[4px] py-2" data-label="código">01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="produto">Produto Modelo 01</td>
