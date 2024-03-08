@@ -7,9 +7,11 @@ import { New } from "./pages/dashboard/new";
 import { Categorias } from "./pages/dashboard/categorias"
 import { Login } from "./pages/login"; 
 import { Register } from "./pages/register";
+import { EditarCategoria } from "./pages/dashboard/categorias/editar-categoria";
 
 import { Layout } from "./components/layout";
 import { Private } from "./routes/Private";
+
 
 const router = createBrowserRouter([
   {
@@ -49,6 +51,10 @@ const router = createBrowserRouter([
   {
     path: "/dashboard/categorias",
     element: <Private><Categorias /></Private>
+  },
+  {
+    path: "/dashboard/categoria/editar-categoria",
+    element: <Private><EditarCategoria /></Private>
   }
 ])
 
