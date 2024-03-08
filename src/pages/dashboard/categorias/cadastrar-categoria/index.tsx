@@ -1,9 +1,9 @@
 import { HeaderDashboard } from "../../../../components/headerDashboard";
 import Title from "../../../../components/titleDahsboard";
-import { FaEdit, FaListAlt, FaUser } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-export function EditarCategoria() {
+export function CadastrarCategoria() {
   return (
     <div>
       <HeaderDashboard/>
