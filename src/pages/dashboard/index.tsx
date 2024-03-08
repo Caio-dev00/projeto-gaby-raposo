@@ -46,7 +46,7 @@ export function Dashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-white border border-solid text-[14px] border-zinc-500 max-sm:text-[12px] max-sm:p-1">
+                        <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
                             <td className="border-0 rounded-[4px] py-2" data-label="código">01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="produto">Produto Modelo 01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="categoria">Conjunto</td>
@@ -56,12 +56,14 @@ export function Dashboard() {
                                 <span className=" p-2 text-[12px] text-white rounded-full bg-green-500 max-sm:text-[10px]">ATIVO</span>
                             </td>
                             <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                <button>
-                                    <FiEdit2 size={15} color="#000" />
-                                </button>
+                               <button>
+                                    <Link to={`/dashboard/new:id`}>
+                                        <FiEdit2 size={15} color="#000" />
+                                    </Link>
+                               </button>
                             </td>
                         </tr>
-                        <tr className="bg-white border border-solid text-[14px] border-zinc-500 max-sm:text-[12px] max-sm:p-1">
+                        <tr className="bg-white border border-solid text-[14px] border-zinc-5300 max-sm:text-[12px] max-sm:p-1">
                             <td className="border-0 rounded-[4px] py-2" data-label="código">01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="produto">Produto Modelo 01</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="categoria">Conjunto</td>
@@ -72,7 +74,9 @@ export function Dashboard() {
                             </td>
                             <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                 <button>
-                                    <FiEdit2 size={15} color="#000" />
+                                    <Link to={`/dashboard/new:id`}>
+                                        <FiEdit2 size={15} color="#000" />
+                                    </Link>
                                 </button>
                             </td>
                         </tr>
