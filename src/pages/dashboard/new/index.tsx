@@ -16,7 +16,6 @@ export function New() {
             <FaListAlt size={25} color="#FFF" />
           </Title>
         </div>
-
     </div>
   )
 }
