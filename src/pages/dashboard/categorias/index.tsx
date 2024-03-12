@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react"
-import { db } from "../../../services/firebaseConnection"
-import { collection, doc, getDocs, limit, orderBy, query, where } from "firebase/firestore"
+import { useEffect, useState, useContext } from "react"
+import { db, storage } from "../../../services/firebaseConnection"
+import { collection, getDocs, orderBy, query, where, deleteDoc, doc } from "firebase/firestore"
+import { deleteObject, ref } from "firebase/storage" 
 
 import { HeaderDashboard } from "../../../components/headerDashboard"
 import Title from "../../../components/titleDahsboard"
@@ -9,16 +10,25 @@ import { Link } from "react-router-dom"
 import { FaUser } from "react-icons/fa"
 import { FiEdit2 } from "react-icons/fi"
 import { FaTrashCan } from "react-icons/fa6";
+import { AuthContext } from "../../../contexts/AuthContext"
 
 import '../dashboard.css'
 
 interface categoryProp {
     name: string
     owner: string,
-    id: string
+    id: string,
+    images: categoryImageProps[]
+}
+
+interface categoryImageProps {
+    uid: string,
+    name: string,
+    url: string,
 }
 
 export function Categorias() {
+    const {user} = useContext(AuthContext)
     const [category, setCategory] = useState<categoryProp[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(true);
@@ -30,7 +40,8 @@ export function Categorias() {
         loadCategories();
         handleSearch();
         return () => {}
-    }, [input])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, input])
 
     async function loadCategories() {
         const categoriesRef = collection(db, 'categorias')
@@ -44,7 +55,8 @@ export function Categorias() {
                listCategories.push({
                    id: doc.id,
                    name: doc.data().name,
-                   owner: doc.data().owner
+                   owner: doc.data().owner,
+                   images: doc.data().images
                 })
             })
             setLoading(false)
@@ -60,24 +72,47 @@ export function Categorias() {
 
         setCategory([]);
 
+
         const q = query(collection(db, "categorias"),
         where("name", ">=", input.toUpperCase()),
-        where("name", "<=", input.toUpperCase() + "\uf8ff")
+        where("name", "<=", input.toUpperCase() + "\uf8ff"),
+        where("uid", "==", user?.uid)
         )
-
-        const querySnapShot = await getDocs(q)
-
-        const listCategory= [] as categoryProp[];
+        getDocs(q)
+        .then((snapshot) => {
+            const listCategory= [] as categoryProp[];
     
-
-        querySnapShot.forEach((doc) => {
-            listCategory.push({
-                id: doc.id,
-                name: doc.data().name,
-                owner: doc.data().owner
+            snapshot.forEach(doc => {
+                listCategory.push({
+                    id: doc.id,
+                    name: doc.data().name,
+                    owner: doc.data().owner,
+                    images: doc.data().images
+                })
             })
+            setCategory(listCategory)
         })
-        setCategory(listCategory)
+      
+    }
+
+    async function handleDeleteCategory(item: categoryProp) {
+        const itemCategory = item;
+
+        const docRef = doc(db, "categorias", itemCategory.id)
+        await deleteDoc(docRef)
+
+        itemCategory.images.map( async (image) => {
+            const imagePath = `images/${image.uid}/${image.name}`
+            const imageRef = ref(storage, imagePath)
+
+            try{
+                await deleteObject(imageRef)
+                setCategory(category.filter(category => category.id !== itemCategory.id))
+            }catch(error){
+                console.log("ERROR AO DELETAR IMAGEM")
+                console.log(error)
+            }
+        })
     }
 
 
@@ -127,7 +162,7 @@ export function Categorias() {
                                             <Link to={`/dashboard/new:id`}>
                                                 <FiEdit2 size={17} color="#000" />
                                             </Link>
-                                            <button>
+                                            <button onClick={() => handleDeleteCategory(item)}>
                                                 <FaTrashCan size={17} color="#000" />
                                             </button>
                                         </div>

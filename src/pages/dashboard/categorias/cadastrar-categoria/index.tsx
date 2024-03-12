@@ -1,15 +1,21 @@
+import { useForm } from 'react-hook-form'
+import { ChangeEvent, useContext, useState } from "react";
 import { AuthContext } from "../../../../contexts/AuthContext";
-import { useContext } from "react";
-import { HeaderDashboard } from "../../../../components/headerDashboard";
-import Title from "../../../../components/titleDahsboard";
-import { FaEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../../../../services/firebaseConnection";
-import Input from "../../../../components/input";
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from 'react-hook-form'
+import { v4 as uuidV4 } from 'uuid';
+
+import { db, storage } from "../../../../services/firebaseConnection";
+import { addDoc, collection } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+
+import { FiUpload, FiTrash } from "react-icons/fi";
+import { FaEdit } from "react-icons/fa";
+
+import { HeaderDashboard } from "../../../../components/headerDashboard";
+import Title from "../../../../components/titleDahsboard";
+import Input from "../../../../components/input";
 
 const schema = z.object({
   name: z.string().min(1, "O campo é obrigatório"),
@@ -17,22 +23,32 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>
 
+interface ImageItemProps{
+  uid: string;
+  name: string;
+  previewUrl: string;
+  url: string;
+}
+
 export function CadastrarCategoria() {
   const { user } = useContext(AuthContext)
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: "onChange"
   })
+  const [categoryImage, setCategoryImage] = useState<ImageItemProps[]>([])
 
   function onSubmit(data: FormData) {
     addDoc(collection(db, "categorias"), {
-      name: data.name.toUpperCase(),
+      name: data.name.toLowerCase(),
       created: new Date(),
       owner: user?.name,
-      uid: user?.uid
+      uid: user?.uid,
+      images: categoryImage,
     })
     .then(() => {
       reset();
+      setCategoryImage([])
       console.log("CATEGORIA CADASTRADA COM SUCESSO!")
     })
     .catch((error) => {
@@ -40,6 +56,54 @@ export function CadastrarCategoria() {
     })
   }
 
+  async function handleFile(e: ChangeEvent<HTMLInputElement>){
+    if(e.target.files && e.target.files[0]){
+      const image = e.target.files[0]
+
+      if(image.type === "image/jpeg" || image.type === "image/png"){
+        await handleUpload(image)
+      }else{
+        alert("Envie uma imagem jpeg ou png")
+        return;
+      }
+    }
+  }
+
+  async function handleUpload(image: File) {
+    if(!user?.uid){
+      return;
+    }
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`)
+
+    uploadBytes(uploadRef, image)
+    .then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((downloadUrl) => {
+        const imageItem = {
+          name: uidImage,
+          uid: currentUid,
+          previewUrl: URL.createObjectURL(image),
+          url: downloadUrl
+        }
+        setCategoryImage((images) => [...images, imageItem])
+      })
+    })
+  }
+
+    async function handleDeleteImage(item: ImageItemProps){
+      const imagePath = `images/${item.uid}/${item.name}`;
+      const imageRef = ref(storage, imagePath)
+
+      try{
+        await deleteObject(imageRef)
+        setCategoryImage(categoryImage.filter((image) => image.url !== item.url))
+      }catch(error){
+        console.log("ERROR AO DELETAR")
+      }
+    }
 
   return (
     <div>
@@ -50,6 +114,34 @@ export function CadastrarCategoria() {
         <Title name="Cadastrar Categorias" >
           <FaEdit size={25} color="#FFF" />
         </Title>
+
+        <div className="w-full justify-center p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+          <button
+            className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
+            <div className="absolute cursor-pointer">
+              <FiUpload size={30} color="#000" />
+            </div>
+            <div className="cursor-pointer">
+              <input
+                className="opacity-0 cursor-pointer"
+                onChange={handleFile}
+                type="file"
+                accept="image/*" />
+            </div>
+          </button>
+
+          {categoryImage.map( item => (
+            <div className='w-[60px] h-[60px] flex items-center justify-center relative' key={item.name}>
+               <button className="absolute" onClick={()=> handleDeleteImage(item)}>
+                    <FiTrash size={28} color="#FFF"/>
+                  </button>
+                  <img 
+                  src={item.previewUrl}
+                  className="rounded-lg w-full h-[60px] object-fill"
+                  />
+            </div>
+          ))}
+        </div>
 
         <div className="mt-12">
           <form onSubmit={handleSubmit(onSubmit)} >
