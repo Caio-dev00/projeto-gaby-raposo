@@ -34,7 +34,7 @@ export function Categorias() {
 
     async function loadCategories() {
         const categoriesRef = collection(db, 'categorias')
-        const q = query(categoriesRef, orderBy('created', 'desc'), limit(5));
+        const q = query(categoriesRef, orderBy('created', 'desc'));
 
         await getDocs(q)
        .then((snapshot) => {
@@ -68,6 +68,7 @@ export function Categorias() {
         const querySnapShot = await getDocs(q)
 
         const listCategory= [] as categoryProp[];
+    
 
         querySnapShot.forEach((doc) => {
             listCategory.push({
