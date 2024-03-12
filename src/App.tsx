@@ -8,6 +8,7 @@ import { Categorias } from "./pages/dashboard/categorias"
 import { Login } from "./pages/login"; 
 import { Register } from "./pages/register";
 import { CadastrarCategoria } from "./pages/dashboard/categorias/cadastrar-categoria";
+import { Variacoes } from "./pages/dashboard/variacoes"
 
 import { Layout } from "./components/layout";
 import { Private } from "./routes/Private";
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
   {
     path: "/dashboard/categorias/cadastrar-categoria",
     element: <Private><CadastrarCategoria /></Private>
+  },
+  {
+    path: "/dashboard/variacoes",
+    element: <Private><Variacoes/></Private>
   }
 ])
 
