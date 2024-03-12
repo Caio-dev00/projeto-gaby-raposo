@@ -28,8 +28,9 @@ export function Categorias() {
 
     useEffect(() => {
         loadCategories();
+        handleSearch();
         return () => {}
-    }, [])
+    }, [input])
 
     async function loadCategories() {
         const categoriesRef = collection(db, 'categorias')
@@ -102,11 +103,7 @@ export function Categorias() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         />
-                    <button 
-                    onClick={handleSearch} 
-                    className="flex justify-center items-center w-[150px] h-[40px] float-right ml-2 bg-wine-black rounded-full max-sm:w-[100px] max-sm:h-[30px]">
-                        <span className="text-white text-[0.8rem] p-1 font-semibold max-sm:text-[11px]">Buscar</span>
-                    </button>    
+                     
                 </div>
                 <table className="w-full text-center border-solid border m-0 p-0 table-fixed border-collapse max-sm:border-0">
                     <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
