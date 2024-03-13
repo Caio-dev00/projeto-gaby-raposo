@@ -31,10 +31,6 @@ export function Categorias() {
     const {user} = useContext(AuthContext)
     const [category, setCategory] = useState<categoryProp[]>([]);
     const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [isEmpty, setIsEmpty] = useState(false);
-    const [lastDocs, setLastDocs] = useState();
-    const [loadingMore, setLoadingMore] = useState(false);
 
     useEffect(() => {
         loadCategories();
@@ -59,7 +55,6 @@ export function Categorias() {
                    images: doc.data().images
                 })
             })
-            setLoading(false)
             setCategory(listCategories)
         })
     }
@@ -141,37 +136,45 @@ export function Categorias() {
                         />
                      
                 </div>
+               <>
+               {category.length === 0 ? (
+                <div className="flex justify-center">
+                    <span>Nehuma categoria encontrada...</span>
+                </div>
+               ) : (
                 <table className="w-full text-center border-solid border m-0 p-0 table-fixed border-collapse max-sm:border-0">
-                    <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
-                        <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
-                            <th scope="col">Código</th>
-                            <th scope="col">Categoria</th>
-                            <th scope="col">Ações</th>
+                <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
+                    <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
+                        <th scope="col">Código</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+
+                {category.map(item => (
+                    <tbody key={item.id}>
+                        <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
+                            <td className="border-0 rounded-[4px] py-2" data-label="código">{item.id}</td>
+                            <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.name}</td>
+
+                            <td className="border-0 rounded-[4px] py-2" data-label="ações">
+                                <button>
+                                    <div className="flex gap-3">
+                                        <Link to={`/dashboard/new:id`}>
+                                            <FiEdit2 size={17} color="#000" />
+                                        </Link>
+                                        <button onClick={() => handleDeleteCategory(item)}>
+                                            <FaTrashCan size={17} color="#000" />
+                                        </button>
+                                    </div>
+                                </button>
+                            </td>
                         </tr>
-                    </thead>
-
-                    {category.map(item => (
-                        <tbody key={item.id}>
-                            <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
-                                <td className="border-0 rounded-[4px] py-2" data-label="código">{item.id}</td>
-                                <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.name}</td>
-
-                                <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                    <button>
-                                        <div className="flex gap-3">
-                                            <Link to={`/dashboard/new:id`}>
-                                                <FiEdit2 size={17} color="#000" />
-                                            </Link>
-                                            <button onClick={() => handleDeleteCategory(item)}>
-                                                <FaTrashCan size={17} color="#000" />
-                                            </button>
-                                        </div>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    ))}
-                </table>
+                    </tbody>
+                ))}
+            </table>
+               )}
+               </>
             </div>
         </div>
     )
