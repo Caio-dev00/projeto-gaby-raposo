@@ -31,10 +31,6 @@ export function Categorias() {
     const {user} = useContext(AuthContext)
     const [category, setCategory] = useState<categoryProp[]>([]);
     const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [isEmpty, setIsEmpty] = useState(false);
-    const [lastDocs, setLastDocs] = useState();
-    const [loadingMore, setLoadingMore] = useState(false);
 
     useEffect(() => {
         loadCategories();
@@ -59,7 +55,6 @@ export function Categorias() {
                    images: doc.data().images
                 })
             })
-            setLoading(false)
             setCategory(listCategories)
         })
     }
