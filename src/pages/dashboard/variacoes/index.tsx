@@ -13,16 +13,16 @@ export function Variacoes() {
                     <FaEdit size={25} color="#FFF" />
                 </Title>
 
-                <div className="flex justify-between py-1 px-40 max-md:ml-0">
-                    <button className="flex justify-center items-center w-[250px] h-[40px] float-right bg-wine-black rounded-full hover:scale-105 duration-300 max-sm:w-[180px]">
+                <div className="flex justify-around py-1 px-0">
+                    <button className="flex justify-center items-center w-36 h-10 float-right bg-wine-black rounded-full hover:scale-105 duration-300 sm:w-48 lg:w-56">
                         <Link to="#">
-                            <span className="text-white text-[0.8rem] p-1 font-semibold max-sm:text-[12px]">CADASTRAR TAMANHO</span>
+                            <span className="text-white text-[11px] font-semibold">CADASTRAR TAMANHO</span>
                         </Link>
                     </button> 
 
-                    <button className="flex justify-center items-center w-[250px] h-[40px] float-right bg-wine-black rounded-full hover:scale-105 duration-300 max-sm:w-[180px]">
+                    <button className="flex justify-center items-center w-36 h-10 float-right bg-wine-black rounded-full hover:scale-105 duration-300 sm:w-48 lg:w-56">
                         <Link to="#">
-                            <span className="text-white text-[0.8rem] p-1 font-semibold max-sm:text-[12px]">CADASTRAR COR</span>
+                            <span className="text-white text-[11px] font-semibold">CADASTRAR COR</span>
                         </Link>
                     </button>
                 </div>
