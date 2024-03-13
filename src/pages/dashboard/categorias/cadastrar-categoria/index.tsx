@@ -132,8 +132,9 @@ export function CadastrarCategoria() {
 
           {categoryImage.map( item => (
             <div className='w-[60px] h-[60px] flex items-center justify-center relative' key={item.name}>
-               <button className="absolute" onClick={()=> handleDeleteImage(item)}>
-                    <FiTrash size={28} color="#FFF"/>
+               <button className="flex absolute mt-24" onClick={()=> handleDeleteImage(item)}>
+                    
+                    <FiTrash size={15} color="#000"/>
                   </button>
                   <img 
                   src={item.previewUrl}
