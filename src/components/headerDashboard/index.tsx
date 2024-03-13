@@ -20,19 +20,19 @@ export function HeaderDashboard() {
         <hr className='w-[250px] border-white my-1'></hr>
       </div>
 
-      <div className="flex flex-col justify-start pt-8 pl-2 max-md:items-center max-md:pl-0">
+      <div className="flex flex-col justify-center pt-8 pl-2 max-md:items-center max-md:pl-0">
           <span className="font-semibold text-white">PRODUTOS</span>
-          <Link to='/dashboard' className="mb-0.5 pl-4 text-white">
+          <Link to='/dashboard' className="mb-0.5 text-white md:pl-3">
             Lista de produtos
           </Link>
-          <Link to='/dashboard/categorias' className="mb-0.5 pl-4 text-white">
+          <Link to='/dashboard/categorias' className="mb-0.5 text-white md:pl-3">
             Categorias
           </Link>
-          <Link to="/dashboard/variacoes" className="mb-0.5 pl-4 text-white">
+          <Link to="/dashboard/variacoes" className="mb-0.5 text-white md:pl-3">
             Variações
           </Link>
           <span className="font-semibold text-white mt-2">MARKETING</span>
-          <Link to='/dashboard/banners' className="mb-0.5 pl-4 text-white">
+          <Link to='/dashboard/banners' className="mb-0.5 text-white md:pl-3">
             Banners
           </Link>
       </div>
