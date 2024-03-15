@@ -15,7 +15,7 @@ export function Variacoes() {
 
                 <div className="flex justify-around py-1 px-0">
                     <button className="flex justify-center items-center w-36 h-10 float-right bg-wine-black rounded-full hover:scale-105 duration-300 sm:w-48 lg:w-56">
-                        <Link to="#">
+                        <Link to="/src/components/variacoes-tamanho">
                             <span className="text-white text-[11px] font-semibold">CADASTRAR TAMANHO</span>
                         </Link>
                     </button> 
