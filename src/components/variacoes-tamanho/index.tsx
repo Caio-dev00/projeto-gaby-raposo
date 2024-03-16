@@ -9,6 +9,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
+import { Link } from "react-router-dom";
 
 const schema = z.object({
     tamanho: z.string().min(0, "Digite o tamanho corretamente !")
@@ -58,8 +59,15 @@ export function CadastrarTamanho() {
                             error={errors.tamanho?.message}
                             type="text"
                         />
+                        <div className="flex w-full justify-around mt-10 px-32">
+                            <button className="bg-inherit border-2 rounded-2xl p-2 border-wine-light text-wine-black font-semibold hover:bg-wine-black hover:bg-opacity-15">
+                                <Link to="/src/pages/dashboard/variacoes">
+                                    <span>Voltar e Fechar</span>
+                                </Link>
+                            </button>
+                            <button type="submit" className="bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90 hover:drop-shadow-lg">Salvar Variação</button>
+                        </div>
                     </form>
-                
                 </div>
 
                 
