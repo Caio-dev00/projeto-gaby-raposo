@@ -1,14 +1,14 @@
-import { HeaderDashboard } from "../headerDashboard";
-import Title from "../titleDahsboard";
+import { HeaderDashboard } from "../../../../components/headerDashboard";
+import Title from "../../../../components/titleDahsboard";
 import { FaEdit } from "react-icons/fa";
-import Input from "../input";
+import Input from "../../../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useContext } from "react";
-import { AuthContext } from "../../contexts/AuthContext";
+import { AuthContext } from "../../../../contexts/AuthContext";
 import { addDoc, collection } from "firebase/firestore";
-import { db } from "../../services/firebaseConnection";
+import { db } from "../../../../services/firebaseConnection";
 import { Link } from "react-router-dom";
 
 const schema = z.object({
@@ -61,7 +61,7 @@ export function CadastrarTamanho() {
                         />
                         <div className="flex w-full justify-around mt-10 px-32">
                             <button className="bg-inherit border-2 rounded-2xl p-2 border-wine-light text-wine-black font-semibold hover:bg-wine-black hover:bg-opacity-15">
-                                <Link to="/src/pages/dashboard/variacoes">
+                                <Link to="/dashboard/variacoes">
                                     <span>Voltar e Fechar</span>
                                 </Link>
                             </button>
