@@ -1,29 +1,53 @@
-import { useEffect, useState } from 'react';
+import { AuthContext } from '../../../contexts/AuthContext';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
-
+import { v4 as uuidV4 } from 'uuid';
 import { FaListAlt } from "react-icons/fa";
+
+import { addDoc, collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { db, storage } from '../../../services/firebaseConnection';
+import { useParams } from 'react-router-dom';
 
 import { HeaderDashboard } from "../../../components/headerDashboard";
 import Input from "../../../components/input";
 import Title from "../../../components/titleDahsboard";
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
-import { db } from '../../../services/firebaseConnection';
-import { useParams } from 'react-router-dom';
 
-const schema = z.object({
-  name: z.string().min(1,"O campo é obrigatorio!"),
-  price: z.string().min(1, "O campo é obrigatorio!"),
-  description: z.string().min(1,"O campo é obrigatorio!")
-})
-
-type FormData = z.infer<typeof schema>
+import { FiTrash, FiUpload } from 'react-icons/fi';
 
 interface categoryProps {
   name: string
   id: string,
 }
+
+interface colorProps {
+  name: string
+  id: string,
+}
+
+interface sizeProps {
+  name: string
+  id: string,
+}
+
+interface ImageItemProps{
+  uid: string;
+  name: string;
+  previewUrl: string;
+  url: string;
+}
+
+
+const schema = z.object({
+  name: z.string().min(1, "O campo é obrigatorio!"),
+  price: z.string().min(1, "O campo é obrigatorio!"),
+  description: z.string().min(1, "O campo é obrigatorio!"),
+  storage: z.number(),
+})
+
+type FormData = z.infer<typeof schema>
 
 const listRef = collection(db, "categorias")
 
@@ -31,95 +55,266 @@ export function New() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: "onChange"
-    })
-
+  })
+  
   const { id } = useParams();
+  const {user} = useContext(AuthContext)
   const [category, setCategory] = useState<categoryProps[]>([])
+  const [color, setColor] = useState<colorProps[]>([])
+  const [size, setSize] = useState<sizeProps[]>([])
+
   const [loadCategory, setLoadCategory] = useState(true)
+  const [loadColor, setLoadColor] = useState(true)
+  const [loadSize, setLoadSize] = useState(true)
+
   const [categorySelected, setCategorySelected] = useState(0)
+  const [colorSelected, setColorSelected] = useState(0)
+  const [sizeSelected, setSizeSelected] = useState(0)
+
+  const [productImage, setProductImage] = useState<ImageItemProps[]>([])
+
+  function onSubmit(data: FormData) {
+    addDoc(collection(db, "Produtos"), {
+      name: data.name.toLowerCase(),
+      created: new Date(),
+      owner: user?.name,
+      uid: user?.uid,
+      images: productImage,
+    })
+    .then(() => {
+      reset();
+      setProductImage([])
+      console.log("CATEGORIA CADASTRADA COM SUCESSO!")
+    })
+    .catch((error) => {
+      console.error("ERRO AO CADASTRAR CATEGORIA", error)
+    })
+  }
+
+  async function handleFile(e: ChangeEvent<HTMLInputElement>){
+    if(e.target.files && e.target.files[0]){
+      const image = e.target.files[0]
+
+      if(image.type === "image/jpeg" || image.type === "image/png"){
+        await handleUpload(image)
+      }else{
+        alert("Envie uma imagem jpeg ou png")
+        return;
+      }
+    }
+  }
+
+  async function handleUpload(image: File) {
+    if(!user?.uid){
+      return;
+    }
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`)
+
+    uploadBytes(uploadRef, image)
+    .then((snapshot) => {
+      getDownloadURL(snapshot.ref).then((downloadUrl) => {
+        const imageItem = {
+          name: uidImage,
+          uid: currentUid,
+          previewUrl: URL.createObjectURL(image),
+          url: downloadUrl
+        }
+        setProductImage((images) => [...images, imageItem])
+      })
+    })
+  }
+
+    async function handleDeleteImage(item: ImageItemProps){
+      const imagePath = `images/${item.uid}/${item.name}`;
+      const imageRef = ref(storage, imagePath)
+
+      try{
+        await deleteObject(imageRef)
+        setProductImage(productImage.filter((image) => image.url !== item.url))
+      }catch(error){
+        console.log("ERROR AO DELETAR")
+      }
+    }
 
 
   useEffect(() => {
-
-    async function loadCatagory(){
+    async function loadCatagory() {
       const querySnapshot = await getDocs(listRef)
-      .then( (snapshot) => {
-        const lista =[];
+        .then((snapshot) => {
+          const lista = [];
 
-        snapshot.forEach((doc) => {
-          lista.push({
-            id: doc.id,
-            name: doc.data().name
+          snapshot.forEach((doc) => {
+            lista.push({
+              id: doc.id,
+              name: doc.data().name
+            })
           })
-        })
 
-        if(snapshot.docs.size === 0){
-          console.log("NENHUMA CATEGORIA ENCONTRADA");
-          setCategory([ {id: '1', name: "FREELA"}])
+          if (snapshot.docs.size === 0) {
+            console.log("NENHUMA CATEGORIA ENCONTRADA");
+            setCategory([{ id: '1', name: "FREELA" }])
+            setLoadCategory(false)
+            return;
+
+          }
+
+          setCategory(lista)
           setLoadCategory(false)
-          return;
-
-        }
-
-        setCategory(lista)
-        setLoadCategory(false)
-      })
-      .catch( (error) => {
-        console.log("ERRO AO BUSCAR OS CLIENTES", error);
-        setLoadCategory(false);
-        setCategory([ {id: '1', name: 'FREELA'} ])
-    })
+        })
+        .catch((error) => {
+          console.log("ERRO AO BUSCAR OS CLIENTES", error);
+          setLoadCategory(false);
+          setCategory([{ id: '1', name: 'FREELA' }])
+        })
     }
     loadCatagory();
-  },[])
+  }, [])
 
-  function handleChangeCategory(e){
+
+
+  function handleChangeCategory(e) {
     setCategorySelected(e.target.value);
-}
+  }
+  function handleChangeColor(e) {
+    setColorSelected(e.target.value);
+  }
+  function handleChangeSize(e) {
+    setSizeSelected(e.target.value);
+  }
 
   return (
     <div>
-      <HeaderDashboard/>
+      <HeaderDashboard />
 
-      
-      <div className="ml-[300px] pt-[1px] px-[16px]">
-          <Title name={"Cadastrar Produto"}>
-            <FaListAlt size={25} color="#FFF" />
-          </Title>
 
-          <div className='bg-white p-10 rounded-md shadow-md'>
-            <form className='flex flex-col'>
-              <label>Nome do Produto</label>
+      <div className="ml-[300px] pt-[1px] px-[16px] max-md:ml-0">
+        <Title name={"Cadastrar Produto"}>
+          <FaListAlt size={25} color="#FFF" />
+        </Title>
+
+        <div className='bg-white p-10 rounded-md shadow-md'>
+        <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+        <button
+            className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
+            <div className="absolute cursor-pointer">
+              <FiUpload size={30} color="#000" />
+            </div>
+            <div className="cursor-pointer">
+              <input
+                className="opacity-0 cursor-pointer"
+                onChange={handleFile}
+                type="file"
+                accept="image/*" />
+            </div>
+          </button>
+
+          {productImage.map( item => (
+            <div className='w-full h-32 flex items-center justify-center relative' key={item.name}>
+               <button className="absolute" onClick={()=> handleDeleteImage(item)}>
+                    
+                    <FiTrash size={24} color="#FFF"/>
+                  </button>
+                  <img 
+                  src={item.previewUrl}
+                  className="rounded-lg w-full h-32 object-cover"
+                  />
+            </div>
+          ))}
+        </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col'>
+            <label>Nome do Produto:</label>
+            <Input
+              placeholder=""
+              name='name'
+              type='text'
+              error={errors.name?.message}
+              register={register}
+            />
+            <div className='flex flex-col w-full'>
+              <label className='mt-4'>Selecione a Categoria</label>
+              {
+                loadCategory ? (
+                  <input type="text" disabled={true} value="Carregando..." />
+                ) : (
+                  <select
+                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                    value={categorySelected}
+                    onChange={handleChangeCategory}>
+                    {category.map((item, index) => {
+                      return (
+                        <option key={index} value={index}>
+                          {item.name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                )
+              }
+              <label>Preço:</label>
               <Input
-                placeholder=""
-                name='name'
+                placeholder="ex: 99,90"
+                name='price'
                 type='text'
-                error={errors.name?.message}
+                error={errors.price?.message}
                 register={register}
               />
+            </div>
+        
+            <h1 className='my-5 text-xl font-semibold'>Variação do Produto:</h1>
 
-              <label className='mt-2'> Categoria </label>
-            {
-              loadCategory ? (
-                <input type="text" disabled={true} value="Carregando..." />
-              ): (
-                <select 
-                className='w-full max-w-44 border border-black py-1 rounded-md mb-2' 
-                value={categorySelected} 
-                onChange={handleChangeCategory}>
-                  {category.map((item, index) => {
-                    return(
-                      <option key={index} value={index}>
-                          {item.name}
-                      </option>
-                    )
-                  })}
-                </select>
-              )
-            }
-            </form>
-          </div>
+               {/* ---SELECIONE A COR--- */}
+            <label>Selecione a cor</label>
+              {
+                loadColor ? (
+                  <input type="text" disabled={true} value="Carregando..." />
+                ) : (
+                  <select
+                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                    value={colorSelected}
+                    onChange={handleChangeColor}>
+                    {category.map((item, index) => {
+                      return (
+                        <option key={index} value={index}>
+                          {item.name}   
+                        </option>
+                      )
+                    })}
+                  </select>
+                )
+              }
+
+              {/* ---TAMANHO--- */}
+
+              <label className='mt-4'>Selecione o Tamanho</label>
+              {
+                loadSize ? (
+                  <input type="text" disabled={true} value="Carregando..." />
+                ) : (
+                  <select
+                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                    value={sizeSelected}
+                    onChange={handleChangeSize}>
+                    {category.map((item, index) => {
+                      return (
+                        <option key={index} value={index}>
+                          {item.name}   
+                        </option>
+                      )
+                    })}
+                  </select>
+                )
+              }
+              <button className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
+                <span className='text-white font-bold'>Cadastrar Produto</span>
+              </button>
+          </form>
         </div>
+      </div>
     </div>
   )
 }
