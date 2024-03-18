@@ -18,7 +18,7 @@ interface tamanhoProps {
 
 export function Variacoes() {
 
-    const { user } = useContext(AuthContext)
+    const {user} = useContext(AuthContext)
     const [tamanho, setTamanho] = useState<tamanhoProps[]>([])
 
     useEffect(() => {
@@ -61,7 +61,7 @@ export function Variacoes() {
                     </button>
 
                     <button className="flex justify-center items-center w-36 h-10 float-right bg-wine-black rounded-full hover:scale-105 duration-300 sm:w-48 lg:w-56">
-                        <Link to="#">
+                        <Link to="/dashboard/variacoes/variacoes-cor">
                             <span className="text-white text-[11px] font-semibold">CADASTRAR COR</span>
                         </Link>
                     </button>
