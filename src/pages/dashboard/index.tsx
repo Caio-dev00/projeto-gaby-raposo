@@ -57,7 +57,7 @@ export function Dashboard() {
                             </td>
                             <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                <button>
-                                    <Link to={`/dashboard/new:id`}>
+                                    <Link to={`/dashboard/new/:id`}>
                                         <FiEdit2 size={15} color="#000" />
                                     </Link>
                                </button>
@@ -74,7 +74,7 @@ export function Dashboard() {
                             </td>
                             <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                 <button>
-                                    <Link to={`/dashboard/new:id`}>
+                                    <Link to={`/dashboard/new/:id`}>
                                         <FiEdit2 size={15} color="#000" />
                                     </Link>
                                 </button>

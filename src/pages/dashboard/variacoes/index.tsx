@@ -40,14 +40,6 @@ export function Variacoes() {
                 </div>
 
             </div>
-
-
-
-
-
-
-
-
         </div>
 
     )

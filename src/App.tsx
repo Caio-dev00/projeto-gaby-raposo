@@ -47,7 +47,7 @@ const router = createBrowserRouter([
     element: <Private><New /></Private>
   },
   {
-    path: "/dashboard/new:id",
+    path: "/dashboard/new/:id",
     element: <Private><New /></Private>
   },
   {
@@ -56,6 +56,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard/categorias/cadastrar-categoria",
+    element: <Private><CadastrarCategoria /></Private>
+  },
+  {
+    path: "/dashboard/categorias/cadastrar-categoria/:id",
     element: <Private><CadastrarCategoria /></Private>
   },
   {

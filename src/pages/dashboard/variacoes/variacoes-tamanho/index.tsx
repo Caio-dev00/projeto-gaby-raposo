@@ -69,8 +69,6 @@ export function CadastrarTamanho() {
                         </div>
                     </form>
                 </div>
-
-                
             </div>
         </div>
     )

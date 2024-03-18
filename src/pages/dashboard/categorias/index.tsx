@@ -8,14 +8,13 @@ import Title from "../../../components/titleDahsboard"
 import { Link } from "react-router-dom"
 
 import { FaUser } from "react-icons/fa"
-import { FiEdit2 } from "react-icons/fi"
 import { FaTrashCan } from "react-icons/fa6";
 import { AuthContext } from "../../../contexts/AuthContext"
 
 import '../dashboard.css'
 
 interface categoryProp {
-    name: string
+    name: string,
     owner: string,
     id: string,
     images: categoryImageProps[]
@@ -151,8 +150,8 @@ export function Categorias() {
                     </tr>
                 </thead>
 
-                {category.map(item => (
-                    <tbody key={item.id}>
+                {category.map((item, index) => (
+                    <tbody key={index}>
                         <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
                             <td className="border-0 rounded-[4px] py-2" data-label="código">{item.id}</td>
                             <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.name}</td>
@@ -160,9 +159,6 @@ export function Categorias() {
                             <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                 <button>
                                     <div className="flex gap-3">
-                                        <Link to={`/dashboard/new:id`}>
-                                            <FiEdit2 size={17} color="#000" />
-                                        </Link>
                                         <button onClick={() => handleDeleteCategory(item)}>
                                             <FaTrashCan size={17} color="#000" />
                                         </button>
