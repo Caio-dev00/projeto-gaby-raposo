@@ -28,7 +28,7 @@ export function CadastrarTamanho() {
     })
     function onSubmit(data: FormData) {
         addDoc(collection(db,"Tamanho"), {
-            tamanho: data.tamanho.toLowerCase(),
+            tamanho: data.tamanho.toUpperCase(),
             created: new Date (),
             owner: user?.name,
             uid: user?.uid,
