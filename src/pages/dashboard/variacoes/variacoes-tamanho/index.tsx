@@ -35,7 +35,7 @@ export function CadastrarTamanho() {
         })
         .then(() => {
             reset();
-            console.log("TAMANHA CADASTRADO COM SUCESSO")
+            console.log("TAMANHO CADASTRADO COM SUCESSO")
         })
         .catch((error) => {
             console.error("ERRO AO CADASTRAR VARIAÇÃO", error)

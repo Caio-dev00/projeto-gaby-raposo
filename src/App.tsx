@@ -8,8 +8,9 @@ import { Categorias } from "./pages/dashboard/categorias"
 import { Login } from "./pages/login"; 
 import { Register } from "./pages/register";
 import { CadastrarCategoria } from "./pages/dashboard/categorias/cadastrar-categoria";
-import { Variacoes } from "./pages/dashboard/variacoes"
+import { Variacoes } from "./pages/dashboard/variacoes";
 import { CadastrarTamanho } from "./pages/dashboard/variacoes/variacoes-tamanho";
+import { CadastrarCor } from "./pages/dashboard/variacoes/variacoes-cor";
 
 import { Layout } from "./components/layout";
 import { Private } from "./routes/Private";
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
   {
     path: "/dashboard/variacoes/variacoes-tamanho",
     element: <Private><CadastrarTamanho/></Private>
+  },
+  {
+    path: "/dashboard/variacoes/variacoes-cor",
+    element: <Private><CadastrarCor/></Private>
   }
 ])
 
