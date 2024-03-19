@@ -12,13 +12,10 @@ import { db } from "../../../../services/firebaseConnection";
 import { Link } from "react-router-dom";
 
 const schema = z.object({
-    tamanho: z.string().min(0, "Digite o tamanho corretamente !")
+    tamanho: z.string().min(1, "Digite o tamanho corretamente !")
 })
 
 type FormData = z.infer<typeof  schema>
-
-
-
 
 export function CadastrarTamanho() {
     const { user } = useContext (AuthContext)
