@@ -39,7 +39,7 @@ export function CadastrarCor() {
     const [categoryImage, setCategoryImage] = useState<ImageItemProps[]>([])
 
     function onSubmit(data: FormData) {
-        addDoc(collection(db, "Tamanho"), {
+        addDoc(collection(db, "Cores"), {
             cor: data.cor.toUpperCase(),
             created: new Date(),
             owner: user?.name,

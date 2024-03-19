@@ -27,8 +27,17 @@ export function Home() {
   }
 
   const settings2: SwiperProps = {
-    spaceBetween: 10,
-    slidesPerView: 8
+    breakpoints: {
+      768: {
+        slidesPerView: 8,
+        spaceBetween: 40,
+      },
+      200: {
+        slidesPerView: 5
+      }
+
+    }
+    
   }
 
   const [isOpen, setIsOpen] = useState<boolean[]>([])
@@ -80,8 +89,8 @@ export function Home() {
         </Slider>
       </div>
 
-      <div className="mt-20 max-md:mt-10 mb-[-90px]">
-        <h1 className="text-center font-extrabold text-xl max-md:text-lg">CATEGORIAS</h1>
+      <div className="mt-20 mb-[-90px]">
+        <h1 className="text-center font-extrabold text-xl max-md:text-lg max-md:mt-[-50px] max-md:mb-[-50px]">CATEGORIAS</h1>
         <div className="overflow-x">
 
           <Slider settings={settings2}>
@@ -99,11 +108,11 @@ export function Home() {
                 {
                   
                   <button onClick={() => toggleCategory(index)} className=" w-full flex items-center justify-center tracking-wider active:text-salmon duration-300 max-md:text-[0.8rem]">
-                    <span className="text-[0.9rem]">{item.name}</span>
+                    <span className="text-[0.9rem] max-md:text-[0.9em]">{item.name}</span>
                     {isOpen[index] ? (
-                      <AiOutlineCaretDown className="h-8" />
+                      <AiOutlineCaretDown className="h-5" />
                       ) : (
-                        <AiOutlineCaretUp className="h-8" />
+                        <AiOutlineCaretUp className="h-5" />
                     )}
                   </button>
 
@@ -112,8 +121,8 @@ export function Home() {
 
                 {isOpen[index] && (
                   <div>
-                    <div className="w-full flex hover:bg-salmon rounded-lg">
-                      <h3 className="text-black cursor-pointer">{item.name}</h3>
+                    <div className="w-full flex hover:bg-salmon rounded-lg ">
+                      <h3 className="text-black cursor-pointer max-md:text-[0.7em]">{item.name}</h3>
                     </div>
                   </div>
 
