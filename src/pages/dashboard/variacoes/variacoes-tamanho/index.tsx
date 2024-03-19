@@ -17,9 +17,6 @@ const schema = z.object({
 
 type FormData = z.infer<typeof  schema>
 
-
-
-
 export function CadastrarTamanho() {
     const { user } = useContext (AuthContext)
     const { register, handleSubmit, formState: { errors}, reset} = useForm<FormData>({

@@ -39,7 +39,7 @@ export function CadastrarCor() {
     const [categoryImage, setCategoryImage] = useState<ImageItemProps[]>([])
 
     function onSubmit(data: FormData) {
-        addDoc(collection(db, "Tamanho"), {
+        addDoc(collection(db, "Cores"), {
             cor: data.cor.toUpperCase(),
             created: new Date(),
             owner: user?.name,
@@ -99,8 +99,9 @@ export function CadastrarCor() {
         try{
             await deleteObject(imageRef)
             setCategoryImage(categoryImage.filter((image) => image.url !== item.url))
+            alert("COR CADASTRADA COM SUCESSO")
         }catch(error){
-            console.log("ERRO AO DELETAR")
+            alert("ERRO AO DELETAR")
         }
     }
     return (
