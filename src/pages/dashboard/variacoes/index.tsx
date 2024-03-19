@@ -5,9 +5,10 @@ import { Link } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
-import { db } from "../../../services/firebaseConnection";
+import { db, storage } from "../../../services/firebaseConnection";
 import { FaTrashCan } from "react-icons/fa6";
 import { FiEdit2 } from "react-icons/fi";
+import { deleteObject, ref } from "firebase/storage";
 
 interface tamanhoProps {
     uid: string,
@@ -73,6 +74,7 @@ export function Variacoes() {
             }
             )
     }
+
     return (
         <div>
             <HeaderDashboard />
