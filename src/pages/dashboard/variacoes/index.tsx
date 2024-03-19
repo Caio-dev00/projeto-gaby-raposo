@@ -4,7 +4,7 @@ import { FaEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
-import { collection, doc, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../../../services/firebaseConnection";
 import { FaTrashCan } from "react-icons/fa6";
 import { FiEdit2 } from "react-icons/fi";
@@ -48,6 +48,31 @@ export function Variacoes() {
             }
             )
     }
+
+    const [cores, setCores] = useState<coresProps[]>([])
+
+    useEffect(() => {
+        loadCores()
+    })
+
+    async function loadCores() {
+        const coresRef = collection(db, "Cores")
+        const q = query(coresRef, orderBy("created", "desc"))
+
+        await getDocs(q)
+            .then((snapshot) => {
+                const listaCores = [] as coresProps[]
+                snapshot.forEach(doc => {
+                    listaCores.push({
+                        uid: doc.id,
+                        name: doc.data().cor,
+                        owner: doc.data().owner
+                    })
+                    setCores(listaCores)
+                })
+            }
+            )
+    }
     return (
         <div>
             <HeaderDashboard />
@@ -87,20 +112,20 @@ export function Variacoes() {
                                     <td className="border-0 rounded-[4px] py-2" data-label="nome">{item.name}</td>
                                     <td className="border-0 rounded-[4px] py-2" data-label="tipo da variacao">Tamanho</td>
 
-                                <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                    <button>
-                                        <div className="flex gap-3">
-                                            <Link to={`/dashboard/new:id`}>
-                                                <FiEdit2 size={17} color="#000" />
-                                            </Link>
-                                            <button>
-                                                <FaTrashCan size={17} color="#000" />
-                                            </button>
-                                        </div>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
+                                    <td className="border-0 rounded-[4px] py-2" data-label="ações">
+                                        <button>
+                                            <div className="flex gap-3">
+                                                <Link to={`/dashboard/new:id`}>
+                                                    <FiEdit2 size={17} color="#000" />
+                                                </Link>
+                                                <button>
+                                                    <FaTrashCan size={17} color="#000" />
+                                                </button>
+                                            </div>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
                         ))}
                     </table>
                 </div>
