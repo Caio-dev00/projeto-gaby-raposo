@@ -8,7 +8,6 @@ import './dashboard.css'
 
 
 export function Dashboard() {
-
     return (
         <div>
             <HeaderDashboard />

@@ -11,9 +11,11 @@ import { FaUser } from "react-icons/fa"
 import { FaTrashCan } from "react-icons/fa6";
 import { AuthContext } from "../../../contexts/AuthContext"
 
+
+
 import '../dashboard.css'
 
-interface categoryProp {
+export interface categoryProp {
     name: string,
     owner: string,
     id: string,

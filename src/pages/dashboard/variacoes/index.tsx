@@ -4,7 +4,7 @@ import { FaEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
-import { collection, doc, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "../../../services/firebaseConnection";
 import { FaTrashCan } from "react-icons/fa6";
 import { FiEdit2 } from "react-icons/fi";
@@ -23,11 +23,10 @@ export function Variacoes() {
 
     useEffect(() => {
         loadTamanhos()
-
-    }, [])
+    }, [user])
 
     async function loadTamanhos() {
-        const tamanhosRef = collection(db, "Tamanho")
+        const tamanhosRef = collection(db, "Tamanhos")
         const q = query(tamanhosRef, orderBy("created", "desc"))
 
         await getDocs(q)
@@ -44,6 +43,24 @@ export function Variacoes() {
             }
             )
     }
+
+    async function handleDeleteTamanho(item: tamanhoProps){
+        const itemTamanho = item;
+
+        const docRef = doc(db, "Tamanhos", itemTamanho.uid)
+        await deleteDoc(docRef)
+        .then(() => {
+            setTamanho(tamanho.filter(tamanho => tamanho.uid !== itemTamanho.uid))
+            console.log("Deletado com sucesso")
+
+        })
+        .catch((error) => {
+            console.error(error, "Erro ao deletar arquivo")
+        })
+
+    }
+
+   
     return (
         <div>
             <HeaderDashboard />
@@ -88,7 +105,7 @@ export function Variacoes() {
                                             <Link to={`/dashboard/new:id`}>
                                                 <FiEdit2 size={17} color="#000" />
                                             </Link>
-                                            <button>
+                                            <button onClick={() => handleDeleteTamanho(item)}>
                                                 <FaTrashCan size={17} color="#000" />
                                             </button>
                                         </div>
