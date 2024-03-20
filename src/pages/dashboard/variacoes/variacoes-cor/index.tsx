@@ -99,9 +99,8 @@ export function CadastrarCor() {
         try{
             await deleteObject(imageRef)
             setCategoryImage(categoryImage.filter((image) => image.url !== item.url))
-            alert("COR CADASTRADA COM SUCESSO")
         }catch(error){
-            alert("ERRO AO DELETAR")
+            console.log("ERRO AO DELETAR", error)
         }
     }
     return (
