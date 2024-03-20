@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { ChangeEvent, useContext, useState } from "react";
 import { AuthContext } from "../../../../contexts/AuthContext";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { v4 as uuidV4 } from 'uuid';
@@ -32,6 +32,8 @@ interface ImageItemProps {
 
 export function CadastrarCategoria() {
   const { id } = useParams();
+  
+
   const { user } = useContext(AuthContext)
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -106,6 +108,11 @@ export function CadastrarCategoria() {
     }
   }
 
+
+  function handleEditCategory(){
+    alert("Teste")
+  }
+
   return (
     <div>
       <HeaderDashboard />
@@ -166,7 +173,11 @@ export function CadastrarCategoria() {
                   </Link>
                 </button>
               </div>
-              <button type="submit" className="bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Salvar Categoria</button>
+             {id ? (
+               <button type="submit" className="bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Editar Categoria</button>
+             ): (
+              <button onClick={handleEditCategory} className="bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Salvar Categoria</button>
+             )}
             </div>
           </form>
         </div>
