@@ -4,7 +4,7 @@ import { FaEdit } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
-import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { db, storage } from "../../../services/firebaseConnection";
 import { FaTrashCan } from "react-icons/fa6";
 import { FiEdit2 } from "react-icons/fi";
