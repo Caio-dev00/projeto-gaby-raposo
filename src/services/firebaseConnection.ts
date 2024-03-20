@@ -5,13 +5,13 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAzJGrL2vj1BI3_yrH3yDoKJiCwtrk2hjc",
-  authDomain: "gabiraposo.firebaseapp.com",
-  projectId: "gabiraposo",
-  storageBucket: "gabiraposo.appspot.com",
-  messagingSenderId: "987227765581",
-  appId: "1:987227765581:web:a19b3f2dfdf4f0e0b8d504",
-  measurementId: "G-3PBCGZHLEC"
+  apiKey: "AIzaSyCV3aRIAVQc275wT1ZYHv_Nk0YuH4R676c",
+  authDomain: "gabiraposo2.firebaseapp.com",
+  projectId: "gabiraposo2",
+  storageBucket: "gabiraposo2.appspot.com",
+  messagingSenderId: "157437268774",
+  appId: "1:157437268774:web:c578ba5d66a2f4a31527e7",
+  measurementId: "G-W2FEEYYGHF"
 };
 
 
