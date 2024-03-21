@@ -72,9 +72,17 @@ const router = createBrowserRouter([
     element: <Private><CadastrarTamanho/></Private>
   },
   {
+    path: "/dashboard/variacoes/variacoes-tamanho/:id",
+    element: <Private><CadastrarTamanho/></Private>
+  },
+  {
     path: "/dashboard/variacoes/variacoes-cor",
     element: <Private><CadastrarCor/></Private>
-  }
+  },
+  {
+    path: "/dashboard/variacoes/variacoes-cor/:id",
+    element: <Private><CadastrarCor/></Private>
+  },
 ])
 
 export { router }

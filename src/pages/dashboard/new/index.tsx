@@ -6,16 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { v4 as uuidV4 } from 'uuid';
 import { FaListAlt } from "react-icons/fa";
 
-import { addDoc, collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '../../../services/firebaseConnection';
-import { useParams } from 'react-router-dom';
 
 import { HeaderDashboard } from "../../../components/headerDashboard";
 import Input from "../../../components/input";
 import Title from "../../../components/titleDahsboard";
 
 import { FiTrash, FiUpload } from 'react-icons/fi';
+import { coresProps, tamanhoProps } from '../variacoes';
 
 interface categoryProps {
   name: string
@@ -50,6 +50,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const listRef = collection(db, "categorias")
+const listCoresRef = collection(db, "Cores")
+const listTamanhoRef = collection(db, "Tamanhos")
 
 export function New() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
@@ -57,7 +59,6 @@ export function New() {
     mode: "onChange"
   })
   
-  const { id } = useParams();
   const {user} = useContext(AuthContext)
   const [category, setCategory] = useState<categoryProps[]>([])
   const [color, setColor] = useState<colorProps[]>([])
@@ -70,6 +71,7 @@ export function New() {
   const [categorySelected, setCategorySelected] = useState(0)
   const [colorSelected, setColorSelected] = useState(0)
   const [sizeSelected, setSizeSelected] = useState(0)
+  const [statusSelected, setStatusSelected] = useState(0)
 
   const [productImage, setProductImage] = useState<ImageItemProps[]>([])
 
@@ -84,10 +86,10 @@ export function New() {
     .then(() => {
       reset();
       setProductImage([])
-      console.log("CATEGORIA CADASTRADA COM SUCESSO!")
+      console.log("PRODUTO COM SUCESSO!")
     })
     .catch((error) => {
-      console.error("ERRO AO CADASTRAR CATEGORIA", error)
+      console.error("ERRO AO CADASTRAR PRODUTO", error)
     })
   }
 
@@ -142,10 +144,10 @@ export function New() {
 
 
   useEffect(() => {
-    async function loadCatagory() {
-      const querySnapshot = await getDocs(listRef)
+    async function loadCategory() {
+      await getDocs(listRef)
         .then((snapshot) => {
-          const lista = [];
+          const lista = [] as categoryProps[];
 
           snapshot.forEach((doc) => {
             lista.push({
@@ -154,7 +156,7 @@ export function New() {
             })
           })
 
-          if (snapshot.docs.size === 0) {
+          if (snapshot.size === 0) {
             console.log("NENHUMA CATEGORIA ENCONTRADA");
             setCategory([{ id: '1', name: "FREELA" }])
             setLoadCategory(false)
@@ -171,19 +173,90 @@ export function New() {
           setCategory([{ id: '1', name: 'FREELA' }])
         })
     }
-    loadCatagory();
+
+    async function loadCores(){
+      await getDocs(listCoresRef)
+      .then((snapshot) => {
+        const lista = [] as coresProps[];
+
+        snapshot.forEach((doc) => {
+          lista.push({
+            id: doc.id,
+            name: doc.data().cor,
+            owner: doc.data().owner,
+            images: doc.data().images
+          })
+        })
+
+        if (snapshot.size === 0) {
+          console.log("NENHUMA CATEGORIA ENCONTRADA");
+          setColor([{ id: '1', name: "FREELA" }])
+          setLoadColor(false)
+          return;
+
+        }
+
+        setColor(lista)
+        setLoadColor(false)
+      })
+      .catch((error) => {
+        console.log("ERRO AO BUSCAR OS CLIENTES", error);
+        setLoadColor(false);
+        setColor([{ id: '1', name: 'FREELA' }])
+      })
+    }
+    async function loadTamanho(){
+      await getDocs(listTamanhoRef)
+      .then((snapshot) => {
+        const lista = [] as tamanhoProps[];
+
+        snapshot.forEach((doc) => {
+          lista.push({
+            id: doc.id,
+            name: doc.data().tamanho,
+            owner: doc.data().owner,
+          })
+        })
+
+        if (snapshot.size === 0) {
+          console.log("NENHUM TAMANHO ENCONTRADO");
+          setSize([{ id: '1', name: "FREELA" }])
+          setLoadSize(false)
+          return;
+
+        }
+
+        setSize(lista)
+        setLoadSize(false)
+      })
+      .catch((error) => {
+        console.log("ERRO AO BUSCAR OS CLIENTES", error);
+        setLoadSize(false);
+        setSize([{ id: '1', name: 'FREELA' }])
+      })
+    }
+    loadCategory();
+    loadCores();
+    loadTamanho();
   }, [])
 
 
 
-  function handleChangeCategory(e) {
-    setCategorySelected(e.target.value);
+  function handleChangeCategory(e:ChangeEvent<HTMLSelectElement>) {
+    const selectedValue = parseInt(e.target.value); // Convertendo para número
+    setCategorySelected(selectedValue);
   }
-  function handleChangeColor(e) {
-    setColorSelected(e.target.value);
+  function handleChangeColor(e:ChangeEvent<HTMLSelectElement>) {
+    const selectedValue = parseInt(e.target.value); // Convertendo para número
+    setColorSelected(selectedValue);
   }
-  function handleChangeSize(e) {
-    setSizeSelected(e.target.value);
+  function handleChangeSize(e:ChangeEvent<HTMLSelectElement>) {
+    const selectedValue = parseInt(e.target.value); // Convertendo para número
+    setSizeSelected(selectedValue);
+  }
+  function handleChangeStatus(e:ChangeEvent<HTMLSelectElement>) {
+    const selectedValue = parseInt(e.target.value); // Convertendo para número
+    setStatusSelected(selectedValue);
   }
 
   return (
@@ -277,7 +350,7 @@ export function New() {
                     className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
                     value={colorSelected}
                     onChange={handleChangeColor}>
-                    {category.map((item, index) => {
+                    {color.map((item, index) => {
                       return (
                         <option key={index} value={index}>
                           {item.name}   
@@ -299,7 +372,7 @@ export function New() {
                     className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
                     value={sizeSelected}
                     onChange={handleChangeSize}>
-                    {category.map((item, index) => {
+                    {size.map((item, index) => {
                       return (
                         <option key={index} value={index}>
                           {item.name}   
@@ -309,6 +382,19 @@ export function New() {
                   </select>
                 )
               }
+              <label className='mt-4'>Status</label>
+              <select  
+              className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+              value={statusSelected}
+              onChange={handleChangeStatus}
+              >
+                <option value="ativo">
+                  Ativo
+                </option>
+                <option value="inativo">
+                  Inativo
+                </option>
+              </select>
               <button className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
                 <span className='text-white font-bold'>Cadastrar Produto</span>
               </button>
