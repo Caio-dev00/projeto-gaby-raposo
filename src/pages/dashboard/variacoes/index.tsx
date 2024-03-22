@@ -1,23 +1,24 @@
-import { HeaderDashboard } from "../../../components/headerDashboard";
-import Title from "../../../components/titleDahsboard";
-import { FaEdit } from "react-icons/fa";
-import { Link } from "react-router-dom";
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
+import { Link } from "react-router-dom";
 import { collection, deleteDoc, doc,  getDocs, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db, storage } from "../../../services/firebaseConnection";
-import { FaTrashCan } from "react-icons/fa6";
-import { FiEdit2 } from "react-icons/fi";
 import { deleteObject, ref } from "firebase/storage";
 
-interface tamanhoProps {
+import { HeaderDashboard } from "../../../components/headerDashboard";
+import Title from "../../../components/titleDahsboard";
+
+import { FaEdit } from "react-icons/fa";
+import { FiEdit2 } from "react-icons/fi";
+import { FaTrashCan } from "react-icons/fa6";
+
+export interface tamanhoProps {
     id: string,
     name: string,
     owner: string,
-    images: imageProps[]
 }
 
-interface coresProps {
+export interface coresProps {
     id: string,
     name: string,
     owner: string,
@@ -52,8 +53,7 @@ export function Variacoes() {
                     lista.push({
                         id: doc.id,
                         name: doc.data().tamanho,
-                        owner: doc.data().owner,
-                        images: doc.data().images
+                        owner: doc.data().owner
                     })
                     setTamanho(lista)
                 })
@@ -104,17 +104,6 @@ export function Variacoes() {
         const docRef = doc(db, "Tamanhos", tamanhoItem.id)
         await deleteDoc(docRef)
 
-        tamanhoItem.images.map( async (image) => {
-        const imagePath = `images/${image.uid}/${image.name}`
-        const imageRef = ref(storage, imagePath)
-
-        try{
-            await deleteObject(imageRef)
-            setTamanho(tamanho.filter(tamanho => tamanho.id !== tamanhoItem.id))
-        }catch(error){
-            console.error("ERRO AO DELETAR IMAGEM", error)
-        }
-        })
     }
 
     return (
@@ -141,7 +130,7 @@ export function Variacoes() {
                 </div>
 
                 <div className="mt-10 flex flex-col justify-center items-center">
-                    <span className="text-wblack text-lg font-bold my-5">TABELA DE TAMANHOS</span>         
+                    <span className="text-wblack text-lg font-bold my-5">TAMANHOS</span>         
                    {tamanho.length === 0 ? (
                     <h1 className="mt-10">Nenhum tamanho encontrada</h1>
                    ):(
@@ -162,7 +151,7 @@ export function Variacoes() {
                                     <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                         <button>
                                             <div className="flex gap-3">
-                                                <Link to={`/dashboard/new:id`}>
+                                                <Link to={`/dashboard/variacoes/variacoes-tamanho?id=${item.id}`}>
                                                     <FiEdit2 size={17} color="#000" />
                                                 </Link>
                                                 <button onClick={() => handleDeleteTamanho(item)}>
@@ -179,7 +168,7 @@ export function Variacoes() {
                 </div>
 
                 <div className="mt-10 flex flex-col justify-center items-center">
-                <span className="text-wblack text-lg font-bold my-5">TABELA DE CORES</span> 
+                <span className="text-wblack text-lg font-bold my-5">CORES</span> 
                    {cores.length === 0 ? (
                         <h1 className="mt-10">Nenhuma cor encontrada...</h1>
                    ):(       
@@ -199,7 +188,7 @@ export function Variacoes() {
                                     <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                         <button>
                                             <div className="flex gap-3">
-                                                <Link to={`/dashboard/new:id`}>
+                                                <Link to={`/dashboard/variacoes/variacoes-cor?id=${item.id}`}>
                                                     <FiEdit2 size={17} color="#000" />
                                                 </Link>
                                                 <button onClick={() => handleDeleteCor(item)}>

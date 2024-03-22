@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react"
 import { db, storage } from "../../../services/firebaseConnection"
 import { collection, getDocs, orderBy, query, where, deleteDoc, doc } from "firebase/firestore"
-import { deleteObject, ref } from "firebase/storage" 
+import { deleteObject, ref } from "firebase/storage"
 
 import { HeaderDashboard } from "../../../components/headerDashboard"
 import Title from "../../../components/titleDahsboard"
@@ -14,6 +14,7 @@ import { AuthContext } from "../../../contexts/AuthContext"
 
 
 import '../dashboard.css'
+import { FiEdit2 } from "react-icons/fi"
 
 export interface categoryProp {
     name: string,
@@ -29,15 +30,15 @@ interface categoryImageProps {
 }
 
 export function Categorias() {
-    const {user} = useContext(AuthContext)
+    const { user } = useContext(AuthContext)
     const [category, setCategory] = useState<categoryProp[]>([]);
     const [input, setInput] = useState("");
 
     useEffect(() => {
         loadCategories();
         handleSearch();
-        return () => {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        return () => { }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, input])
 
     async function loadCategories() {
@@ -45,23 +46,23 @@ export function Categorias() {
         const q = query(categoriesRef, orderBy('created', 'desc'));
 
         await getDocs(q)
-       .then((snapshot) => {
-           const listCategories = [] as categoryProp[]
-           
-           snapshot.forEach(doc => {
-               listCategories.push({
-                   id: doc.id,
-                   name: doc.data().name,
-                   owner: doc.data().owner,
-                   images: doc.data().images
+            .then((snapshot) => {
+                const listCategories = [] as categoryProp[]
+
+                snapshot.forEach(doc => {
+                    listCategories.push({
+                        id: doc.id,
+                        name: doc.data().name,
+                        owner: doc.data().owner,
+                        images: doc.data().images
+                    })
                 })
+                setCategory(listCategories)
             })
-            setCategory(listCategories)
-        })
     }
 
-    async function handleSearch(){
-        if(input === ""){
+    async function handleSearch() {
+        if (input === "") {
             loadCategories();
             return;
         }
@@ -70,25 +71,25 @@ export function Categorias() {
 
 
         const q = query(collection(db, "categorias"),
-        where("name", ">=", input.toUpperCase()),
-        where("name", "<=", input.toUpperCase() + "\uf8ff"),
-        where("uid", "==", user?.uid)
+            where("name", ">=", input.toUpperCase()),
+            where("name", "<=", input.toUpperCase() + "\uf8ff"),
+            where("uid", "==", user?.uid)
         )
         getDocs(q)
-        .then((snapshot) => {
-            const listCategory= [] as categoryProp[];
-    
-            snapshot.forEach(doc => {
-                listCategory.push({
-                    id: doc.id,
-                    name: doc.data().name,
-                    owner: doc.data().owner,
-                    images: doc.data().images
+            .then((snapshot) => {
+                const listCategory = [] as categoryProp[];
+
+                snapshot.forEach(doc => {
+                    listCategory.push({
+                        id: doc.id,
+                        name: doc.data().name,
+                        owner: doc.data().owner,
+                        images: doc.data().images
+                    })
                 })
+                setCategory(listCategory)
             })
-            setCategory(listCategory)
-        })
-      
+
     }
 
     async function handleDeleteCategory(item: categoryProp) {
@@ -97,20 +98,19 @@ export function Categorias() {
         const docRef = doc(db, "categorias", itemCategory.id)
         await deleteDoc(docRef)
 
-        itemCategory.images.map( async (image) => {
+        itemCategory.images.map(async (image) => {
             const imagePath = `images/${image.uid}/${image.name}`
             const imageRef = ref(storage, imagePath)
 
-            try{
+            try {
                 await deleteObject(imageRef)
                 setCategory(category.filter(category => category.id !== itemCategory.id))
-            }catch(error){
+            } catch (error) {
                 console.log("ERROR AO DELETAR IMAGEM")
                 console.log(error)
             }
         })
     }
-
 
     return (
         <div>
@@ -131,48 +131,51 @@ export function Categorias() {
                     <input
                         placeholder="Buscar Categorias"
                         className="w-full p-3 rounded-full border-2 max-sm:p-1"
-                        type="text" 
+                        type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        />
-                     
-                </div>
-               <>
-               {category.length === 0 ? (
-                <div className="flex justify-center">
-                    <span>Nehuma categoria encontrada...</span>
-                </div>
-               ) : (
-                <table className="w-full text-center border-solid border m-0 p-0 table-fixed border-collapse max-sm:border-0">
-                <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
-                    <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
-                        <th scope="col">Código</th>
-                        <th scope="col">Categoria</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
+                    />
 
-                {category.map((item, index) => (
-                    <tbody key={index}>
-                        <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
-                            <td className="border-0 rounded-[4px] py-2" data-label="código">{item.id}</td>
-                            <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.name}</td>
+                </div>
+                <>
+                    {category.length === 0 ? (
+                        <div className="flex justify-center">
+                            <span>Nehuma categoria encontrada...</span>
+                        </div>
+                    ) : (
+                        <table className="w-full text-center border-solid border m-0 p-0 table-fixed border-collapse max-sm:border-0">
+                            <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
+                                <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
+                                    <th scope="col">Código</th>
+                                    <th scope="col">Categoria</th>
+                                    <th scope="col">Ações</th>
+                                </tr>
+                            </thead>
 
-                            <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                <button>
-                                    <div className="flex gap-3">
-                                        <button onClick={() => handleDeleteCategory(item)}>
-                                            <FaTrashCan size={17} color="#000" />
-                                        </button>
-                                    </div>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                ))}
-            </table>
-               )}
-               </>
+                            {category.map((item, index) => (
+                                <tbody key={index}>
+                                    <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
+                                        <td className="border-0 rounded-[4px] py-2" data-label="código">{item.id}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.name}</td>
+
+                                        <td className="border-0 rounded-[4px] py-2" data-label="ações">
+                                            <button>
+                                                <div className="flex gap-3">
+                                                    <Link to={`/dashboard/categorias/cadastrar-categoria?id=${item.id}`}>
+                                                        <FiEdit2 size={17} color="#000" />
+                                                    </Link>
+                                                    <button onClick={() => handleDeleteCategory(item)}>
+                                                        <FaTrashCan size={17} color="#000" />
+                                                    </button>
+                                                </div>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            ))}
+                        </table>
+                    )}
+                </>
             </div>
         </div>
     )
