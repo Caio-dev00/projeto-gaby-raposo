@@ -183,7 +183,7 @@ export function Variacoes() {
                    {cores.length === 0 ? (
                         <h1 className="mt-10">Nenhuma cor encontrada...</h1>
                    ):(       
-                    <table className="w-full text-center border-solid border my-2 p-0 table-fixed border-collapse max-sm:border-0">
+                    <table className="w-full text-center border-solid border mb-32 my-2 p-0 table-fixed border-collapse max-sm:border-0">
                         <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
                             <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
                                 <th scope="col">Nome Variação</th>
