@@ -11,6 +11,7 @@ import { CadastrarCategoria } from "./pages/dashboard/categorias/cadastrar-categ
 import { Variacoes } from "./pages/dashboard/variacoes";
 import { CadastrarTamanho } from "./pages/dashboard/variacoes/variacoes-tamanho";
 import { CadastrarCor } from "./pages/dashboard/variacoes/variacoes-cor";
+import { Banners } from "./pages/dashboard/banners";
 
 import { Layout } from "./components/layout";
 import { Private } from "./routes/Private";
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
     path: "/dashboard/variacoes/variacoes-cor/:id",
     element: <Private><CadastrarCor/></Private>
   },
+  {
+    path: "/dashboard/banners",
+    element: <Private><Banners/></Private>
+  }
 ])
 
 export { router }

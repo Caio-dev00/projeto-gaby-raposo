@@ -124,7 +124,7 @@ export function Categorias() {
 
                 <button className="mb-4 flex justify-center items-center w-[250px] h-[40px] float-right ml-2 bg-wine-black rounded-full hover:scale-105 duration-300 max-sm:w-[180px]">
                     <Link to="/dashboard/categorias/cadastrar-categoria">
-                        <span className="text-white text-[0.8rem] p-1 font-semibold max-sm:text-[12px]">CADASTRAR CATEGORIA</span>
+                        <span className="text-white text-xs p-1 font-semibold max-sm:text-[12px]">CADASTRAR CATEGORIA</span>
                     </Link>
                 </button>
                 <div className="flex justify-center items-center mb-5 mr-4 w-full max-sm:text-[0.9rem]">
