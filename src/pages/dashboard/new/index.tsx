@@ -32,7 +32,7 @@ interface sizeProps {
   id: string,
 }
 
-interface ImageItemProps{
+interface ImageItemProps {
   uid: string;
   name: string;
   previewUrl: string;
@@ -58,8 +58,8 @@ export function New() {
     resolver: zodResolver(schema),
     mode: "onChange"
   })
-  
-  const {user} = useContext(AuthContext)
+
+  const { user } = useContext(AuthContext)
   const [category, setCategory] = useState<categoryProps[]>([])
   const [color, setColor] = useState<colorProps[]>([])
   const [size, setSize] = useState<sizeProps[]>([])
@@ -71,7 +71,7 @@ export function New() {
   const [categorySelected, setCategorySelected] = useState(0)
   const [colorSelected, setColorSelected] = useState(0)
   const [sizeSelected, setSizeSelected] = useState(0)
-  const [statusSelected, setStatusSelected] = useState(0)
+  const [status, setStatus] = useState("Ativo")
 
   const [productImage, setProductImage] = useState<ImageItemProps[]>([])
 
@@ -83,23 +83,23 @@ export function New() {
       uid: user?.uid,
       images: productImage,
     })
-    .then(() => {
-      reset();
-      setProductImage([])
-      console.log("PRODUTO COM SUCESSO!")
-    })
-    .catch((error) => {
-      console.error("ERRO AO CADASTRAR PRODUTO", error)
-    })
+      .then(() => {
+        reset();
+        setProductImage([])
+        console.log("PRODUTO CADASTRADO COM SUCESSO!")
+      })
+      .catch((error) => {
+        console.error("ERRO AO CADASTRAR PRODUTO", error)
+      })
   }
 
-  async function handleFile(e: ChangeEvent<HTMLInputElement>){
-    if(e.target.files && e.target.files[0]){
+  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
       const image = e.target.files[0]
 
-      if(image.type === "image/jpeg" || image.type === "image/png"){
+      if (image.type === "image/jpeg" || image.type === "image/png") {
         await handleUpload(image)
-      }else{
+      } else {
         alert("Envie uma imagem jpeg ou png")
         return;
       }
@@ -107,7 +107,7 @@ export function New() {
   }
 
   async function handleUpload(image: File) {
-    if(!user?.uid){
+    if (!user?.uid) {
       return;
     }
 
@@ -117,30 +117,30 @@ export function New() {
     const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`)
 
     uploadBytes(uploadRef, image)
-    .then((snapshot) => {
-      getDownloadURL(snapshot.ref).then((downloadUrl) => {
-        const imageItem = {
-          name: uidImage,
-          uid: currentUid,
-          previewUrl: URL.createObjectURL(image),
-          url: downloadUrl
-        }
-        setProductImage((images) => [...images, imageItem])
+      .then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((downloadUrl) => {
+          const imageItem = {
+            name: uidImage,
+            uid: currentUid,
+            previewUrl: URL.createObjectURL(image),
+            url: downloadUrl
+          }
+          setProductImage((images) => [...images, imageItem])
+        })
       })
-    })
   }
 
-    async function handleDeleteImage(item: ImageItemProps){
-      const imagePath = `images/${item.uid}/${item.name}`;
-      const imageRef = ref(storage, imagePath)
+  async function handleDeleteImage(item: ImageItemProps) {
+    const imagePath = `images/${item.uid}/${item.name}`;
+    const imageRef = ref(storage, imagePath)
 
-      try{
-        await deleteObject(imageRef)
-        setProductImage(productImage.filter((image) => image.url !== item.url))
-      }catch(error){
-        console.log("ERROR AO DELETAR")
-      }
+    try {
+      await deleteObject(imageRef)
+      setProductImage(productImage.filter((image) => image.url !== item.url))
+    } catch (error) {
+      console.log("ERROR AO DELETAR")
     }
+  }
 
 
   useEffect(() => {
@@ -174,66 +174,66 @@ export function New() {
         })
     }
 
-    async function loadCores(){
+    async function loadCores() {
       await getDocs(listCoresRef)
-      .then((snapshot) => {
-        const lista = [] as coresProps[];
+        .then((snapshot) => {
+          const lista = [] as coresProps[];
 
-        snapshot.forEach((doc) => {
-          lista.push({
-            id: doc.id,
-            name: doc.data().cor,
-            owner: doc.data().owner,
-            images: doc.data().images
+          snapshot.forEach((doc) => {
+            lista.push({
+              id: doc.id,
+              name: doc.data().cor,
+              owner: doc.data().owner,
+              images: doc.data().images
+            })
           })
-        })
 
-        if (snapshot.size === 0) {
-          console.log("NENHUMA CATEGORIA ENCONTRADA");
-          setColor([{ id: '1', name: "FREELA" }])
+          if (snapshot.size === 0) {
+            console.log("NENHUMA CATEGORIA ENCONTRADA");
+            setColor([{ id: '1', name: "FREELA" }])
+            setLoadColor(false)
+            return;
+
+          }
+
+          setColor(lista)
           setLoadColor(false)
-          return;
-
-        }
-
-        setColor(lista)
-        setLoadColor(false)
-      })
-      .catch((error) => {
-        console.log("ERRO AO BUSCAR OS CLIENTES", error);
-        setLoadColor(false);
-        setColor([{ id: '1', name: 'FREELA' }])
-      })
-    }
-    async function loadTamanho(){
-      await getDocs(listTamanhoRef)
-      .then((snapshot) => {
-        const lista = [] as tamanhoProps[];
-
-        snapshot.forEach((doc) => {
-          lista.push({
-            id: doc.id,
-            name: doc.data().tamanho,
-            owner: doc.data().owner,
-          })
         })
+        .catch((error) => {
+          console.log("ERRO AO BUSCAR OS CLIENTES", error);
+          setLoadColor(false);
+          setColor([{ id: '1', name: 'FREELA' }])
+        })
+    }
+    async function loadTamanho() {
+      await getDocs(listTamanhoRef)
+        .then((snapshot) => {
+          const lista = [] as tamanhoProps[];
 
-        if (snapshot.size === 0) {
-          console.log("NENHUM TAMANHO ENCONTRADO");
-          setSize([{ id: '1', name: "FREELA" }])
+          snapshot.forEach((doc) => {
+            lista.push({
+              id: doc.id,
+              name: doc.data().tamanho,
+              owner: doc.data().owner,
+            })
+          })
+
+          if (snapshot.size === 0) {
+            console.log("NENHUM TAMANHO ENCONTRADO");
+            setSize([{ id: '1', name: "FREELA" }])
+            setLoadSize(false)
+            return;
+
+          }
+
+          setSize(lista)
           setLoadSize(false)
-          return;
-
-        }
-
-        setSize(lista)
-        setLoadSize(false)
-      })
-      .catch((error) => {
-        console.log("ERRO AO BUSCAR OS CLIENTES", error);
-        setLoadSize(false);
-        setSize([{ id: '1', name: 'FREELA' }])
-      })
+        })
+        .catch((error) => {
+          console.log("ERRO AO BUSCAR OS CLIENTES", error);
+          setLoadSize(false);
+          setSize([{ id: '1', name: 'FREELA' }])
+        })
     }
     loadCategory();
     loadCores();
@@ -242,21 +242,20 @@ export function New() {
 
 
 
-  function handleChangeCategory(e:ChangeEvent<HTMLSelectElement>) {
+  function handleChangeCategory(e: ChangeEvent<HTMLSelectElement>) {
     const selectedValue = parseInt(e.target.value); // Convertendo para número
     setCategorySelected(selectedValue);
   }
-  function handleChangeColor(e:ChangeEvent<HTMLSelectElement>) {
+  function handleChangeColor(e: ChangeEvent<HTMLSelectElement>) {
     const selectedValue = parseInt(e.target.value); // Convertendo para número
     setColorSelected(selectedValue);
   }
-  function handleChangeSize(e:ChangeEvent<HTMLSelectElement>) {
+  function handleChangeSize(e: ChangeEvent<HTMLSelectElement>) {
     const selectedValue = parseInt(e.target.value); // Convertendo para número
     setSizeSelected(selectedValue);
   }
-  function handleChangeStatus(e:ChangeEvent<HTMLSelectElement>) {
-    const selectedValue = parseInt(e.target.value); // Convertendo para número
-    setStatusSelected(selectedValue);
+  function handleOptionChange(e:ChangeEvent<HTMLInputElement>){
+    setStatus(e.target.value)
   }
 
   return (
@@ -264,40 +263,40 @@ export function New() {
       <HeaderDashboard />
 
 
-      <div className="ml-[300px] pt-[1px] px-[16px] max-md:ml-0">
+      <div>
         <Title name={"Cadastrar Produto"}>
           <FaListAlt size={25} color="#FFF" />
         </Title>
 
         <div className='bg-white p-10 rounded-md shadow-md'>
-        <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
-        <button
-            className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
-            <div className="absolute cursor-pointer">
-              <FiUpload size={30} color="#000" />
-            </div>
-            <div className="cursor-pointer">
-              <input
-                className="opacity-0 cursor-pointer"
-                onChange={handleFile}
-                type="file"
-                accept="image/*" />
-            </div>
-          </button>
+          <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+            <button
+              className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
+              <div className="absolute cursor-pointer">
+                <FiUpload size={30} color="#000" />
+              </div>
+              <div className="cursor-pointer">
+                <input
+                  className="opacity-0 cursor-pointer"
+                  onChange={handleFile}
+                  type="file"
+                  accept="image/*" />
+              </div>
+            </button>
 
-          {productImage.map( item => (
-            <div className='w-full h-32 flex items-center justify-center relative' key={item.name}>
-               <button className="absolute" onClick={()=> handleDeleteImage(item)}>
-                    
-                    <FiTrash size={24} color="#FFF"/>
-                  </button>
-                  <img 
+            {productImage.map(item => (
+              <div className='w-full h-32 flex items-center justify-center relative' key={item.name}>
+                <button className="absolute" onClick={() => handleDeleteImage(item)}>
+
+                  <FiTrash size={24} color="#FFF" />
+                </button>
+                <img
                   src={item.previewUrl}
                   className="rounded-lg w-full h-32 object-cover"
-                  />
-            </div>
-          ))}
-        </div>
+                />
+              </div>
+            ))}
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col'>
             <label>Nome do Produto:</label>
@@ -337,67 +336,74 @@ export function New() {
                 register={register}
               />
             </div>
-        
+
             <h1 className='my-5 text-xl font-semibold'>Variação do Produto:</h1>
 
-               {/* ---SELECIONE A COR--- */}
+            {/* ---SELECIONE A COR--- */}
             <label>Selecione a cor</label>
-              {
-                loadColor ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={colorSelected}
-                    onChange={handleChangeColor}>
-                    {color.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}   
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
+            {
+              loadColor ? (
+                <input type="text" disabled={true} value="Carregando..." />
+              ) : (
+                <select
+                  className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                  value={colorSelected}
+                  onChange={handleChangeColor}>
+                  {color.map((item, index) => {
+                    return (
+                      <option key={index} value={index}>
+                        {item.name}
+                      </option>
+                    )
+                  })}
+                </select>
+              )
+            }
 
-              {/* ---TAMANHO--- */}
+            {/* ---TAMANHO--- */}
 
-              <label className='mt-4'>Selecione o Tamanho</label>
-              {
-                loadSize ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={sizeSelected}
-                    onChange={handleChangeSize}>
-                    {size.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}   
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
-              <label className='mt-4'>Status</label>
-              <select  
-              className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-              value={statusSelected}
-              onChange={handleChangeStatus}
-              >
-                <option value="ativo">
-                  Ativo
-                </option>
-                <option value="inativo">
-                  Inativo
-                </option>
-              </select>
-              <button className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
-                <span className='text-white font-bold'>Cadastrar Produto</span>
-              </button>
+            <label className='mt-4'>Selecione o Tamanho</label>
+            {
+              loadSize ? (
+                <input type="text" disabled={true} value="Carregando..." />
+              ) : (
+                <select
+                  className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                  value={sizeSelected}
+                  onChange={handleChangeSize}>
+                  {size.map((item, index) => {
+                    return (
+                      <option key={index} value={index}>
+                        {item.name}
+                      </option>
+                    )
+                  })}
+                </select>
+              )
+            }
+               <label className='my-2'>Status</label>
+                    <div>
+                        <input
+                            type="radio"
+                            name="radio"
+                            value="Ativo"
+                            onChange={handleOptionChange}
+                            checked={ status === 'Ativo'}
+                        />
+                        <span className="ml-1 mr-1">Ativo</span>
+
+                        <input
+                            type="radio"
+                            name="radio"
+                            value="Inativo"
+                            onChange={handleOptionChange}
+                            checked={ status === 'Inativo'}
+                        />
+                        <span className="ml-1">Inativo</span>
+                        </div>
+            <button className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
+              <span className='text-white font-bold'>Cadastrar Produto</span>
+            </button>
           </form>
         </div>
       </div>
