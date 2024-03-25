@@ -1,16 +1,17 @@
-import { HeaderDashboard } from "../../../../components/headerDashboard";
-import Title from "../../../../components/titleDahsboard";
-import { FaEdit } from "react-icons/fa";
-import Input from "../../../../components/input";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../../contexts/AuthContext";
 import { useForm } from "react-hook-form";
+import { FaEdit } from "react-icons/fa";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../../../contexts/AuthContext";
 import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../../services/firebaseConnection";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import { tamanhoProps } from "..";
+import Input from "../../../../components/input";
+import Title from "../../../../components/titleDahsboard";
+import { HeaderDashboard } from "../../../../components/headerDashboard";
 
 const schema = z.object({
     tamanho: z.string().min(1, "Digite o tamanho corretamente !")
