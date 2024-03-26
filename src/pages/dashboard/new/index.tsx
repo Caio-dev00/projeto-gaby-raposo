@@ -18,18 +18,18 @@ import { FiTrash, FiUpload } from 'react-icons/fi';
 import { coresProps, tamanhoProps } from '../variacoes';
 
 interface categoryProps {
-  name: string
-  id: string,
+  name: string;
+  id: string;
 }
 
 interface colorProps {
-  name: string
-  id: string,
+  name: string;
+  id: string;
 }
 
 interface sizeProps {
-  name: string
-  id: string,
+  name: string;
+  id: string;
 }
 
 interface ImageItemProps {
@@ -39,12 +39,11 @@ interface ImageItemProps {
   url: string;
 }
 
-
 const schema = z.object({
   name: z.string().min(1, "O campo é obrigatorio!"),
   price: z.string().min(1, "O campo é obrigatorio!"),
   description: z.string().min(1, "O campo é obrigatorio!"),
-  storage: z.number(),
+  storage: z.string().min(1, "A quantidade é obrigatoria!"),
 })
 
 type FormData = z.infer<typeof schema>
@@ -68,20 +67,29 @@ export function New() {
   const [loadColor, setLoadColor] = useState(true)
   const [loadSize, setLoadSize] = useState(true)
 
-  const [categorySelected, setCategorySelected] = useState(0)
-  const [colorSelected, setColorSelected] = useState(0)
-  const [sizeSelected, setSizeSelected] = useState(0)
+  const [categorySelected, setCategorySelected] = useState<string>("")
+  const [colorSelected, setColorSelected] = useState<string>("")
+  const [sizeSelected, setSizeSelected] = useState<string>("")
   const [status, setStatus] = useState("Ativo")
 
   const [productImage, setProductImage] = useState<ImageItemProps[]>([])
 
   function onSubmit(data: FormData) {
+    if (!data) {
+      console.error("Erro: dados não definidos");
+      return;
+    }
     addDoc(collection(db, "Produtos"), {
       name: data.name.toLowerCase(),
+      price: data.price,
+      storage: data.storage,
+      description: data.description,
+      status: status,
       created: new Date(),
       owner: user?.name,
-      uid: user?.uid,
+      id: user?.uid,
       images: productImage,
+      
     })
       .then(() => {
         reset();
@@ -243,19 +251,22 @@ export function New() {
 
 
   function handleChangeCategory(e: ChangeEvent<HTMLSelectElement>) {
-    const selectedValue = parseInt(e.target.value); // Convertendo para número
-    setCategorySelected(selectedValue);
+    const selectedCategory = e.target.value; // Obtendo o nome da categoria selecionada
+    setCategorySelected(selectedCategory);
   }
+
   function handleChangeColor(e: ChangeEvent<HTMLSelectElement>) {
-    const selectedValue = parseInt(e.target.value); // Convertendo para número
+    const selectedValue = e.target.value; // Valor selecionado como string
     setColorSelected(selectedValue);
   }
+
   function handleChangeSize(e: ChangeEvent<HTMLSelectElement>) {
-    const selectedValue = parseInt(e.target.value); // Convertendo para número
+    const selectedValue = e.target.value; // Valor selecionado como string
     setSizeSelected(selectedValue);
   }
-  function handleOptionChange(e:ChangeEvent<HTMLInputElement>){
+  function handleOptionChange(e: ChangeEvent<HTMLInputElement>) {
     setStatus(e.target.value)
+    console.log(status)
   }
 
   return (
@@ -263,12 +274,13 @@ export function New() {
       <HeaderDashboard />
 
 
-      <div>
+      <div className="ml-[300px] pt-[1px] px-[16px] max-md:ml-0">
         <Title name={"Cadastrar Produto"}>
           <FaListAlt size={25} color="#FFF" />
         </Title>
 
         <div className='bg-white p-10 rounded-md shadow-md'>
+          <h1 className='text-red-500'>Maximo: 4 fotos</h1>
           <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
             <button
               className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
@@ -319,7 +331,7 @@ export function New() {
                     onChange={handleChangeCategory}>
                     {category.map((item, index) => {
                       return (
-                        <option key={index} value={index}>
+                        <option key={index} value={item.name}>
                           {item.name}
                         </option>
                       )
@@ -333,6 +345,14 @@ export function New() {
                 name='price'
                 type='text'
                 error={errors.price?.message}
+                register={register}
+              />
+              <label>Estoque:</label>
+              <Input
+                placeholder="ex: 14"
+                name='storage'
+                type='text'
+                error={errors.storage?.message}
                 register={register}
               />
             </div>
@@ -351,7 +371,7 @@ export function New() {
                   onChange={handleChangeColor}>
                   {color.map((item, index) => {
                     return (
-                      <option key={index} value={index}>
+                      <option key={index} value={item.name}>
                         {item.name}
                       </option>
                     )
@@ -381,27 +401,35 @@ export function New() {
                 </select>
               )
             }
-               <label className='my-2'>Status</label>
-                    <div>
-                        <input
-                            type="radio"
-                            name="radio"
-                            value="Ativo"
-                            onChange={handleOptionChange}
-                            checked={ status === 'Ativo'}
-                        />
-                        <span className="ml-1 mr-1">Ativo</span>
+            <label className='my-2'>Status</label>
+            <div>
+              <input
+                type="radio"
+                name="radio"
+                value="Ativo"
+                onChange={handleOptionChange}
+                checked={status === 'Ativo'}
+              />
+              <span className="ml-1 mr-1">Ativo</span>
 
-                        <input
-                            type="radio"
-                            name="radio"
-                            value="Inativo"
-                            onChange={handleOptionChange}
-                            checked={ status === 'Inativo'}
-                        />
-                        <span className="ml-1">Inativo</span>
-                        </div>
-            <button className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
+              <input
+                type="radio"
+                name="radio"
+                value="Inativo"
+                onChange={handleOptionChange}
+                checked={status === 'Inativo'}
+              />
+              <span className="ml-1">Inativo</span>
+            </div>
+            <label className='mt-4'>Descrição do produto</label>
+            <textarea
+              className='w-full border-2 rounded-md h-24 px-2'
+              {...register("description")}
+              name='description'
+              id="description"
+              placeholder='Escreva algo sobre o produto...'
+            />
+            <button type='submit' className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
               <span className='text-white font-bold'>Cadastrar Produto</span>
             </button>
           </form>
