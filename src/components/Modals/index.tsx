@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import photo from '../../assets/produto.png'
 
 import { BsThreeDotsVertical } from "react-icons/bs";
-import DropdownModal from '../dropdownModal';
 import { Fade } from '@mui/material';
 
 const style = {
@@ -131,14 +130,6 @@ export default function NestedModal() {
             <div className='flex flex-col justify-center items-center my-5'>
                 <h1 className='font-black text-black text-[1.5rem]'>FRETE:</h1>
             </div>
-
-            <DropdownModal 
-            title='Retirar na Loja'
-            rua='São Judas Tadeu'
-            bairro='São Judas'
-            numero='139'
-            cep="19880-000"
-            />
           <ChildModal />
         </Box>
       </Fade>
