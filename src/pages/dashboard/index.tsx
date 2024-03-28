@@ -188,7 +188,7 @@ export function Dashboard() {
                                         <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                             <button>
                                                 <div className="flex gap-3">
-                                                    <Link to={`/dashboard/categorias/cadastrar-categoria?id=${item.id}`}>
+                                                    <Link to={`/dashboard/new/new?id=${item.id}`}>
                                                         <FiEdit2 size={17} color="#000" />
                                                     </Link>
                                                     <button onClick={() => handleDeleteProduct(item)}>
