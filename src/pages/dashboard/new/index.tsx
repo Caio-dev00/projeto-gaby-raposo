@@ -17,6 +17,7 @@ import Title from "../../../components/titleDahsboard";
 import { FiTrash, FiUpload } from 'react-icons/fi';
 import { coresProps, tamanhoProps } from '../variacoes';
 
+
 interface categoryProps {
   name: string;
   id: string;
@@ -63,24 +64,25 @@ export function New() {
   const [color, setColor] = useState<colorProps[]>([])
   const [size, setSize] = useState<sizeProps[]>([])
 
+
   const [loadCategory, setLoadCategory] = useState(true)
   const [loadColor, setLoadColor] = useState(true)
   const [loadSize, setLoadSize] = useState(true)
 
-  const [categorySelected, setCategorySelected] = useState<string>("")
-  const [colorSelected, setColorSelected] = useState<string>("")
-  const [sizeSelected, setSizeSelected] = useState<string>("")
+  const [categoria, setCategoria] = useState<number>(0)
+  const [colorSelected, setColorSelected] = useState<number>(0)
+  const [sizeSelected, setSizeSelected] = useState<number>(0)
   const [status, setStatus] = useState("Ativo")
 
   const [productImage, setProductImage] = useState<ImageItemProps[]>([])
 
-  function onSubmit(data: FormData) {
-    if (!data) {
-      console.error("Erro: dados não definidos");
-      return;
-    }
-    addDoc(collection(db, "Produtos"), {
+  async function onSubmit(data: FormData) {
+
+    await addDoc(collection(db, "Produtos"), {
       name: data.name.toLowerCase(),
+      categoria: category[categoria].name,
+      color: color[colorSelected].name,
+      size: size[sizeSelected].name,
       price: data.price,
       storage: data.storage,
       description: data.description,
@@ -250,19 +252,22 @@ export function New() {
 
 
 
-  function handleChangeCategory(e: ChangeEvent<HTMLSelectElement>) {
-    const selectedCategory = e.target.value; // Obtendo o nome da categoria selecionada
-    setCategorySelected(selectedCategory);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function handleChangeCategory(e: any):void{
+  setCategoria(e.target.value)
+  console.log(categoria)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function handleChangeColor(e: any):void{
+  setColorSelected(e.target.value)
+  console.log(colorSelected)
   }
 
-  function handleChangeColor(e: ChangeEvent<HTMLSelectElement>) {
-    const selectedValue = e.target.value; // Valor selecionado como string
-    setColorSelected(selectedValue);
-  }
-
-  function handleChangeSize(e: ChangeEvent<HTMLSelectElement>) {
-    const selectedValue = e.target.value; // Valor selecionado como string
-    setSizeSelected(selectedValue);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function handleChangeSize(e: any):void{
+    setSizeSelected(e.target.value)
+    console.log(sizeSelected)
   }
   function handleOptionChange(e: ChangeEvent<HTMLInputElement>) {
     setStatus(e.target.value)
@@ -327,11 +332,11 @@ export function New() {
                 ) : (
                   <select
                     className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={categorySelected}
+                    value={categoria}
                     onChange={handleChangeCategory}>
                     {category.map((item, index) => {
                       return (
-                        <option key={index} value={item.name}>
+                        <option key={index} value={index}>
                           {item.name}
                         </option>
                       )
@@ -371,7 +376,7 @@ export function New() {
                   onChange={handleChangeColor}>
                   {color.map((item, index) => {
                     return (
-                      <option key={index} value={item.name}>
+                      <option key={index} value={index}>
                         {item.name}
                       </option>
                     )
