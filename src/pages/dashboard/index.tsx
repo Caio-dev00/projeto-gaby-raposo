@@ -41,7 +41,7 @@ export function Dashboard() {
         loadProducts()
         handleSearch()
         return () => { }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [input, user])
 
     async function loadProducts() {
@@ -56,7 +56,7 @@ export function Dashboard() {
                     listProducts.push({
                         id: doc.id,
                         name: doc.data().name,
-                        category: doc.data().categoryRef,
+                        category: doc.data().categoria,
                         color: doc.data().color,
                         price: doc.data().price,
                         size: doc.data().size,
@@ -92,7 +92,7 @@ export function Dashboard() {
                     listProduct.push({
                         id: doc.id,
                         name: doc.data().name,
-                        category: doc.data().category,
+                        category: doc.data().categoria,
                         color: doc.data().color,
                         price: doc.data().price,
                         size: doc.data().size,
@@ -160,6 +160,8 @@ export function Dashboard() {
                                     <th scope="col">Código</th>
                                     <th scope="col">Produto</th>
                                     <th scope="col">Categoria</th>
+                                    <th scope="col">Tamanho</th>
+                                    <th scope="col">Cor</th>
                                     <th scope="col">Preço</th>
                                     <th scope="col">Estoque</th>
                                     <th scope="col">Status</th>
@@ -172,6 +174,8 @@ export function Dashboard() {
                                         <td className="border-0 rounded-[4px] py-2" data-label="código">{index.toFixed()}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="produto">{item.name}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.category}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="tamanho">{item.size}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="cor">{item.color}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="preco">R$ {item.price}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="estoque">{item.storage}</td>
                                         <td className="border-0 p-[3px]" data-label="status">
@@ -184,7 +188,7 @@ export function Dashboard() {
                                         <td className="border-0 rounded-[4px] py-2" data-label="ações">
                                             <button>
                                                 <div className="flex gap-3">
-                                                    <Link to={`/dashboard/categorias/cadastrar-categoria?id=${item.id}`}>
+                                                    <Link to={`/dashboard/new/new?id=${item.id}`}>
                                                         <FiEdit2 size={17} color="#000" />
                                                     </Link>
                                                     <button onClick={() => handleDeleteProduct(item)}>
