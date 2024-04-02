@@ -11,10 +11,11 @@ interface EnedecoProps {
   bairro: string;
   numero: string | number;
   cep: number | string;
+  cidade: string;
 }
 
 
-export default function DropdownModal({ title1, title2, rua, bairro, cep, numero }: EnedecoProps) {
+export default function DropdownModal({ title1, title2, rua, bairro, cep, numero, cidade }: EnedecoProps) {
   const [selectedValue, setSelectedValue] = React.useState('');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedValue(event.target.value);
@@ -35,7 +36,7 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
 
 
   return (
-    <div className="relative flex flex-col w-fullrounded-lg">
+    <div className="relative flex flex-col w-full rounded-lg">
       <div>
         <Radio
           onClick={() => setIsOpen((prev) => !prev)}
@@ -48,22 +49,22 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
           }}
         />
         <span>{title1}</span>
+
+        {isOpen && (
+          <div className="flex w-full ml-2">
+            <div className="flex flex-col w-full justify-start gap-1">
+              <h3 className="font-semibold text-lg">Endereço:</h3>
+              <h3 className="font-medium text-base">{rua}, {numero} - {bairro}, {cidade}, {cep}</h3>
+              <button className="flex justify-start items-center my-2">
+                <span className="font-semibold bg-inherit text-wine-light text-sm border-2 border-wine-light py-2 px-3 rounded-xl">Ver no mapa</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {isOpen && (
-        <div className="flex w-full mt-3">
-          <div className="flex flex-col w-full justify-start gap-1">
-            <h3 className="">Bairro: {bairro}</h3>
-            <h3 className="">CEP: {cep}</h3>
-          </div>
-          <div className="w-full">
-            <h3 className="">Rua: {rua}</h3>
-            <h3>Numero: {numero}</h3>
-          </div>
-        </div>
-      )}
-      <div>
 
+      <div>
         <Radio
           onClick={() => setIsOpenInput((prev) => !prev)}
           {...controlProps('b')}
@@ -78,7 +79,7 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
         <>
           {isOpenInput && (
             <button className='flex justify-center bg-wine-black p-2 rounded-xl text-white font-semibold'>
-              <ChildModal/>
+              <ChildModal />
             </button>
           )}
         </>
