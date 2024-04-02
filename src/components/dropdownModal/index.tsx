@@ -5,73 +5,83 @@ import Radio from '@mui/material/Radio';
 import { ChildModal } from '../Modals/index.js';
 
 interface EnedecoProps {
-    title: string;
-    rua: string;
-    bairro: string;
-    numero: string | number;
-    cep: number | string;
+  title: string;
+  rua: string;
+  bairro: string;
+  numero: string | number;
+  cep: number | string;
 }
 
 interface EnedecoProps {
- title: string;
+  title: string;
 }
 
-export default function DropdownModal({title, rua, bairro, cep, numero}: EnedecoProps){
-    const [selectedValue, setSelectedValue] = React.useState('');
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSelectedValue(event.target.value);
-    };
-    const [isOpen, setIsOpen] = useState(false)
-    const isOpenInput = false
+export default function DropdownModal({ title, rua, bairro, cep, numero }: EnedecoProps) {
+  const [selectedValue, setSelectedValue] = React.useState('');
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedValue(event.target.value);
+  };
+  const [isOpen, setIsOpen] = useState(false)
+  const isOpenInput = false
 
-    const controlProps = (item: string) => ({
-      checked: selectedValue === item,
-      onChange: handleChange,
-      value: item,
-      name: 'color-radio-button-demo',
-      inputProps: { 'aria-label': item },
-    });
-    
+  const controlProps = (item: string) => ({
+    checked: selectedValue === item,
+    onChange: handleChange,
+    value: item,
+    name: 'color-radio-button-demo',
+    inputProps: { 'aria-label': item },
+  });
 
-  return(
-    <div className="relative flex flex-col w-fullrounded-lg">
+
+  return (
+    <div className="relative flex flex-col w-full rounded-lg">
       <div>
-      <Radio
-        onClick={() => setIsOpen((prev) => !prev)}
-        {...controlProps('e')}
-        sx={{
-          color: pink[800],
-          '&.Mui-checked': {
-            color: pink[600],
-          },
-        }}
-      />
-      <span>{title}</span>
+        <Radio
+          onClick={() => setIsOpen((prev) => !prev)}
+          {...controlProps('e')}
+          sx={{
+            color: pink[800],
+            '&.Mui-checked': {
+              color: pink[600],
+            },
+          }}
+        />
+        <span className='font-medium'>{title}</span>
       </div>
-        
-        {isOpen && (
-            <div className="flex w-full mt-3">
-               <div className="flex flex-col w-full justify-start gap-1">
-                  <h3 className="">Bairro: {bairro}</h3>
-                  <h3 className="">CEP: {cep}</h3>
-               </div>
-               <div className="w-full">
-               <h3 className="">Rua: {rua}</h3>
-               <h3>Numero: {numero}</h3> 
-               </div>
-            </div>    
-        )}
+
+      {isOpen && (
+        <div className="flex w-full mt-3">
+          <div className="mx-3 flex flex-wrap justify-start w-full gap-1">
+            <h3 className="font-medium text-base">Rua: {rua}, {numero} - Bairro: {bairro}</h3>
+            <h3 className="font-medium text-base">CEP: {cep}</h3>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <Radio
+          onClick={() => setIsOpen((prev) => !prev)}
+          {...controlProps('e')}
+          sx={{
+            color: pink[800],
+            '&.Mui-checked': {
+              color: pink[600],
+            },
+          }}
+        />
+        <span className="font-medium">Entregar no meu endereço</span>
+      </div>
 
 
       {isOpenInput && (
         <div className='w-full'>
-            <button>
-                <ChildModal/>
-            </button>
+          <button>
+            <ChildModal />
+          </button>
         </div>
-      )}  
+      )}
     </div>
-     
-    
+
+
   )
 }
