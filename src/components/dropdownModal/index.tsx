@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from "react";
 import { pink } from '@mui/material/colors';
 import Radio from '@mui/material/Radio';
-import { ChildModal } from '../Modals/index.js';
+import { ChildModal } from '../Modals';
 
 interface EnedecoProps {
   title: string;

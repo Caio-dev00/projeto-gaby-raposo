@@ -10,6 +10,7 @@ import photo from '../../assets/produto.png'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import DropdownModal from '../dropdownModal';
 import { Fade } from '@mui/material';
+import EnderecoUsusario from '../enderecoUsuario';
 
 const style = {
   position: 'absolute',
@@ -49,7 +50,7 @@ const handleClose = () => {
 
   return (
     <React.Fragment>
-    <Button style={{color:"#000"}} onClick={handleOpen}>+ Adicionar meu Endereço</Button>
+    <Button style={{color:"#FFF", padding:"1px"}} onClick={handleOpen}>+ Adicionar meu Endereço</Button>
       <Modal
         open={open}
         onClose={handleClose}
@@ -57,13 +58,8 @@ const handleClose = () => {
         aria-describedby="child-modal-description"
       >
         <Box sx={{ ...style}}>
-          <h1>PREENCHA SEU ENDEREÇO</h1>
-          <form>
-            <input 
-            type="text"
-            placeholder="Bairro" 
-            />
-          </form>
+          <h1 className="font-semibold">PREENCHA SEU ENDEREÇO</h1>
+          <EnderecoUsusario/>
           <Button onClick={handleClose}>Voltar</Button>
         </Box>
       </Modal>
@@ -136,13 +132,18 @@ export default function NestedModal() {
             </div>
 
             <DropdownModal 
-            title='Retirar na Loja'
+            title1='Retirar na Loja'
+            title2='Entregar no meu endereço'
             rua='São Judas Tadeu'
             bairro='São Judas'
             numero='139'
             cep="19880-000"
             />
+<<<<<<< HEAD
           <ChildModal />
+=======
+            
+>>>>>>> 0d973b01fd7f8819ae5f42052cb91f354187a2b1
         </Box>
       </Fade>
        
