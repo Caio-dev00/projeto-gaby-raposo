@@ -1,31 +1,61 @@
-import photo from '../../assets/produto.png'
+import { useEffect, useState } from 'react';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { db } from '../../services/firebaseConnection';
+
+import { productProps } from '../../pages/dashboard/new';
 
 export default function Catalogo() {
 
-    const promotional = true;
+    const [product, setProduct] = useState<productProps[]>([])
 
-  return (
-    <div className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
-        <div>
-            <img className='rounded-ss-lg rounded-se-lg' src={photo} alt="Product photo" />
-        </div>
-        <span className='text-gray-500 pl-4 pt-2 font-semibold max-md:text-[0.80rem] max-md:pb-1'>PRODUTO MODELO 1</span>
-        <div className='flex'>
-        {promotional ? (
-            <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] line-through max-md:text-[0.85rem]'>R$99,90</span>
-        ):(
-            <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[1rem]'>R$99,90</span>
-        )}
-            {
-                promotional && (
-                    <span className='text-green-400 pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[1rem]'>R$88,90</span>
-                )
-            }
-        </div>
-        <div className='flex justify-center bg-wine-light w-full max-md:w-[170px] rounded-ee-lg rounded-es-lg h-10 mb-10 hover:bg-wine-black'>
-            <button className='text-white font-bold hover:scale-105 duration-300 max-md:text-[0.70rem]'>ADICIONAR AO CARRINHO</button>
-        </div>
-    </div>
-  )
+    useEffect(() => {
+        loadProducts()
+    }, [])
+
+    async function loadProducts() {
+        const productRef = collection(db, "Produtos")
+        const q = query(productRef, orderBy("created", "desc"))
+
+        await getDocs(q)
+            .then((snapshot) => {
+                const listProduct = [] as productProps[]
+
+                snapshot.forEach(doc => {
+                    listProduct.push({
+                        id: doc.id,
+                        name: doc.data().name,
+                        categoria: doc.data().categoria,
+                        color: doc.data().color,
+                        storage: doc.data().storage,
+                        description: doc.data().description,
+                        owner: doc.data().owner,
+                        price: doc.data().price,
+                        size: doc.data().size,
+                        status: doc.data().status,
+                        image: doc.data().images
+                    })
+                })
+                setProduct(listProduct)
+            })
+    }
+
+    return (
+        <>
+            {product.length === 0 && (
+                <div>Nenhum produto encontrado</div>
+            )}
+            {product.map((item, index) => (
+                <div key={index} className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
+                    <div>
+                        <img className=' max-h-[300px] w-[305px] max-md:h-[170px] rounded-ss-lg rounded-se-lg' src={item.image[0].url} alt="Product photo" />
+                    </div>
+                    <span className='text-gray-500 pl-4 pt-2 font-semibold max-md:text-[0.80rem] max-md:pb-1'>{item.name}</span>
+                        <span className='text-green-400 pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[1rem]'>R$R${item.price}</span>
+                    <div className='flex justify-center bg-wine-light w-full max-md:w-[170px] rounded-ee-lg rounded-es-lg h-10 mb-10 hover:bg-wine-black'>
+                        <button className='text-white font-bold hover:scale-105 duration-300 max-md:text-[0.70rem]'>ADICIONAR AO CARRINHO</button>
+                    </div>
+                </div>
+            ))}
+        </>
+    )
 }
- 

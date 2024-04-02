@@ -18,7 +18,7 @@ import { FiTrash, FiUpload } from 'react-icons/fi';
 import { coresProps, tamanhoProps } from '../variacoes';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-interface productProps {
+export interface productProps {
   id: string;
   name: string;
   owner: string;
@@ -29,6 +29,7 @@ interface productProps {
   categoria: string;
   color: string;
   description: string;
+  image: ImageItemProps[];
 }
 
 
@@ -103,7 +104,7 @@ export function New() {
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) return;
-  
+
       try {
         const productDoc = await getDoc(doc(db, "Produtos", productId))
         if (productDoc.exists()) {
@@ -120,14 +121,14 @@ export function New() {
               storage: productData.storage,
               price: productData.price,
               description: productData.description,
+              image: productData.images
             }
-          
+
             setName(productCompleto.name)
             setPrice(productCompleto.price)
             setStorageEdit(productCompleto.storage)
             setDescription(productCompleto.description)
             setStatus(productCompleto.status)
-  
           }
         } else {
           console.log("Produto não encontrado")
@@ -139,7 +140,7 @@ export function New() {
       }
     }
     fetchProduct()
-  },[productId, navigate])
+  }, [productId, navigate])
 
   async function onSubmit(data: FormData) {
     await addDoc(collection(db, "Produtos"), {
@@ -235,7 +236,7 @@ export function New() {
             setCategory([{ id: '1', name: "FREELA" }])
             setLoadCategory(false)
             return;
-            
+
           }
           setCategory(lista)
           setLoadCategory(false)
@@ -385,12 +386,12 @@ export function New() {
       <div className="ml-[300px] pt-[1px] px-[16px] max-md:ml-0">
         {productId ? (
           <Title name={"Editar Produto"}>
-          <FaListAlt size={25} color="#FFF" />
-        </Title>
-        ): (
+            <FaListAlt size={25} color="#FFF" />
+          </Title>
+        ) : (
           <Title name={"Cadastrar Produto"}>
-          <FaListAlt size={25} color="#FFF" />
-        </Title>
+            <FaListAlt size={25} color="#FFF" />
+          </Title>
         )}
 
 
@@ -427,20 +428,20 @@ export function New() {
                 }
                 <label>Preço:</label>
                 <input
-                className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
-                placeholder="Editar preço do produto"
-                value={price}
-                onChange={handlePriceChange}
-                type='text'
-              />
+                  className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
+                  placeholder="Editar preço do produto"
+                  value={price}
+                  onChange={handlePriceChange}
+                  type='text'
+                />
                 <label>Estoque:</label>
                 <input
-                className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
-                placeholder="Editar estoque do produto"
-                value={storageEdit}
-                onChange={handleStorageChange}
-                type='text'
-              />
+                  className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
+                  placeholder="Editar estoque do produto"
+                  value={storageEdit}
+                  onChange={handleStorageChange}
+                  type='text'
+                />
               </div>
 
               <h1 className='my-5 text-xl font-semibold'>Variação do Produto:</h1>

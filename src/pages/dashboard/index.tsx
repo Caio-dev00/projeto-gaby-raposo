@@ -16,6 +16,7 @@ interface productProps {
     id: string;
     name: string;
     price: string;
+    promotional?: string;
     storage: string;
     description: string;
     images: ImageItemProps[];
@@ -95,6 +96,7 @@ export function Dashboard() {
                         category: doc.data().categoria,
                         color: doc.data().color,
                         price: doc.data().price,
+                        promotional: doc.data().promotion,
                         size: doc.data().size,
                         storage: doc.data().storage,
                         status: doc.data().status,
