@@ -5,24 +5,23 @@ import Radio from '@mui/material/Radio';
 import { ChildModal } from '../Modals';
 
 interface EnedecoProps {
-  title: string;
+  title1: string;
+  title2: string;
   rua: string;
   bairro: string;
   numero: string | number;
   cep: number | string;
 }
 
-interface EnedecoProps {
-  title: string;
-}
 
-export default function DropdownModal({ title, rua, bairro, cep, numero }: EnedecoProps) {
+export default function DropdownModal({ title1, title2, rua, bairro, cep, numero }: EnedecoProps) {
   const [selectedValue, setSelectedValue] = React.useState('');
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedValue(event.target.value);
   };
   const [isOpen, setIsOpen] = useState(false)
-  const isOpenInput = false
+  const [isOpenInput, setIsOpenInput] = useState(false)
+
 
   const controlProps = (item: string) => ({
     checked: selectedValue === item,
@@ -33,12 +32,14 @@ export default function DropdownModal({ title, rua, bairro, cep, numero }: Enede
   });
 
 
+
+
   return (
-    <div className="relative flex flex-col w-full rounded-lg">
+    <div className="relative flex flex-col w-fullrounded-lg">
       <div>
         <Radio
           onClick={() => setIsOpen((prev) => !prev)}
-          {...controlProps('e')}
+          {...controlProps('a')}
           sx={{
             color: pink[800],
             '&.Mui-checked': {
@@ -46,22 +47,26 @@ export default function DropdownModal({ title, rua, bairro, cep, numero }: Enede
             },
           }}
         />
-        <span className='font-medium'>{title}</span>
+        <span>{title1}</span>
       </div>
 
       {isOpen && (
         <div className="flex w-full mt-3">
-          <div className="mx-3 flex flex-wrap justify-start w-full gap-1">
-            <h3 className="font-medium text-base">Rua: {rua}, {numero} - Bairro: {bairro}</h3>
-            <h3 className="font-medium text-base">CEP: {cep}</h3>
+          <div className="flex flex-col w-full justify-start gap-1">
+            <h3 className="">Bairro: {bairro}</h3>
+            <h3 className="">CEP: {cep}</h3>
+          </div>
+          <div className="w-full">
+            <h3 className="">Rua: {rua}</h3>
+            <h3>Numero: {numero}</h3>
           </div>
         </div>
       )}
-
       <div>
+
         <Radio
-          onClick={() => setIsOpen((prev) => !prev)}
-          {...controlProps('e')}
+          onClick={() => setIsOpenInput((prev) => !prev)}
+          {...controlProps('b')}
           sx={{
             color: pink[800],
             '&.Mui-checked': {
@@ -69,17 +74,15 @@ export default function DropdownModal({ title, rua, bairro, cep, numero }: Enede
             },
           }}
         />
-        <span className="font-medium">Entregar no meu endereço</span>
+        <span>{title2}</span>
+        <>
+          {isOpenInput && (
+            <button className='flex justify-center bg-wine-black p-2 rounded-xl text-white font-semibold'>
+              <ChildModal/>
+            </button>
+          )}
+        </>
       </div>
-
-
-      {isOpenInput && (
-        <div className='w-full'>
-          <button>
-            <ChildModal />
-          </button>
-        </div>
-      )}
     </div>
 
 
