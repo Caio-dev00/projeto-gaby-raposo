@@ -23,32 +23,32 @@ export interface productProps {
   name: string;
   owner: string;
   price: string;
-  size: string;
+  sizes: sizeProps[];
   status: string;
   storage: string;
-  categoria: string;
-  color: string;
+  categoria: categoryProps;
+  colors: colorProps[];
   description: string;
   image: ImageItemProps[];
 }
 
 
-interface categoryProps {
+export interface categoryProps {
   name: string | number;
   id: string;
 }
 
-interface colorProps {
-  name: string | number;
+export interface colorProps {
+  name: string;
   id: string;
 }
 
-interface sizeProps {
-  name: string | number;
+export interface sizeProps {
+  name: string;
   id: string;
 }
 
-interface ImageItemProps {
+export interface ImageItemProps {
   uid: string;
   name: string;
   previewUrl: string;
@@ -87,9 +87,9 @@ export function New() {
   const [loadSize, setLoadSize] = useState(true)
 
 
-  const [categoria, setCategoria] = useState<number>(0)
-  const [colorSelected, setColorSelected] = useState<number>(0)
-  const [sizeSelected, setSizeSelected] = useState<number>(0)
+  const [categoria, setCategoria] = useState<number>(0);
+  const [colorSelected, setColorSelected] = useState<string[]>([])
+  const [sizeSelected, setSizeSelected] = useState<string[]>([])
   const [status, setStatus] = useState("Ativo")
 
   const location = useLocation();
@@ -115,8 +115,8 @@ export function New() {
               name: productData.name,
               owner: productData.owner,
               categoria: productData.categoria,
-              color: productData.color,
-              size: productData.size,
+              colors: productData.colors,
+              sizes: productData.sizes,
               status: productData.status,
               storage: productData.storage,
               price: productData.price,
@@ -129,6 +129,8 @@ export function New() {
             setStorageEdit(productCompleto.storage)
             setDescription(productCompleto.description)
             setStatus(productCompleto.status)
+            setColor(productCompleto.colors)
+            setSize(productCompleto.sizes)
           }
         } else {
           console.log("Produto não encontrado")
@@ -144,10 +146,10 @@ export function New() {
 
   async function onSubmit(data: FormData) {
     await addDoc(collection(db, "Produtos"), {
-      name: data.name.toLowerCase(),
+      name: data.name.toUpperCase(),
       categoria: category[categoria].name,
-      color: color[colorSelected].name,
-      size: size[sizeSelected].name,
+      colors: colorSelected,
+      sizes: sizeSelected,
       price: data.price,
       storage: data.storage,
       description: data.description,
@@ -161,6 +163,8 @@ export function New() {
       .then(() => {
         reset();
         setProductImage([])
+        setColorSelected([])
+        setSizeSelected([])
         console.log("PRODUTO CADASTRADO COM SUCESSO!")
       })
       .catch((error) => {
@@ -217,7 +221,6 @@ export function New() {
     }
   }
 
-
   useEffect(() => {
     async function loadCategory() {
       await getDocs(listRef)
@@ -247,7 +250,6 @@ export function New() {
           setCategory([{ id: '1', name: 'FREELA' }])
         })
     }
-
     async function loadCores() {
       await getDocs(listCoresRef)
         .then((snapshot) => {
@@ -264,7 +266,6 @@ export function New() {
 
           if (snapshot.size === 0) {
             console.log("NENHUMA CATEGORIA ENCONTRADA");
-            setColor([{ id: '1', name: "FREELA" }])
             setLoadColor(false)
             return;
 
@@ -276,7 +277,7 @@ export function New() {
         .catch((error) => {
           console.log("ERRO AO BUSCAR OS CLIENTES", error);
           setLoadColor(false);
-          setColor([{ id: '1', name: 'FREELA' }])
+
         })
     }
     async function loadTamanho() {
@@ -294,7 +295,6 @@ export function New() {
 
           if (snapshot.size === 0) {
             console.log("NENHUM TAMANHO ENCONTRADO");
-            setSize([{ id: '1', name: "FREELA" }])
             setLoadSize(false)
             return;
 
@@ -306,35 +306,20 @@ export function New() {
         .catch((error) => {
           console.log("ERRO AO BUSCAR OS CLIENTES", error);
           setLoadSize(false);
-          setSize([{ id: '1', name: 'FREELA' }])
         })
     }
-
 
     loadCategory();
     loadCores();
     loadTamanho();
   }, [])
 
-
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handleChangeCategory(e: any): void {
     setCategoria(e.target.value)
     console.log(categoria)
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleChangeColor(e: any): void {
-    setColorSelected(e.target.value)
-    console.log(colorSelected)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleChangeSize(e: any): void {
-    setSizeSelected(e.target.value)
-    console.log(sizeSelected)
-  }
+ 
   function handleOptionChange(e: ChangeEvent<HTMLInputElement>) {
     setStatus(e.target.value)
     console.log(status)
@@ -362,13 +347,13 @@ export function New() {
     try {
       await updateDoc(doc(db, "Produtos", productId!), {
         name: name,
-        categoria: category[categoria].name,
+        categorias: category.map(cat => cat.name),
         price: price,
         storage: storageEdit,
         description: description,
         status: status,
-        color: color[colorSelected].name,
-        size: size[sizeSelected].name,
+        color: color.map(color => color.name),
+        size: size.map(size => size.name),
       });
       alert("Produto editado com sucesso!");
       navigate("/dashboard"); // Redireciona de volta para a lista de categorias
@@ -376,6 +361,33 @@ export function New() {
       console.error("Erro ao editar produto:", error);
       navigate("/dashboard");
     }
+  };
+
+  const handleCheckboxChangeSize = (name: string) => {
+    const currentIndex = sizeSelected.indexOf(name);
+    const newSelectedOptions = [...sizeSelected];
+
+    if (currentIndex === -1) {
+      newSelectedOptions.push(name);
+    } else {
+      newSelectedOptions.splice(currentIndex, 1);
+    }
+    setSizeSelected(newSelectedOptions);
+    console.log(newSelectedOptions)
+  };
+
+  const handleCheckboxChangeColor = (name: string) => {
+    const currentIndex = colorSelected.indexOf(name);
+    const newSelectedOptions = [...colorSelected];
+
+    if (currentIndex === -1) {
+      newSelectedOptions.push(name);
+    } else {
+      newSelectedOptions.splice(currentIndex, 1);
+    }
+
+    setColorSelected(newSelectedOptions);
+    console.log(newSelectedOptions)
   };
 
   return (
@@ -452,20 +464,19 @@ export function New() {
                 loadColor ? (
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={colorSelected}
-                    onChange={handleChangeColor}>
-                    {color.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
+                  color.map((item) => (
+                    <label key={item.id}>
+                      <input
+                        id={`checkbox-${item.id}`}
+                        type="checkbox"
+                        value={item.name.toString()}
+                        checked={colorSelected.includes(item.id)}
+                        onChange={() => handleCheckboxChangeColor(item.name)}
+                      />
+                      {item.name}
+                    </label>
+                ))
+              )}
 
               {/* ---TAMANHO--- */}
 
@@ -474,20 +485,19 @@ export function New() {
                 loadSize ? (
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={sizeSelected}
-                    onChange={handleChangeSize}>
-                    {size.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
+                  size.map((item) => (
+                    <label key={item.id}>
+                      <input
+                        id={`checkbox-${item.id}`}
+                        type="checkbox"
+                        value={item.name.toString()}
+                        checked={sizeSelected.includes(item.id)}
+                        onChange={() => handleCheckboxChangeSize(item.id)}
+                      />
+                      <label htmlFor={`checkbox-${item.id}`}>{item.name}</label>
+                    </label>
+                ))
+                )}
               <label className='my-2'>Status</label>
               <div>
                 <input
@@ -607,20 +617,19 @@ export function New() {
                 loadColor ? (
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={colorSelected}
-                    onChange={handleChangeColor}>
-                    {color.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
+                  color.map((item) => (
+                    <label key={item.id}>
+                      <input
+                        id={`checkbox-${item.id}`}
+                        type="checkbox"
+                        value={item.name.toString()}
+                        checked={colorSelected.includes(item.name)}
+                        onChange={() => handleCheckboxChangeColor(item.name)}
+                      />
+                      {item.name}
+                    </label>
+                ))
+                )}
 
               {/* ---TAMANHO--- */}
 
@@ -629,20 +638,19 @@ export function New() {
                 loadSize ? (
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={sizeSelected}
-                    onChange={handleChangeSize}>
-                    {size.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
+                  size.map((item) => (
+                    <label key={item.id}>
+                      <input
+                        id={`checkbox-${item.id}`}
+                        type="checkbox"
+                        value={item.name.toString()}
+                        checked={sizeSelected.includes(item.name)}
+                        onChange={() => handleCheckboxChangeSize(item.name)}
+                      />
+                      <label htmlFor={`checkbox-${item.id}`}>{item.name}</label>
+                    </label>
+                ))
+                )}
               <label className='my-2'>Status</label>
               <div>
                 <input

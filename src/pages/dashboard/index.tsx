@@ -12,7 +12,7 @@ import { db, storage } from "../../services/firebaseConnection"
 import { FaTrashCan } from "react-icons/fa6"
 import { deleteObject, ref } from "firebase/storage"
 
-interface productProps {
+export interface productProps {
     id: string;
     name: string;
     price: string;
@@ -21,8 +21,8 @@ interface productProps {
     description: string;
     images: ImageItemProps[];
     category: string;
-    size: string;
-    color: string;
+    size: string[];
+    color: string[];
     status: string;
 }
 
@@ -58,9 +58,9 @@ export function Dashboard() {
                         id: doc.id,
                         name: doc.data().name,
                         category: doc.data().categoria,
-                        color: doc.data().color,
+                        color: doc.data().colors,
                         price: doc.data().price,
-                        size: doc.data().size,
+                        size: doc.data().sizes,
                         storage: doc.data().storage,
                         status: doc.data().status,
                         description: doc.data().description,
@@ -94,10 +94,10 @@ export function Dashboard() {
                         id: doc.id,
                         name: doc.data().name,
                         category: doc.data().categoria,
-                        color: doc.data().color,
+                        color: doc.data().colors,
                         price: doc.data().price,
                         promotional: doc.data().promotion,
-                        size: doc.data().size,
+                        size: doc.data().sizes,
                         storage: doc.data().storage,
                         status: doc.data().status,
                         description: doc.data().description,
@@ -176,8 +176,30 @@ export function Dashboard() {
                                         <td className="border-0 rounded-[4px] py-2" data-label="código">{index.toFixed()}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="produto">{item.name}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.category}</td>
-                                        <td className="border-0 rounded-[4px] py-2" data-label="tamanho">{item.size}</td>
-                                        <td className="border-0 rounded-[4px] py-2" data-label="cor">{item.color}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="tamanho">
+                                            <select
+                                                className='w-full max-w-12 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                                                value={item.size}
+                                            >
+                                                {item.size.map((size, sizeIndex) => (
+                                                    <option key={sizeIndex} value={size}>
+                                                        {size}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="cor">
+                                        <select
+                                                className='w-full max-w-40 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                                                value={item.color}
+                                            >
+                                                {item.color.map((color, colorIndex) => (
+                                                    <option key={colorIndex} value={color}>
+                                                        {color}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="preco">R$ {item.price}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="estoque">{item.storage}</td>
                                         <td className="border-0 p-[3px]" data-label="status">
