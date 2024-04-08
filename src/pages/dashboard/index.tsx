@@ -7,126 +7,72 @@ import { FiEdit2 } from "react-icons/fi"
 import Title from "../../components/titleDahsboard"
 import { HeaderDashboard } from "../../components/headerDashboard"
 import './dashboard.css'
-import { collection, deleteDoc, doc, getDocs, orderBy, query, where } from "firebase/firestore"
+import { collection, deleteDoc, doc, getDocs, orderBy, query } from "firebase/firestore"
 import { db, storage } from "../../services/firebaseConnection"
 import { FaTrashCan } from "react-icons/fa6"
 import { deleteObject, ref } from "firebase/storage"
+import { productProps } from "./new"
 
-export interface productProps {
-    id: string;
-    name: string;
-    price: string;
-    promotional?: string;
-    storage: string;
-    description: string;
-    images: ImageItemProps[];
-    category: string;
-    size: string[];
-    color: string[];
-    status: string;
-}
 
-interface ImageItemProps {
-    uid: string;
-    name: string;
-    previewUrl: string;
-    url: string;
-}
 
 export function Dashboard() {
-    const { user } = useContext(AuthContext)
-    const [product, setProduct] = useState<productProps[]>([]);
+    const { user } = useContext(AuthContext);
+    const [products, setProducts] = useState<productProps[]>([]);
     const [input, setInput] = useState("");
 
     useEffect(() => {
-        loadProducts()
-        handleSearch()
-        return () => { }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [input, user])
+        loadProducts();
+    }, [user]);
 
     async function loadProducts() {
-        const productRef = collection(db, 'Produtos')
-        const q = query(productRef, orderBy("created", "desc"))
+        const productRef = collection(db, 'Produtos');
+        const q = query(productRef, orderBy("created", "desc"));
 
-        await getDocs(q)
-            .then((snapshot) => {
-                const listProducts = [] as productProps[];
+        const snapshot = await getDocs(q);
+        const productList: productProps[] = [];
 
-                snapshot.forEach(doc => {
-                    listProducts.push({
-                        id: doc.id,
-                        name: doc.data().name,
-                        category: doc.data().categoria,
-                        color: doc.data().colors,
-                        price: doc.data().price,
-                        size: doc.data().sizes,
-                        storage: doc.data().storage,
-                        status: doc.data().status,
-                        description: doc.data().description,
-                        images: doc.data().images
-                    })
-                })
-                setProduct(listProducts)
-            })
-    }
+        snapshot.forEach(doc => {
+            const productData = doc.data();
+            productList.push({
+                id: doc.id,
+                name: productData.name,
+                categoria: productData.categoria,
+                colors: productData.colors, // Suponha que isso seja um array de cores
+                sizes: productData.sizes, // Suponha que isso seja um array de tamanhos
+                price: productData.price,
+                storage: productData.storage,
+                status: productData.status,
+                description: productData.description,
+                owner: productData.owner,
+                colorImage: productData.colorImage,
+                image: productData.image
+            });
+        });
 
-    async function handleSearch() {
-        if (input === "") {
-            loadProducts();
-            return;
-        }
-
-        setProduct([]);
-
-
-        const q = query(collection(db, "Produtos"),
-            where("name", ">=", input.toUpperCase()),
-            where("name", "<=", input.toUpperCase() + "\uf8ff"),
-            where("uid", "==", user?.uid)
-        )
-        getDocs(q)
-            .then((snapshot) => {
-                const listProduct = [] as productProps[];
-
-                snapshot.forEach(doc => {
-                    listProduct.push({
-                        id: doc.id,
-                        name: doc.data().name,
-                        category: doc.data().categoria,
-                        color: doc.data().colors,
-                        price: doc.data().price,
-                        promotional: doc.data().promotion,
-                        size: doc.data().sizes,
-                        storage: doc.data().storage,
-                        status: doc.data().status,
-                        description: doc.data().description,
-                        images: doc.data().images
-                    })
-                })
-                setProduct(listProduct)
-            })
-
+        setProducts(productList);
     }
 
     async function handleDeleteProduct(item: productProps) {
         const itemProduct = item;
-
-        const docRef = doc(db, "Produtos", itemProduct.id)
-        await deleteDoc(docRef)
-
-        itemProduct.images.map(async (image) => {
-            const imagePath = `images/${image.uid}/${image.name}`
-            const imageRef = ref(storage, imagePath)
-
-            try {
-                await deleteObject(imageRef)
-                setProduct(product.filter(product => product.id !== itemProduct.id))
-            } catch (error) {
-                console.log("ERROR AO DELETAR IMAGEM")
-                console.log(error)
-            }
-        })
+    
+        const docRef = doc(db, "Produtos", itemProduct.id);
+    
+        try {
+            // Exclua o documento do banco de dados
+            await deleteDoc(docRef);
+    
+            // Remova o produto do estado local imediatamente após a exclusão do documento
+            setProducts(prevProducts => prevProducts.filter(product => product.id !== itemProduct.id));
+    
+            // Remova as imagens do armazenamento
+            await Promise.all(itemProduct.image.map(async (image) => {
+                const imagePath = `images/${image.uid}/${image.name}`;
+                const imageRef = ref(storage, imagePath);
+                await deleteObject(imageRef);
+            }));
+        } catch (error) {
+            console.log("Erro ao excluir produto:", error);
+        }
     }
 
     return (
@@ -151,7 +97,7 @@ export function Dashboard() {
                         type="text" />
                 </div>
                 <>
-                    {product.length === 0 ? (
+                    {products.length === 0 ? (
                         <div>
                             <span>Nenhum produto encontrado</span>
                         </div>
@@ -170,33 +116,29 @@ export function Dashboard() {
                                     <th scope="col">Ações</th>
                                 </tr>
                             </thead>
-                            {product.map((item, index) => (
+                            {products.map((item, index) => (
                                 <tbody key={index}>
                                     <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
                                         <td className="border-0 rounded-[4px] py-2" data-label="código">{index.toFixed()}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="produto">{item.name}</td>
-                                        <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.category}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.categoria.name}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="tamanho">
                                             <select
                                                 className='w-full max-w-12 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                                                value={item.size}
+                                                value={''}
                                             >
-                                                {item.size.map((size, sizeIndex) => (
-                                                    <option key={sizeIndex} value={size}>
-                                                        {size}
-                                                    </option>
+                                                {item.sizes.map((size, index) => (
+                                                    <option key={index}>{size.name}</option>
                                                 ))}
                                             </select>
                                         </td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="cor">
-                                        <select
+                                            <select
                                                 className='w-full max-w-40 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                                                value={item.color}
+                                                value={''}
                                             >
-                                                {item.color.map((color, colorIndex) => (
-                                                    <option key={colorIndex} value={color}>
-                                                        {color}
-                                                    </option>
+                                                {item.colors.map((color, index) => (
+                                                    <option key={index}>{color.name}</option>
                                                 ))}
                                             </select>
                                         </td>
