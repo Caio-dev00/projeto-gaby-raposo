@@ -15,7 +15,7 @@ import Input from "../../../components/input";
 import Title from "../../../components/titleDahsboard";
 
 import { FiTrash, FiUpload } from 'react-icons/fi';
-import { coresProps, tamanhoProps } from '../variacoes';
+import { tamanhoProps } from '../variacoes';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export interface productProps {
@@ -30,8 +30,12 @@ export interface productProps {
   colors: colorProps[];
   description: string;
   image: ImageItemProps[];
+  colorImage: Color[];
 }
-
+type Color = {
+  imageUrl: string;
+  name: string;
+}
 
 export interface categoryProps {
   name: string | number;
@@ -41,6 +45,8 @@ export interface categoryProps {
 export interface colorProps {
   name: string;
   id: string;
+  images: ImageItemProps[]
+  
 }
 
 export interface sizeProps {
@@ -80,12 +86,9 @@ export function New() {
   const [size, setSize] = useState<sizeProps[]>([])
   const [productImage, setProductImage] = useState<ImageItemProps[]>([])
 
-
-
   const [loadCategory, setLoadCategory] = useState(true)
   const [loadColor, setLoadColor] = useState(true)
   const [loadSize, setLoadSize] = useState(true)
-
 
   const [categoria, setCategoria] = useState<number>(0);
   const [colorSelected, setColorSelected] = useState<string[]>([])
@@ -101,12 +104,34 @@ export function New() {
   const [storageEdit, setStorageEdit] = useState("")
   const [description, setDescription] = useState("")
 
+  async function fetchColorImage(colorNames: string[]): Promise<{ name: string; imageUrl: string }[]> {
+    try {
+      const colorImages: { name: string; imageUrl: string }[] = [];
+
+      for (const colorName of colorNames) {
+        const selectedColor = color.find((c: colorProps) => c.name === colorName);
+        if (selectedColor) {
+          const imageUrl = selectedColor.images.length > 0 ? selectedColor.images[0].url : '';
+          colorImages.push({ name: colorName, imageUrl: imageUrl });
+        } else {
+          console.log(`Imagem não encontrada para a cor ${colorName}`);
+        }
+      }
+
+      return colorImages;
+    } catch (error) {
+      console.log("Erro ao buscar imagem da cor:", error);
+      return [];
+    }
+  }
+
+
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) return;
 
       try {
-        const productDoc = await getDoc(doc(db, "Produtos", productId))
+        const productDoc = await getDoc(doc(db, "Produtos", productId));
         if (productDoc.exists()) {
           const productData = productDoc.data();
           if (productData) {
@@ -121,55 +146,61 @@ export function New() {
               storage: productData.storage,
               price: productData.price,
               description: productData.description,
-              image: productData.images
-            }
+              image: productData.images,
+              colorImage: productData.colorImage,
+            };
 
-            setName(productCompleto.name)
-            setPrice(productCompleto.price)
-            setStorageEdit(productCompleto.storage)
-            setDescription(productCompleto.description)
-            setStatus(productCompleto.status)
-            setColor(productCompleto.colors)
-            setSize(productCompleto.sizes)
+            setName(productCompleto.name);
+            setPrice(productCompleto.price);
+            setStorageEdit(productCompleto.storage);
+            setDescription(productCompleto.description);
+            setStatus(productCompleto.status);
+            setColor(productCompleto.colors);
+            setSize(productCompleto.sizes);
           }
         } else {
-          console.log("Produto não encontrado")
-          navigate("/dashboard/new")
+          console.log("Produto não encontrado");
+          navigate("/dashboard/new");
         }
       } catch (error) {
-        console.log("Error ao buscar produto")
-        navigate("/dashboard/new")
+        console.log("Error ao buscar produto");
+        navigate("/dashboard/new");
       }
     }
-    fetchProduct()
-  }, [productId, navigate])
+    fetchProduct();
+  }, [productId, navigate]);
 
   async function onSubmit(data: FormData) {
-    await addDoc(collection(db, "Produtos"), {
-      name: data.name.toUpperCase(),
-      categoria: category[categoria].name,
-      colors: colorSelected,
-      sizes: sizeSelected,
-      price: data.price,
-      storage: data.storage,
-      description: data.description,
-      status: status,
-      created: new Date(),
-      owner: user?.name,
-      id: user?.uid,
-      images: productImage,
+    try {
+      const colorImages = await fetchColorImage(colorSelected);
 
-    })
-      .then(() => {
-        reset();
-        setProductImage([])
-        setColorSelected([])
-        setSizeSelected([])
-        console.log("PRODUTO CADASTRADO COM SUCESSO!")
-      })
-      .catch((error) => {
-        console.error("ERRO AO CADASTRAR PRODUTO", error)
-      })
+      const newProduct = {
+        name: data.name.toUpperCase(),
+        categoria: category[categoria].name,
+        colors: colorSelected.map(name => ({ name })),
+        sizes: sizeSelected.map(name => ({ name })),
+        price: data.price,
+        storage: data.storage,
+        description: data.description,
+        status: status,
+        created: new Date(),
+        owner: user?.name,
+        id: user?.uid,
+        images: productImage,
+        colorImage: colorImages,
+      };
+
+      await addDoc(collection(db, "Produtos"), newProduct);
+
+      reset();
+      setProductImage([]);
+      setColorSelected([]);
+      setSizeSelected([]);
+
+      console.log("PRODUTO CADASTRADO COM SUCESSO!");
+    } catch (error) {
+      console.error("ERRO AO CADASTRAR PRODUTO", error);
+    }
   }
 
   async function handleFile(e: ChangeEvent<HTMLInputElement>) {
@@ -253,14 +284,14 @@ export function New() {
     async function loadCores() {
       await getDocs(listCoresRef)
         .then((snapshot) => {
-          const lista = [] as coresProps[];
+          const lista = [] as colorProps[];
 
           snapshot.forEach((doc) => {
             lista.push({
               id: doc.id,
               name: doc.data().cor,
-              owner: doc.data().owner,
               images: doc.data().images
+
             })
           })
 
@@ -319,7 +350,7 @@ export function New() {
     setCategoria(e.target.value)
     console.log(categoria)
   }
- 
+
   function handleOptionChange(e: ChangeEvent<HTMLInputElement>) {
     setStatus(e.target.value)
     console.log(status)
@@ -370,7 +401,9 @@ export function New() {
     if (currentIndex === -1) {
       newSelectedOptions.push(name);
     } else {
-      newSelectedOptions.splice(currentIndex, 1);
+      newSelectedOptions
+
+        .splice(currentIndex, 1);
     }
     setSizeSelected(newSelectedOptions);
     console.log(newSelectedOptions)
@@ -387,7 +420,6 @@ export function New() {
     }
 
     setColorSelected(newSelectedOptions);
-    console.log(newSelectedOptions)
   };
 
   return (
@@ -456,48 +488,8 @@ export function New() {
                 />
               </div>
 
-              <h1 className='my-5 text-xl font-semibold'>Variação do Produto:</h1>
+              <h1 className='my-1 text-xl font-semibold'>Variação do Produto:</h1>
 
-              {/* ---SELECIONE A COR--- */}
-              <label>Selecione a cor</label>
-              {
-                loadColor ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  color.map((item) => (
-                    <label key={item.id}>
-                      <input
-                        id={`checkbox-${item.id}`}
-                        type="checkbox"
-                        value={item.name.toString()}
-                        checked={colorSelected.includes(item.id)}
-                        onChange={() => handleCheckboxChangeColor(item.name)}
-                      />
-                      {item.name}
-                    </label>
-                ))
-              )}
-
-              {/* ---TAMANHO--- */}
-
-              <label className='mt-4'>Selecione o Tamanho</label>
-              {
-                loadSize ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  size.map((item) => (
-                    <label key={item.id}>
-                      <input
-                        id={`checkbox-${item.id}`}
-                        type="checkbox"
-                        value={item.name.toString()}
-                        checked={sizeSelected.includes(item.id)}
-                        onChange={() => handleCheckboxChangeSize(item.id)}
-                      />
-                      <label htmlFor={`checkbox-${item.id}`}>{item.name}</label>
-                    </label>
-                ))
-                )}
               <label className='my-2'>Status</label>
               <div>
                 <input
@@ -618,40 +610,40 @@ export function New() {
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
                   color.map((item) => (
-                    <label key={item.id}>
+
+
+                    <div key={item.id} className='flex flex-row'>
                       <input
-                        id={`checkbox-${item.id}`}
                         type="checkbox"
-                        value={item.name.toString()}
                         checked={colorSelected.includes(item.name)}
                         onChange={() => handleCheckboxChangeColor(item.name)}
                       />
-                      {item.name}
-                    </label>
-                ))
-                )}
+                      <label className='pl-1'>{item.name}</label>
+                    </div>
+                  ))
+                )
+              }
 
-              {/* ---TAMANHO--- */}
-
-              <label className='mt-4'>Selecione o Tamanho</label>
+              {/* ---SELECIONE O TAMANHO--- */}
+              <label>Selecione o Tamanho</label>
               {
                 loadSize ? (
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
                   size.map((item) => (
-                    <label key={item.id}>
+                    <div key={item.id} className='flex flex-row'>
                       <input
-                        id={`checkbox-${item.id}`}
                         type="checkbox"
-                        value={item.name.toString()}
                         checked={sizeSelected.includes(item.name)}
                         onChange={() => handleCheckboxChangeSize(item.name)}
                       />
-                      <label htmlFor={`checkbox-${item.id}`}>{item.name}</label>
-                    </label>
-                ))
-                )}
-              <label className='my-2'>Status</label>
+                      <label className='pl-1'>{item.name}</label>
+                    </div>
+                  ))
+                )
+              }
+
+              <label className='mt-4'>Status</label>
               <div>
                 <input
                   type="radio"
@@ -674,10 +666,8 @@ export function New() {
               <label className='mt-4'>Descrição do produto</label>
               <textarea
                 className='w-full border-2 rounded-md h-24 px-2'
-                {...register("description")}
-                name='description'
-                id="description"
-                placeholder='Escreva algo sobre o produto...'
+                placeholder='Adicionar descrição do produto...'
+                {...register('description')}
               />
               <button type='submit' className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
                 <span className='text-white font-bold'>Cadastrar Produto</span>

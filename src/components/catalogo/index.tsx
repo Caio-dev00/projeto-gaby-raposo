@@ -26,12 +26,12 @@ export default function Catalogo() {
                         id: doc.id,
                         name: doc.data().name,
                         categoria: doc.data().categoria,
-                        color: doc.data().color,
+                        colors: doc.data().color,
                         storage: doc.data().storage,
                         description: doc.data().description,
                         owner: doc.data().owner,
                         price: doc.data().price,
-                        size: doc.data().size,
+                        sizes: doc.data().size,
                         status: doc.data().status,
                         image: doc.data().images
                     })
@@ -48,7 +48,7 @@ export default function Catalogo() {
             {product.map((item, index) => (
                 <div key={index} className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
                     <div>
-                      <Link to={`/product/${item.id}`}>
+                      <Link to={`/product/details?id=${item.id}`}>
                         <img className=' max-h-[300px] w-[305px] max-md:h-[170px] rounded-ss-lg rounded-se-lg' src={item.image[0].url} alt="Product photo" />
                       </Link>
                     </div>
