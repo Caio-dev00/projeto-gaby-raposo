@@ -105,7 +105,7 @@ export function ProductDetail() {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    prevArrow: <IoMdArrowBack color="#000"/>,
+    prevArrow: <IoMdArrowBack color="#000" />,
     nextArrow: <IoMdArrowForward color="#000" />,
   };
 
@@ -118,19 +118,29 @@ export function ProductDetail() {
     <Container>
       {product && (
         <div className="flex flex-col md:flex-row justify-center mt-20 w-full">
-          <div className="md:w-[600px] md:mr-8">
-            <Slider {...sliderSettings}>
-              {product.image.map((item, index) => (
-                <div key={index} onClick={() => openModal(index)}>
-                  <img src={item.url} alt="" className="h-full w-full object-contain rounded-md" />
-                </div>
-              ))}
-            </Slider>
-            <div className="flex flex-col">
-              <span className="mt-5 mb-2 max-md:mt-10 text-xl font-semibold">Descrição do Produto:</span>
-              <p>{product.description}</p>
+          {product.image.length === 1 ? (
+            <div className="md:w-[600px] md:mr-8">
+              <img src={product.image[0].url} alt="" className="h-auto w-full object-contain" />
+              <div className="flex flex-col">
+                <span className="mt-5 mb-2 max-md:mt-10 text-xl font-semibold">Descrição do Produto:</span>
+                <p>{product.description}</p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="md:w-[600px] md:mr-8">
+              <Slider {...sliderSettings}>
+                {product.image.map((item, index) => (
+                  <div key={index} onClick={() => openModal(index)}>
+                    <img src={item.url} alt="" className="h-full w-full object-contain" />
+                  </div>
+                ))}
+              </Slider>
+              <div className="flex flex-col">
+                <span className="mt-5 mb-2 max-md:mt-10 text-xl font-semibold">Descrição do Produto:</span>
+                <p>{product.description}</p>
+              </div>
+            </div>
+          )}
           <div className="flex flex-col md:ml-8 w-full md:w-80">
             <div className="uppercase w-full h-full">
               <>
@@ -174,11 +184,11 @@ export function ProductDetail() {
               </div>
               <div className="flex flex-col my-6">
                 <span className="uppercase text-sm font-bold"> Observações do Pedido</span>
-                <textarea 
-                className="w-full h-20 bg-salmon border-[1px] rounded-lg pb-12 pl-1 text-sm font-medium" 
-                onChange={() => handleObservationsChange}
+                <textarea
+                  className="w-full h-20 bg-salmon border-[1px] rounded-lg pb-12 pl-1 text-sm font-medium"
+                  onChange={() => handleObservationsChange}
                 />
-                
+
               </div>
               <div className="my-6">
                 <button className="uppercase w-full justify-center items-center mb-0 mt font-semibold text-white text-[14px] rounded-md h-[32px] bg-wine-black">
@@ -195,14 +205,14 @@ export function ProductDetail() {
         className={modalStyles.overlay}
       >
         <div onClick={closeModal} className="w-full h-full flex justify-center items-center">
-        {selectedImageIndex !== null && (
-          <img
-            src={product?.image[selectedImageIndex].previewUrl}
-            alt="Product Preview"
-            className="w-96"
-            onClick={closeModal}
-          />
-        )}
+          {selectedImageIndex !== null && (
+            <img
+              src={product?.image[selectedImageIndex].previewUrl}
+              alt="Product Preview"
+              className="w-96"
+              onClick={closeModal}
+            />
+          )}
         </div>
       </Modal>
     </Container>
