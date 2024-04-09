@@ -152,8 +152,8 @@ export function ProductDetail() {
               <div className="flex flex-row gap-2 uppercase font-semibold">
                 <select className="w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2">
                   {product.sizes.map((size, index) => (
-                    <option key={index} value={size.name}>
-                      {size.name}
+                    <option key={index} value={size}>
+                      {size}
                     </option>
                   ))}
                 </select>
