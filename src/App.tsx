@@ -16,6 +16,7 @@ import { CadastrarBanner } from "./pages/dashboard/banners/cadastrar-banner";
 
 import { Layout } from "./components/layout";
 import { Private } from "./routes/Private";
+import Produtos from "./pages/produtos/produtos";
 
 
 const router = createBrowserRouter([
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "/product/:id",
         element: <ProductDetail />
+      },
+      {
+        path: "/produtos/:categoria/:tamanho",
+        element: <Produtos />
       },
       
     ]

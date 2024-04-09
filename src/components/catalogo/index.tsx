@@ -33,7 +33,8 @@ export default function Catalogo() {
                         price: doc.data().price,
                         sizes: doc.data().size,
                         status: doc.data().status,
-                        image: doc.data().images
+                        image: doc.data().images,
+                        colorImage: doc.data().colorImage
                     })
                 })
                 setProduct(listProduct)

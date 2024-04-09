@@ -23,10 +23,10 @@ export interface productProps {
   name: string;
   owner: string;
   price: string;
-  sizes: sizeProps[];
+  sizes: string[];
   status: string;
   storage: string;
-  categoria: categoryProps;
+  categoria: string;
   colors: colorProps[];
   description: string;
   image: ImageItemProps[];
@@ -156,7 +156,7 @@ export function New() {
             setDescription(productCompleto.description);
             setStatus(productCompleto.status);
             setColor(productCompleto.colors);
-            setSize(productCompleto.sizes);
+            
           }
         } else {
           console.log("Produto não encontrado");
@@ -176,9 +176,9 @@ export function New() {
 
       const newProduct = {
         name: data.name.toUpperCase(),
-        categoria: category[categoria].name,
+        categoria: category[categoria],
         colors: colorSelected.map(name => ({ name })),
-        sizes: sizeSelected.map(name => ({ name })),
+        sizes: sizeSelected,
         price: data.price,
         storage: data.storage,
         description: data.description,

@@ -121,14 +121,14 @@ export function Dashboard() {
                                     <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
                                         <td className="border-0 rounded-[4px] py-2" data-label="código">{index.toFixed()}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="produto">{item.name}</td>
-                                        <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.categoria.name}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.categoria}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="tamanho">
                                             <select
                                                 className='w-full max-w-12 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
                                                 value={''}
                                             >
                                                 {item.sizes.map((size, index) => (
-                                                    <option key={index}>{size.name}</option>
+                                                    <option key={index}>{size[0]}</option>
                                                 ))}
                                             </select>
                                         </td>
