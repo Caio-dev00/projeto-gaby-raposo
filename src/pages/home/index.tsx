@@ -3,7 +3,6 @@ import { Container } from "../../components/container"
 import { Slider } from "../../components/slideBanner/Slider"
 
 import Catalogo from "../../components/catalogo"
-import Pagination from "../../components/pagination"
 import { useEffect, useState } from "react"
 import { collection, getDocs, onSnapshot, orderBy, query } from "firebase/firestore"
 import { db } from "../../services/firebaseConnection"
@@ -42,7 +41,6 @@ export function Home() {
   const [category, setCategory] = useState<categoryProp[]>([])
   const [tamanho, setTamanho] = useState<tamanhoProps[]>([])
   const [banner, setBanner] = useState<BannerProps[]>([])
-
 
   useEffect(() => {
 
@@ -190,15 +188,7 @@ export function Home() {
       <div>
         <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5 max-md:mt-32">CATÁLOGO</h1>
       </div>
-
-      <div className="flex justify-center">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
           <Catalogo />
-        </div>
-      </div>
-
-      <Pagination />
-
     </Container>
   )
 }

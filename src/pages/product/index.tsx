@@ -84,7 +84,6 @@ export function ProductDetail() {
 
   const handleObservationsChange = (event: ChangeEvent<HTMLInputElement>) => {
     const observations = event.target.value;
-    // Faça o que quiser com os dados, como salvar em um estado
     setObservation(observations)
   };
 
