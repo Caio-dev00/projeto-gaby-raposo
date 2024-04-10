@@ -64,7 +64,7 @@ function CatalogoFilter() {
                 <span className="font-bold text-center text-white">{item.categoria}</span>
                 </div>
                 
-                <div key={index} className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
+                <div className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
                   <div>
                     <Link key={index} to={`/product/details?id=${item.id}`}>
                       <img
