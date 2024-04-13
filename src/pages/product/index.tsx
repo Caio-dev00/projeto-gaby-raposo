@@ -11,17 +11,24 @@ import { useLocation } from 'react-router-dom';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
 import { productProps } from "../dashboard/new";
-
+import { useCart } from "../../contexts/cartContext";
 
 export function ProductDetail() {
+  const { addToCart, cart, setCart } = useCart();
   const location = useLocation()
   const productId = new URLSearchParams(location.search).get("id")
+
   const [product, setProduct] = useState<productProps | null>(null);
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
-  const [quantity, setQuantity] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState<number>(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
-  const [obeservation, setObservation] = useState("")
+  const [observation, setObservation] = useState("");
+
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [defaultSize, setDefaultSize] = useState<string>("Selecione o Tamanho");
+
 
   useEffect(() => {
     async function fetchProduct() {
@@ -58,33 +65,20 @@ export function ProductDetail() {
     fetchProduct()
   }, [productId])
 
-  const handleColorSelect = (index: number) => {
+  const handleColorSelect = (color: string, index: number) => {
+    setSelectedColor(color);
     setSelectedColorIndex(index);
   };
 
-  const incrementQuantity = () => {
-    // Converte o valor de storage para um número antes de comparar
-    const stockQuantity = parseInt(product?.storage || "0");
-
-    // Incrementa a quantidade apenas se ainda houver estoque disponível
-    if (!isNaN(stockQuantity) && quantity < stockQuantity) {
-      setQuantity(quantity + 1);
-    }
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size);
+    setDefaultSize(size); // Atualiza o valor padrão do select de tamanho
   };
 
-  const decrementQuantity = () => {
-    // Converte o valor de storage para um número antes de comparar
-    const stockQuantity = parseInt(product?.storage || "0");
 
-    // Decrementa a quantidade apenas se a quantidade atual for maior que 1
-    if (!isNaN(stockQuantity) && quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
-  const handleObservationsChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleObservationsChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const observations = event.target.value;
-    setObservation(observations)
+    setObservation(observations);
   };
 
   const openModal = (index: number) => {
@@ -96,6 +90,77 @@ export function ProductDetail() {
     setSelectedImageIndex(null);
     setIsModalOpen(false);
   };
+
+  const incrementQuantity = () => {
+    const stockQuantity = parseInt(product?.storage || "0");
+    if (!isNaN(stockQuantity) && quantity < stockQuantity) {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleAddToCart = () => {
+
+
+    if (product && selectedColor && selectedSize) {
+      const price = parseFloat(product.price);
+      const totalPrice = price * quantity;
+
+      const existingProductIndex = cart.findIndex(item =>
+        item.id === product.id && // Verifica se o ID do produto é o mesmo
+        item.size === selectedSize && // Verifica se o tamanho é o mesmo
+        item.selectedColorName === selectedColor // Verifica se a cor selecionada é a mesma
+      );
+
+      if (existingProductIndex !== -1) {
+        const existingProduct = cart[existingProductIndex];
+        const updatedQuantity = existingProduct.quantidade + quantity;
+        const updatedPrice = existingProduct.price + totalPrice;
+        const updatedProduct = {
+          ...existingProduct,
+          quantidade: updatedQuantity,
+          price: updatedPrice
+        };
+        const updatedCart = [...cart];
+        updatedCart[existingProductIndex] = updatedProduct;
+        setCart(updatedCart);
+      } else {
+        const colorImageItems = selectedColorIndex !== null ? [{
+          uid: product.colorImage[selectedColorIndex].name,
+          previewUrl: product.colorImage[selectedColorIndex].imageUrl,
+          url: product.colorImage[selectedColorIndex].imageUrl,
+          name: product.colorImage[selectedColorIndex].name,
+          imageUrl: product.colorImage[selectedColorIndex].imageUrl,
+        }] : []
+        addToCart({
+          id: product.id,
+          name: product.name,
+          size: selectedSize,
+          image: product.image,
+          price: parseInt(totalPrice.toFixed(2)),
+          colorImage: colorImageItems, // Apenas a cor selecionada é adicionada
+          quantidade: quantity.toString(),
+          observation: observation,
+          selectedColorIndex: selectedColorIndex !== null ? selectedColorIndex : undefined,
+          selectedColorName: selectedColor,
+          variation: quantity.toString()
+        }, selectedColorIndex !== null ? selectedColorIndex : undefined,
+          selectedColor);
+      }
+      setObservation('')
+      setSelectedColor(null);
+      setSelectedColorIndex(null);
+      setSelectedSize(null);
+      setQuantity(1);
+      setDefaultSize("Selecione o Tamanho");
+    }
+  };
+
 
 
   const sliderSettings = {
@@ -122,7 +187,7 @@ export function ProductDetail() {
               <img src={product.image[0].url} alt="" className="h-auto w-full object-contain" />
               <div className="flex flex-col">
                 <span className="mt-5 mb-2 max-md:mt-10 text-xl font-semibold">Descrição do Produto:</span>
-                <p>{product.description}</p>
+                <p className="max-md:mb-2">{product.description}</p>
               </div>
             </div>
           ) : (
@@ -136,7 +201,7 @@ export function ProductDetail() {
               </Slider>
               <div className="flex flex-col">
                 <span className="mt-5 mb-2 max-md:mt-10 text-xl font-semibold">Descrição do Produto:</span>
-                <p>{product.description}</p>
+                <p className="max-md:mb-2">{product.description}</p>
               </div>
             </div>
           )}
@@ -149,9 +214,10 @@ export function ProductDetail() {
                 <h3 className="font-bold mt-6">Tamanhos</h3>
               </>
               <div className="flex flex-row gap-2 uppercase font-semibold">
-                <select className="w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2">
+                <select value={defaultSize} onChange={(event) => handleSizeSelect(event.target.value)} className="w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2">
+                  <option disabled value="Selecione o Tamanho">Selecione o Tamanho</option>
                   {product.sizes.map((size, index) => (
-                    <option key={index} value={size}>
+                    <option key={index} value={size} >
                       {size}
                     </option>
                   ))}
@@ -164,7 +230,7 @@ export function ProductDetail() {
                     <button
                       className={`w-[30px] h-[30px] rounded-full border border-spacing-1 border-wine-black ${selectedColorIndex === index ? "border-4" : ""
                         }`}
-                      onClick={() => handleColorSelect(index)}
+                      onClick={() => handleColorSelect(color.imageUrl, index)}
                     >
                       <img className="rounded-full" src={color.imageUrl} alt={color.name} />
                     </button>
@@ -177,7 +243,7 @@ export function ProductDetail() {
                   -
                 </button>
                 <button className="font-bold">{quantity}</button>
-                <button className="font-bold" onClick={incrementQuantity} disabled={quantity >= parseInt(product.storage || "0")}>
+                <button className="font-bold" onClick={incrementQuantity}>
                   +
                 </button>
               </div>
@@ -185,12 +251,13 @@ export function ProductDetail() {
                 <span className="uppercase text-sm font-bold"> Observações do Pedido</span>
                 <textarea
                   className="w-full h-20 bg-salmon border-[1px] rounded-lg pb-12 pl-1 text-sm font-medium"
-                  onChange={() => handleObservationsChange}
+                  onChange={handleObservationsChange}
+                  value={observation}
                 />
 
               </div>
               <div className="my-6">
-                <button className="uppercase w-full justify-center items-center mb-0 mt font-semibold text-white text-[14px] rounded-md h-[32px] bg-wine-black">
+                <button onClick={handleAddToCart} className="uppercase w-full justify-center items-center mb-0 mt font-semibold text-white text-[14px] rounded-md h-[32px] bg-wine-black">
                   Adicionar ao Carrinho
                 </button>
               </div>

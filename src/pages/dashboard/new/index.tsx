@@ -32,7 +32,10 @@ export interface productProps {
   image: ImageItemProps[];
   colorImage: Color[];
 }
-type Color = {
+export type Color = {
+  uid: string;
+  url: string;
+  previewUrl: string;
   imageUrl: string;
   name: string;
 }
