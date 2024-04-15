@@ -76,12 +76,15 @@ export function Home() {
         const listBanner = [] as BannerProps[]
 
         snapshot.forEach(doc => {
+          const bannerData = doc.data();
+
+          if(bannerData.status === "Ativo")
           listBanner.push({
             id: doc.id,
-            name: doc.data().name,
-            images: doc.data().images,
-            owner: doc.data().owner,
-            status: doc.data().status,
+            name: bannerData.name,
+            images: bannerData.images,
+            owner:bannerData.owner,
+            status: bannerData.status,
           })
         })
         setBanner(listBanner)
@@ -185,7 +188,7 @@ export function Home() {
           </Slider>
         </div>
       </div>
-      <div>
+      <div id="catalogo">
         <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5 max-md:mt-32">CATÁLOGO</h1>
       </div>
           <Catalogo />

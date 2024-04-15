@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logoImg from '../../assets/logo.png';
 import { AiOutlineClose } from "react-icons/ai";
@@ -11,6 +11,23 @@ export default function Header() {
     const handleToggleButton = () => {
       setToggleButton(toggleButton => !toggleButton)
     }
+
+    useEffect(() => {
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+              e.preventDefault();
+
+              const target = document.querySelector(this.getAttribute('href'));
+
+              if (target) {
+                  window.scrollTo({
+                      top: target.offsetTop,
+                      behavior: 'smooth'
+                  });
+              }
+          });
+      });
+  }, []);
 
     return (
       <div className="w-full flex items-center justify-center h-20 bg-salmon">
@@ -27,9 +44,9 @@ export default function Header() {
           <div className="block max-md:hidden">
               <li className="flex justify-between gap-5 font-semibold text-sm">
                   <a href=""><ul>PAGINA INICIAL</ul></a>
-                  <a href=""><ul>CATÁLOGO</ul></a>
-                  <a href=""><ul>SOBRE</ul></a>
-                  <a href=""><ul>CONTATO</ul></a>
+                  <a href="#catalogo"><ul>CATÁLOGO</ul></a>
+                  <a href="sobre"><ul>SOBRE</ul></a>
+                  <a href="contato"><ul>CONTATO</ul></a>
               </li>
           </div> 
           
@@ -40,7 +57,7 @@ export default function Header() {
                  <a href="#" className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Pagina Incial</a>
                </li>
                <li>
-                 <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Catálogo</a>
+                 <a href="#catalogo" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Catálogo</a>
                </li>
                <li>
                  <a href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Sobre</a>

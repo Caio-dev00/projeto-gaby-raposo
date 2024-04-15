@@ -1,13 +1,13 @@
-import { ReactNode} from "react";
+import { ReactNode, useContext} from "react";
 import { Navigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 
 interface PrivateProps{
     children: ReactNode
 }
 
 export function Private({children} : PrivateProps){
-    const signed = true;
-    const loadingAuth = false;
+    const {signed, loadingAuth} = useContext(AuthContext)
 
     if(loadingAuth){
         return <div></div>

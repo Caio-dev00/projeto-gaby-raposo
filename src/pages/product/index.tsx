@@ -14,7 +14,7 @@ import { productProps } from "../dashboard/new";
 import { useCart } from "../../contexts/cartContext";
 
 export function ProductDetail() {
-  const { addToCart, cart, setCart } = useCart();
+  const { addToCart, cart } = useCart();
   const location = useLocation()
   const productId = new URLSearchParams(location.search).get("id")
 
@@ -108,8 +108,8 @@ export function ProductDetail() {
 
 
     if (product && selectedColor && selectedSize) {
-      const price = parseFloat(product.price);
-      const totalPrice = price * quantity;
+      const price = parseFloat(product.price.replace(',', '.'));
+      const totalPrice = (price * quantity).toFixed(2);
 
       const existingProductIndex = cart.findIndex(item =>
         item.id === product.id && // Verifica se o ID do produto é o mesmo
@@ -118,41 +118,37 @@ export function ProductDetail() {
       );
 
       if (existingProductIndex !== -1) {
-        const existingProduct = cart[existingProductIndex];
-        const updatedQuantity = existingProduct.quantidade + quantity;
-        const updatedPrice = existingProduct.price + totalPrice;
-        const updatedProduct = {
-          ...existingProduct,
-          quantidade: updatedQuantity,
-          price: updatedPrice
-        };
-        const updatedCart = [...cart];
-        updatedCart[existingProductIndex] = updatedProduct;
-        setCart(updatedCart);
-      } else {
-        const colorImageItems = selectedColorIndex !== null ? [{
-          uid: product.colorImage[selectedColorIndex].name,
-          previewUrl: product.colorImage[selectedColorIndex].imageUrl,
-          url: product.colorImage[selectedColorIndex].imageUrl,
-          name: product.colorImage[selectedColorIndex].name,
-          imageUrl: product.colorImage[selectedColorIndex].imageUrl,
-        }] : []
-        addToCart({
-          id: product.id,
-          name: product.name,
-          size: selectedSize,
-          image: product.image,
-          price: parseInt(totalPrice.toFixed(2)),
-          colorImage: colorImageItems, // Apenas a cor selecionada é adicionada
-          quantidade: quantity.toString(),
-          observation: observation,
-          selectedColorIndex: selectedColorIndex !== null ? selectedColorIndex : undefined,
-          selectedColorName: selectedColor,
-          variation: quantity.toString()
-        }, selectedColorIndex !== null ? selectedColorIndex : undefined,
-          selectedColor);
+        // Se o produto já existe no carrinho, não faz nada ou mostra uma mensagem para o usuário
+        console.log("Produto já existe no carrinho.");
+        return;
       }
-      setObservation('')
+  
+      // Se não existe um produto com as mesmas propriedades, adiciona ao carrinho
+      const colorImageItems = selectedColorIndex !== null ? [{
+        uid: product.colorImage[selectedColorIndex].name,
+        previewUrl: product.colorImage[selectedColorIndex].imageUrl,
+        url: product.colorImage[selectedColorIndex].imageUrl,
+        name: product.colorImage[selectedColorIndex].name,
+        imageUrl: product.colorImage[selectedColorIndex].imageUrl,
+      }] : [];
+  
+      addToCart({
+        id: product.id,
+        name: product.name,
+        size: selectedSize,
+        image: product.image,
+        price: parseFloat(totalPrice),
+        colorImage: colorImageItems,
+        quantidade: quantity.toString(),
+        observation: observation,
+        selectedColorIndex: selectedColorIndex !== null ? selectedColorIndex : undefined,
+        selectedColorName: selectedColor,
+        variation: quantity.toString()
+      }, selectedColorIndex !== null ? selectedColorIndex : undefined,
+        selectedColor);
+        
+      // Limpa os campos depois de adicionar ao carrinho
+      setObservation('');
       setSelectedColor(null);
       setSelectedColorIndex(null);
       setSelectedSize(null);
@@ -209,7 +205,7 @@ export function ProductDetail() {
             <div className="uppercase w-full h-full">
               <>
                 <h1 className="font-semibold text-[20px] text-gray-500">{product.name}</h1>
-                <h2 className="text-[32px] font-bold text-vinho-principal">R${product.price}</h2>
+                <h2 className="text-[32px] font-bold text-vinho-principal ">R${product.price}</h2>
                 <hr className="mt-[25px] w-60" />
                 <h3 className="font-bold mt-6">Tamanhos</h3>
               </>

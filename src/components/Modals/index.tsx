@@ -72,6 +72,19 @@ export default function NestedModal() {
   const [open, setOpen] = React.useState(false);
   const { cart, removeFromCart } = useCart();
   const navigate = useNavigate();
+  const [totalPrice, setTotalPrice] = React.useState(0)
+
+  React.useEffect(() => {
+    const calculateTotalPrice = () => {
+      let total = 0;
+      cart.forEach(item => {
+        const quantidade = parseFloat(item.quantidade)
+        total += item.price * quantidade;
+      });
+      setTotalPrice(total)
+    }
+    calculateTotalPrice()
+  }, [cart])
 
   function handleClickNavigate(){
     navigate("/")
@@ -122,7 +135,7 @@ export default function NestedModal() {
             <span className='font-semibold ml-2 text-xs max-md:text-xs'>({item.colorImage[0].name} - {item.size})</span>
               </div>
               <div className='flex items-center justify-center'>
-              <span className='font-bold max-md:mx-1 text-green-600'>R${item.price}</span>
+              <span className='font-bold max-md:mx-1 text-green-600 mr-2'>R${item.price.toFixed(2)}</span>
               <button onClick={() => removeFromCart(item.id, item.variation)} className='hover:scale-110'>
                   <FaTrash />
               </button>
@@ -133,7 +146,7 @@ export default function NestedModal() {
       </div>
           ))}
           {cart.length >= 1 ? (
-            <h1 className='text-center font-bold mt-5'>TOTAL A PAGAR:</h1>
+            <h1 className='text-center font-bold mt-5'>TOTAL A PAGAR: R$ <span className='text-green-600 text-lg'>{totalPrice.toFixed(2)}</span></h1>
           ) : (
             <h1 className='text-center mt-5'>Adicione produtos ao seu carrinho</h1>
           )}

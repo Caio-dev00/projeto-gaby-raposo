@@ -27,20 +27,24 @@ export default function Catalogo() {
             const allProducts: productProps[] = [];
 
             snapshot.forEach(doc => {
-                allProducts.push({
-                    id: doc.id,
-                    name: doc.data().name,
-                    categoria: doc.data().categoria,
-                    colors: doc.data().color,
-                    storage: doc.data().storage,
-                    description: doc.data().description,
-                    owner: doc.data().owner,
-                    price: doc.data().price,
-                    sizes: doc.data().size,
-                    status: doc.data().status,
-                    image: doc.data().images,
-                    colorImage: doc.data().colorImage
-                });
+                const productData = doc.data();
+                // Verifica se o status do produto é "Ativo"
+                if (productData.status === "Ativo") {
+                    allProducts.push({
+                        id: doc.id,
+                        name: productData.name,
+                        categoria: productData.categoria,
+                        colors: productData.color,
+                        storage: productData.storage,
+                        description: productData.description,
+                        owner: productData.owner,
+                        price: productData.price,
+                        sizes: productData.size,
+                        status: productData.status,
+                        image: productData.images,
+                        colorImage: productData.colorImage
+                    });
+                }
             });
 
             const startIndex = (currentPage - 1) * productsPerPage;

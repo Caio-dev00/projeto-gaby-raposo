@@ -17,6 +17,7 @@ import Title from "../../../components/titleDahsboard";
 import { FiTrash, FiUpload } from 'react-icons/fi';
 import { tamanhoProps } from '../variacoes';
 import { useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export interface productProps {
   id: string;
@@ -163,10 +164,12 @@ export function New() {
           }
         } else {
           console.log("Produto não encontrado");
+          toast.success("Produto cadastrado!")
           navigate("/dashboard/new");
         }
       } catch (error) {
         console.log("Error ao buscar produto");
+        toast.error("Erro ao cadastrar produto!")
         navigate("/dashboard/new");
       }
     }
@@ -179,7 +182,7 @@ export function New() {
 
       const newProduct = {
         name: data.name.toUpperCase(),
-        categoria: category[categoria],
+        categoria: category[categoria].name,
         colors: colorSelected.map(name => ({ name })),
         sizes: sizeSelected,
         price: data.price,
@@ -196,6 +199,7 @@ export function New() {
       await addDoc(collection(db, "Produtos"), newProduct);
 
       reset();
+      toast.success("Produto Cadastrado!")
       setProductImage([]);
       setColorSelected([]);
       setSizeSelected([]);
@@ -203,6 +207,7 @@ export function New() {
       console.log("PRODUTO CADASTRADO COM SUCESSO!");
     } catch (error) {
       console.error("ERRO AO CADASTRAR PRODUTO", error);
+      toast.error("Erro ao cadastrar o")
     }
   }
 
@@ -390,9 +395,11 @@ export function New() {
         size: size.map(size => size.name),
       });
       alert("Produto editado com sucesso!");
+      toast.success("Produto editado!")
       navigate("/dashboard"); // Redireciona de volta para a lista de categorias
     } catch (error) {
       console.error("Erro ao editar produto:", error);
+      toast.error("Erro ao editar produto!")
       navigate("/dashboard");
     }
   };
