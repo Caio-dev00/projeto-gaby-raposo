@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 
@@ -9,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { auth } from "../../services/firebaseConnection";
 import { signOut, signInWithEmailAndPassword } from "firebase/auth";
-
+import { toast } from "react-hot-toast";
 
 const schema = z.object({
   email: z.string().email("Insira um email valido").min(0, "O campo email é obrigatorio!"),
@@ -32,22 +31,23 @@ export function Login() {
       handleLogOut()
     },[])
 
-    async function onSubmit (data: FormaData){
+     async function onSubmit (data: FormaData){
       signInWithEmailAndPassword(auth, data.email, data.password)
       .then(async () => {
         console.log("LOGIN REALIZADO")
+        toast.success("Login realizado com sucesso!")
         navigate("/dashboard", {replace: true})
       })
       .catch((error) => {
-          console.error("ERRO AO REALIZAR LOGIN")
-          console.error(error)
+        toast.error("Erro ao logar")
+        console.log(error)
       })
     }
     return (
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img className="mx-auto w-12 rounded-full md:w-24 lg:w-36" src="/src/assets/logo.png" alt="logo" />
-        <h2 className="mt-10 text-center text-sm font-semibold leading-9 tracking-tight text-gray-900 md:text-lg lg:text-xl">Cadstrar Dashboard Gabi Raposo</h2>
+        <h2 className="mt-10 text-center text-sm font-semibold leading-9 tracking-tight text-gray-900 md:text-lg lg:text-xl">Login Dashboard Gabi Raposo</h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xl">
@@ -85,10 +85,6 @@ export function Login() {
             <button type="submit" className="flex w-full justify-center rounded-lg bg-wine-black px-4 py-2 text-sm font-semibold text-white hover:bg-opacity-95 hover:shadow-lg hover:border-black ">Login</button>
           </div>
         </form>
-
-        <Link to="/register">
-          <p className="my-2 flex justify-center">Não possui uma conta? Cadastre-se agora!</p>
-        </Link>
       </div>
     </div>
     )

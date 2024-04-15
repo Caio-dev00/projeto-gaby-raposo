@@ -17,7 +17,7 @@ interface ProductProps {
     image: ImageItemProps[];
     price: number,
     colorImage: Color[],
-    quantidade: number | string,
+    quantidade: string,
     observation?: string
     selectedColorIndex?: number,
     selectedColorName: string ,

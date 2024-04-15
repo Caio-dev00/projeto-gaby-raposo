@@ -2,15 +2,20 @@ import { useContext } from "react";
 
 import { AuthContext } from "../../contexts/AuthContext";
 import logo from '../../assets/logo.png'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { PiSignOutBold } from "react-icons/pi";
 
 export function HeaderDashboard() {
-  const { user } = useContext(AuthContext)
+  const { user, logOut } = useContext(AuthContext)
+  const navigate = useNavigate()
+
+
   return (
     <aside className="w-[300px] bg-wine-black fixed h-full overflow-auto m-0 p-0 max-md:w-full max-md:h-auto max-md:relative">
       <div className="w-full bg-center bg-repeat bg-cover h-[150px] p-[30px] max-md:hidden">
         <img
-          className=" pb- w-[90px] h-[90px] block m-auto rounded-[50px] object-cover drop-shadow-md"
+          onClick={() => navigate("/")}
+          className=" cursor-pointer pb- w-[90px] h-[90px] block m-auto rounded-[50px] object-cover drop-shadow-md"
           src={logo}
           alt="logo" />
 
@@ -35,6 +40,10 @@ export function HeaderDashboard() {
           <Link to='/dashboard/banners' className="mb-0.5 text-white md:pl-3">
             Banners
           </Link>
+          <button onClick={() => logOut()} className="mb-0.5 text-white md:pl-3 max-md:relative max-md:mt-5 flex justify-start absolute bottom-1 items-center">
+          <span className="mr-1 text-md font-semibold max-md:font-normal ">Sair</span>
+          <PiSignOutBold size={20}/>
+          </button>
       </div>
     </aside>
   )

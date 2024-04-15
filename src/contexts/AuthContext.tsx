@@ -1,6 +1,7 @@
 import { ReactNode, createContext, useState, useEffect } from "react"; 
 import { onAuthStateChanged } from "@firebase/auth";
 import { auth } from "../services/firebaseConnection"; 
+import { signOut } from 'firebase/auth'
 
 interface AuthProviderProps{
     children: ReactNode;
@@ -11,6 +12,7 @@ type AuthContextData = {
     loadingAuth: boolean;
     handleInfoUser: ({ name, email, uid }: UserProps) => void;
     user: UserProps | null;
+    logOut: () => void
 }
 
 interface UserProps{
@@ -35,9 +37,7 @@ function AuthProvider({ children } : AuthProviderProps){
                     name: user?.displayName,
                     email: user?.email
                 })
-
                 setLoadingAuth(false);
-
             }else{
                 setUser(null);
                 setLoadingAuth(false);
@@ -57,9 +57,16 @@ function AuthProvider({ children } : AuthProviderProps){
             uid
         })
     }
+
+    async function logOut(){
+        await signOut(auth);
+        setUser(null)
+    }
+
+    
     
     return(
-        <AuthContext.Provider value={{ signed: !!user, loadingAuth, handleInfoUser, user }}>
+        <AuthContext.Provider value={{ signed: !!user, loadingAuth, handleInfoUser, user, logOut }}>
             { children }
         </AuthContext.Provider>
     )

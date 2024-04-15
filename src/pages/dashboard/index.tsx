@@ -54,16 +54,16 @@ export function Dashboard() {
 
     async function handleDeleteProduct(item: productProps) {
         const itemProduct = item;
-    
+
         const docRef = doc(db, "Produtos", itemProduct.id);
-    
+
         try {
             // Exclua o documento do banco de dados
             await deleteDoc(docRef);
-    
+
             // Remova o produto do estado local imediatamente após a exclusão do documento
             setProducts(prevProducts => prevProducts.filter(product => product.id !== itemProduct.id));
-    
+
             // Remova as imagens do armazenamento
             await Promise.all(itemProduct.image.map(async (image) => {
                 const imagePath = `images/${image.uid}/${image.name}`;
@@ -119,7 +119,7 @@ export function Dashboard() {
                             {products.map((item, index) => (
                                 <tbody key={index}>
                                     <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
-                                        <td className="border-0 rounded-[4px] py-2" data-label="código">{index.toFixed()}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="código">{index}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="produto">{item.name}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.categoria}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="tamanho">
