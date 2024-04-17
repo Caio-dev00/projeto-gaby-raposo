@@ -3,13 +3,16 @@ import { Container } from "../../components/container"
 import { Slider } from "../../components/slideBanner/Slider"
 
 import Catalogo from "../../components/catalogo"
-import Pagination from "../../components/pagination"
 import { useEffect, useState } from "react"
-import { collection, getDocs, orderBy, query } from "firebase/firestore"
+import { collection, getDocs, onSnapshot, orderBy, query } from "firebase/firestore"
 import { db } from "../../services/firebaseConnection"
-import { categoryProp } from "../dashboard/categorias"
 import { AiOutlineCaretUp, AiOutlineCaretDown } from "react-icons/ai";
 import { BannerProps } from "../dashboard/banners"
+
+import { categoryProp } from "../dashboard/categorias"
+import { tamanhoProps } from "../dashboard/variacoes"
+import { Link } from "react-router-dom"
+
 
 
 export function Home() {
@@ -36,8 +39,8 @@ export function Home() {
 
   const [isOpen, setIsOpen] = useState<boolean[]>([])
   const [category, setCategory] = useState<categoryProp[]>([])
+  const [tamanho, setTamanho] = useState<tamanhoProps[]>([])
   const [banner, setBanner] = useState<BannerProps[]>([])
-
 
   useEffect(() => {
 
@@ -57,31 +60,53 @@ export function Home() {
             })
           })
           setCategory(listCategories)
-          setIsOpen(Array(listCategories.length).fill(false))
         })
-    }
+      }
+    loadTamanhos()
     loadBanner()
     getCategory()
   }, [])
 
-  async function loadBanner(){
+  async function loadBanner() {
     const bannerRef = collection(db, "Banners")
     const q = query(bannerRef, orderBy("created", "desc"))
 
     await getDocs(q)
-    .then((snapshot) => {
-      const listBanner = [] as BannerProps[]
+      .then((snapshot) => {
+        const listBanner = [] as BannerProps[]
 
-      snapshot.forEach(doc => {
-        listBanner.push({
-          id: doc.id,
-          name: doc.data().name,
-          images: doc.data().images,
-          owner: doc.data().owner,
-          status: doc.data().status,
+        snapshot.forEach(doc => {
+          const bannerData = doc.data();
+
+          if(bannerData.status === "Ativo")
+          listBanner.push({
+            id: doc.id,
+            name: bannerData.name,
+            images: bannerData.images,
+            owner:bannerData.owner,
+            status: bannerData.status,
+          })
         })
+        setBanner(listBanner)
       })
-      setBanner(listBanner)
+  }
+
+  async function loadTamanhos() {
+    const tamanhosRef = collection(db, "Tamanhos")
+    const q = query(tamanhosRef, orderBy("created", "desc"))
+
+    await getDocs(q)
+    onSnapshot(q, (snapshot) => {
+      const lista = [] as tamanhoProps[]
+      snapshot.forEach((doc) => {
+        lista.push({
+          id: doc.id,
+          name: doc.data().tamanho,
+          owner: doc.data().owner
+        })
+        setTamanho(lista)
+        setIsOpen(Array(lista.length).fill(false))
+      })
     })
   }
 
@@ -96,17 +121,17 @@ export function Home() {
     <Container>
       <div className="mt-15 max-md:p-2 mt-10">
         <Slider settings={settings}>
-         {banner.map((item, index) => (
-           <div key={index}>
+          {banner.map((item, index) => (
+            <div key={index}>
               <SwiperSlide>
                 {item.status === "Inativo" ? (
                   <div></div>
                 ) : (
                   <img key={index} src={item.images[0].url} alt="banner" />
                 )}
-            </SwiperSlide>
-           </div>
-         ))}
+              </SwiperSlide>
+            </div>
+          ))}
         </Slider>
       </div>
 
@@ -140,34 +165,33 @@ export function Home() {
 
                   }
 
-                  {isOpen[index] && (
-                    <div>
-                      <div className="w-full flex hover:bg-salmon rounded-lg ">
-                        <h3 className="text-black cursor-pointer max-md:text-[0.7em]">{item.name}</h3>
-                      </div>
-                    </div>
+                  {tamanho.map((tamanhoItem, tamanhoIndex) => (
+                    <div key={tamanhoIndex}>
+                      {isOpen[index] && (
+                        <div className=" w-[80px] flex p-1 hover:bg-wine-black  ">
+                          <div className="flex w-full max-w[100px]">
+                          <Link to={`/produtos/${item.name}/${tamanhoItem.name}?`} className="text-black flex w-full justify-center items-center hover:text-white cursor-pointer max-md:text-[0.7em]">
+                              <p className="text-[0.9rem] max-md:text-[0.6rem] text-center">Tamanho {tamanhoItem.name}</p>
+                            </Link>
+                          </div>
+                        </div>
 
-                  )}
+                      )}
+                    </div>
+                  ))}
                 </div>
               </SwiperSlide>
             )}
 
 
+
           </Slider>
         </div>
       </div>
-      <div>
+      <div id="catalogo">
         <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5 max-md:mt-32">CATÁLOGO</h1>
       </div>
-
-      <div className="flex justify-center">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
           <Catalogo />
-        </div>
-      </div>
-
-      <Pagination />
-
     </Container>
   )
 }

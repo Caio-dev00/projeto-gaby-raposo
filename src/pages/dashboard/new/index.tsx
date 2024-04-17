@@ -15,40 +15,50 @@ import Input from "../../../components/input";
 import Title from "../../../components/titleDahsboard";
 
 import { FiTrash, FiUpload } from 'react-icons/fi';
-import { coresProps, tamanhoProps } from '../variacoes';
+import { tamanhoProps } from '../variacoes';
 import { useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export interface productProps {
   id: string;
   name: string;
   owner: string;
   price: string;
-  size: string;
+  sizes: string[];
   status: string;
   storage: string;
   categoria: string;
-  color: string;
+  colors: colorProps[];
   description: string;
   image: ImageItemProps[];
+  colorImage: Color[];
+}
+export type Color = {
+  uid: string;
+  url: string;
+  previewUrl: string;
+  imageUrl: string;
+  name: string;
 }
 
-
-interface categoryProps {
+export interface categoryProps {
   name: string | number;
   id: string;
 }
 
-interface colorProps {
-  name: string | number;
+export interface colorProps {
+  name: string;
+  id: string;
+  images: ImageItemProps[]
+  
+}
+
+export interface sizeProps {
+  name: string;
   id: string;
 }
 
-interface sizeProps {
-  name: string | number;
-  id: string;
-}
-
-interface ImageItemProps {
+export interface ImageItemProps {
   uid: string;
   name: string;
   previewUrl: string;
@@ -80,16 +90,13 @@ export function New() {
   const [size, setSize] = useState<sizeProps[]>([])
   const [productImage, setProductImage] = useState<ImageItemProps[]>([])
 
-
-
   const [loadCategory, setLoadCategory] = useState(true)
   const [loadColor, setLoadColor] = useState(true)
   const [loadSize, setLoadSize] = useState(true)
 
-
-  const [categoria, setCategoria] = useState<number>(0)
-  const [colorSelected, setColorSelected] = useState<number>(0)
-  const [sizeSelected, setSizeSelected] = useState<number>(0)
+  const [categoria, setCategoria] = useState<number>(0);
+  const [colorSelected, setColorSelected] = useState<string[]>([])
+  const [sizeSelected, setSizeSelected] = useState<string[]>([])
   const [status, setStatus] = useState("Ativo")
 
   const location = useLocation();
@@ -101,12 +108,34 @@ export function New() {
   const [storageEdit, setStorageEdit] = useState("")
   const [description, setDescription] = useState("")
 
+  async function fetchColorImage(colorNames: string[]): Promise<{ name: string; imageUrl: string }[]> {
+    try {
+      const colorImages: { name: string; imageUrl: string }[] = [];
+
+      for (const colorName of colorNames) {
+        const selectedColor = color.find((c: colorProps) => c.name === colorName);
+        if (selectedColor) {
+          const imageUrl = selectedColor.images.length > 0 ? selectedColor.images[0].url : '';
+          colorImages.push({ name: colorName, imageUrl: imageUrl });
+        } else {
+          console.log(`Imagem não encontrada para a cor ${colorName}`);
+        }
+      }
+
+      return colorImages;
+    } catch (error) {
+      console.log("Erro ao buscar imagem da cor:", error);
+      return [];
+    }
+  }
+
+
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) return;
 
       try {
-        const productDoc = await getDoc(doc(db, "Produtos", productId))
+        const productDoc = await getDoc(doc(db, "Produtos", productId));
         if (productDoc.exists()) {
           const productData = productDoc.data();
           if (productData) {
@@ -115,57 +144,71 @@ export function New() {
               name: productData.name,
               owner: productData.owner,
               categoria: productData.categoria,
-              color: productData.color,
-              size: productData.size,
+              colors: productData.colors,
+              sizes: productData.sizes,
               status: productData.status,
               storage: productData.storage,
               price: productData.price,
               description: productData.description,
-              image: productData.images
-            }
+              image: productData.images,
+              colorImage: productData.colorImage,
+            };
 
-            setName(productCompleto.name)
-            setPrice(productCompleto.price)
-            setStorageEdit(productCompleto.storage)
-            setDescription(productCompleto.description)
-            setStatus(productCompleto.status)
+            setName(productCompleto.name);
+            setPrice(productCompleto.price);
+            setStorageEdit(productCompleto.storage);
+            setDescription(productCompleto.description);
+            setStatus(productCompleto.status);
+            setColor(productCompleto.colors);
+            
           }
         } else {
-          console.log("Produto não encontrado")
-          navigate("/dashboard/new")
+          console.log("Produto não encontrado");
+          toast.success("Produto cadastrado!")
+          navigate("/dashboard/new");
         }
       } catch (error) {
-        console.log("Error ao buscar produto")
-        navigate("/dashboard/new")
+        console.log("Error ao buscar produto");
+        toast.error("Erro ao cadastrar produto!")
+        navigate("/dashboard/new");
       }
     }
-    fetchProduct()
-  }, [productId, navigate])
+    fetchProduct();
+  }, [productId, navigate]);
 
   async function onSubmit(data: FormData) {
-    await addDoc(collection(db, "Produtos"), {
-      name: data.name.toLowerCase(),
-      categoria: category[categoria].name,
-      color: color[colorSelected].name,
-      size: size[sizeSelected].name,
-      price: data.price,
-      storage: data.storage,
-      description: data.description,
-      status: status,
-      created: new Date(),
-      owner: user?.name,
-      id: user?.uid,
-      images: productImage,
+    try {
+      const colorImages = await fetchColorImage(colorSelected);
 
-    })
-      .then(() => {
-        reset();
-        setProductImage([])
-        console.log("PRODUTO CADASTRADO COM SUCESSO!")
-      })
-      .catch((error) => {
-        console.error("ERRO AO CADASTRAR PRODUTO", error)
-      })
+      const newProduct = {
+        name: data.name.toUpperCase(),
+        categoria: category[categoria].name,
+        colors: colorSelected.map(name => ({ name })),
+        sizes: sizeSelected,
+        price: data.price,
+        storage: data.storage,
+        description: data.description,
+        status: status,
+        created: new Date(),
+        owner: user?.name,
+        id: user?.uid,
+        images: productImage,
+        colorImage: colorImages,
+      };
+
+      await addDoc(collection(db, "Produtos"), newProduct);
+
+      reset();
+      toast.success("Produto Cadastrado!")
+      setProductImage([]);
+      setColorSelected([]);
+      setSizeSelected([]);
+
+      console.log("PRODUTO CADASTRADO COM SUCESSO!");
+    } catch (error) {
+      console.error("ERRO AO CADASTRAR PRODUTO", error);
+      toast.error("Erro ao cadastrar o")
+    }
   }
 
   async function handleFile(e: ChangeEvent<HTMLInputElement>) {
@@ -217,7 +260,6 @@ export function New() {
     }
   }
 
-
   useEffect(() => {
     async function loadCategory() {
       await getDocs(listRef)
@@ -247,24 +289,22 @@ export function New() {
           setCategory([{ id: '1', name: 'FREELA' }])
         })
     }
-
     async function loadCores() {
       await getDocs(listCoresRef)
         .then((snapshot) => {
-          const lista = [] as coresProps[];
+          const lista = [] as colorProps[];
 
           snapshot.forEach((doc) => {
             lista.push({
               id: doc.id,
               name: doc.data().cor,
-              owner: doc.data().owner,
               images: doc.data().images
+
             })
           })
 
           if (snapshot.size === 0) {
             console.log("NENHUMA CATEGORIA ENCONTRADA");
-            setColor([{ id: '1', name: "FREELA" }])
             setLoadColor(false)
             return;
 
@@ -276,7 +316,7 @@ export function New() {
         .catch((error) => {
           console.log("ERRO AO BUSCAR OS CLIENTES", error);
           setLoadColor(false);
-          setColor([{ id: '1', name: 'FREELA' }])
+
         })
     }
     async function loadTamanho() {
@@ -294,7 +334,6 @@ export function New() {
 
           if (snapshot.size === 0) {
             console.log("NENHUM TAMANHO ENCONTRADO");
-            setSize([{ id: '1', name: "FREELA" }])
             setLoadSize(false)
             return;
 
@@ -306,17 +345,13 @@ export function New() {
         .catch((error) => {
           console.log("ERRO AO BUSCAR OS CLIENTES", error);
           setLoadSize(false);
-          setSize([{ id: '1', name: 'FREELA' }])
         })
     }
-
 
     loadCategory();
     loadCores();
     loadTamanho();
   }, [])
-
-
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handleChangeCategory(e: any): void {
@@ -324,17 +359,6 @@ export function New() {
     console.log(categoria)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleChangeColor(e: any): void {
-    setColorSelected(e.target.value)
-    console.log(colorSelected)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleChangeSize(e: any): void {
-    setSizeSelected(e.target.value)
-    console.log(sizeSelected)
-  }
   function handleOptionChange(e: ChangeEvent<HTMLInputElement>) {
     setStatus(e.target.value)
     console.log(status)
@@ -362,20 +386,50 @@ export function New() {
     try {
       await updateDoc(doc(db, "Produtos", productId!), {
         name: name,
-        categoria: category[categoria].name,
+        categorias: category.map(cat => cat.name),
         price: price,
         storage: storageEdit,
         description: description,
         status: status,
-        color: color[colorSelected].name,
-        size: size[sizeSelected].name,
+        color: color.map(color => color.name),
+        size: size.map(size => size.name),
       });
       alert("Produto editado com sucesso!");
+      toast.success("Produto editado!")
       navigate("/dashboard"); // Redireciona de volta para a lista de categorias
     } catch (error) {
       console.error("Erro ao editar produto:", error);
+      toast.error("Erro ao editar produto!")
       navigate("/dashboard");
     }
+  };
+
+  const handleCheckboxChangeSize = (name: string) => {
+    const currentIndex = sizeSelected.indexOf(name);
+    const newSelectedOptions = [...sizeSelected];
+
+    if (currentIndex === -1) {
+      newSelectedOptions.push(name);
+    } else {
+      newSelectedOptions
+
+        .splice(currentIndex, 1);
+    }
+    setSizeSelected(newSelectedOptions);
+    console.log(newSelectedOptions)
+  };
+
+  const handleCheckboxChangeColor = (name: string) => {
+    const currentIndex = colorSelected.indexOf(name);
+    const newSelectedOptions = [...colorSelected];
+
+    if (currentIndex === -1) {
+      newSelectedOptions.push(name);
+    } else {
+      newSelectedOptions.splice(currentIndex, 1);
+    }
+
+    setColorSelected(newSelectedOptions);
   };
 
   return (
@@ -444,50 +498,8 @@ export function New() {
                 />
               </div>
 
-              <h1 className='my-5 text-xl font-semibold'>Variação do Produto:</h1>
+              <h1 className='my-1 text-xl font-semibold'>Variação do Produto:</h1>
 
-              {/* ---SELECIONE A COR--- */}
-              <label>Selecione a cor</label>
-              {
-                loadColor ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={colorSelected}
-                    onChange={handleChangeColor}>
-                    {color.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
-
-              {/* ---TAMANHO--- */}
-
-              <label className='mt-4'>Selecione o Tamanho</label>
-              {
-                loadSize ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={sizeSelected}
-                    onChange={handleChangeSize}>
-                    {size.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                )
-              }
               <label className='my-2'>Status</label>
               <div>
                 <input
@@ -607,43 +619,41 @@ export function New() {
                 loadColor ? (
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={colorSelected}
-                    onChange={handleChangeColor}>
-                    {color.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
+                  color.map((item) => (
+
+
+                    <div key={item.id} className='flex flex-row'>
+                      <input
+                        type="checkbox"
+                        checked={colorSelected.includes(item.name)}
+                        onChange={() => handleCheckboxChangeColor(item.name)}
+                      />
+                      <label className='pl-1'>{item.name}</label>
+                    </div>
+                  ))
                 )
               }
 
-              {/* ---TAMANHO--- */}
-
-              <label className='mt-4'>Selecione o Tamanho</label>
+              {/* ---SELECIONE O TAMANHO--- */}
+              <label>Selecione o Tamanho</label>
               {
                 loadSize ? (
                   <input type="text" disabled={true} value="Carregando..." />
                 ) : (
-                  <select
-                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                    value={sizeSelected}
-                    onChange={handleChangeSize}>
-                    {size.map((item, index) => {
-                      return (
-                        <option key={index} value={index}>
-                          {item.name}
-                        </option>
-                      )
-                    })}
-                  </select>
+                  size.map((item) => (
+                    <div key={item.id} className='flex flex-row'>
+                      <input
+                        type="checkbox"
+                        checked={sizeSelected.includes(item.name)}
+                        onChange={() => handleCheckboxChangeSize(item.name)}
+                      />
+                      <label className='pl-1'>{item.name}</label>
+                    </div>
+                  ))
                 )
               }
-              <label className='my-2'>Status</label>
+
+              <label className='mt-4'>Status</label>
               <div>
                 <input
                   type="radio"
@@ -666,10 +676,8 @@ export function New() {
               <label className='mt-4'>Descrição do produto</label>
               <textarea
                 className='w-full border-2 rounded-md h-24 px-2'
-                {...register("description")}
-                name='description'
-                id="description"
-                placeholder='Escreva algo sobre o produto...'
+                placeholder='Adicionar descrição do produto...'
+                {...register('description')}
               />
               <button type='submit' className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
                 <span className='text-white font-bold'>Cadastrar Produto</span>

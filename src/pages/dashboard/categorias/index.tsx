@@ -155,7 +155,7 @@ export function Categorias() {
                             {category.map((item, index) => (
                                 <tbody key={index}>
                                     <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
-                                        <td className="border-0 rounded-[4px] py-2" data-label="código">{item.id}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="código">{index.toFixed()}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.name}</td>
 
                                         <td className="border-0 rounded-[4px] py-2" data-label="ações">
