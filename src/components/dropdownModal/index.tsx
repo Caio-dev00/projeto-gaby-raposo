@@ -76,13 +76,13 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
           }}
         />
         <span>{title2}</span>
-        <>
+        <div className='flex ml-10'>
           {isOpenInput && (
-            <button className='flex justify-center bg-wine-black p-2 rounded-xl text-white font-semibold'>
-              <ChildModal />
+            <button className='flex justify-center w-72 bg-wine-black py-2 rounded-full text-white font-medium text-base'>
+              <ChildModal/>
             </button>
           )}
-        </>
+        </div>
       </div>
     </div>
 

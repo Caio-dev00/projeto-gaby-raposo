@@ -1,56 +1,75 @@
+import { useForm } from "react-hook-form";
 
 
 export default function EnderecoUsuario() {
+
+  const { register, handleSubmit, setValue } = useForm();
+
+  const onSubmit = (e) => {
+    console.log(e);
+  }
+
+    const checkCEP = (e) => {
+    const cep = e.target.value.replace(/D/g, '');
+    console.log(cep);
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then(res => res.json()).then(data => {
+        console.log(data);
+        setValue('endereco', data.logradouro);
+        setValue('bairro', data.bairro);
+        setValue('cidade', data.localidade);
+        setValue('estado', data.uf);
+      })
+  }
+
   return (
-    <form className="flex flex-wrap justify-between w-full">
-      <input className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
-        placeholder="CEP"
-      />
-      <input className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
-        placeholder="Endereço"
-      />
-      <input className="bg-gray-200 w-5/12d rounded-full px-4 py-2 my-2"
-        placeholder="Numero"
-      />
-      <input className="bg-gray-200 w-1/2 rounded-full px-4 py-2 my-2"
-        placeholder="Bairro"
-      />
-      <input className="bg-gray-200 w-1/2 rounded-full px-4 py-2 my-2"
-        placeholder="Cidade"
-      />
-      <select className="bg-gray-200 w-5/12 rounded-full px-4 py-2 my-2">
-        <option value="">Selecione</option>
-        <option value="AC">Acre</option>
-        <option value="AL">Alagoas</option>
-        <option value="AP">Amapá</option>
-        <option value="AM">Amazonas</option>
-        <option value="BA">Bahia</option>
-        <option value="CE">Ceará</option>
-        <option value="DF">Distrito Federal</option>
-        <option value="ES">Espirito Santo</option>
-        <option value="GO">Goiás</option>
-        <option value="MA">Maranhão</option>
-        <option value="MS">Mato Grosso do Sul</option>
-        <option value="MT">Mato Grosso</option>
-        <option value="MG">Minas Gerais</option>
-        <option value="PA">Pará</option>
-        <option value="PB">Paraíba</option>
-        <option value="PR">Paraná</option>
-        <option value="PE">Pernambuco</option>
-        <option value="PI">Piauí</option>
-        <option value="RJ">Rio de Janeiro</option>
-        <option value="RN">Rio Grande do Norte</option>
-        <option value="RS">Rio Grande do Sul</option>
-        <option value="RO">Rondônia</option>
-        <option value="RR">Roraima</option>
-        <option value="SC">Santa Catarina</option>
-        <option value="SP">São Paulo</option>
-        <option value="SE">Sergipe</option>
-        <option value="TO">Tocantins</option>
-      </select>
-      <input className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
-        placeholder="Complemento"
-      />
-    </form>
+    <div className="mt-10">
+      <span 
+        id="erro"
+        ></span>
+      <form className="flex flex-wrap justify-between w-full">
+        <input
+          type="text"
+          className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
+          placeholder="CEP"
+          onBlur={checkCEP}
+        />
+        <input
+          type="text"
+          className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
+          placeholder="Endereço"
+          {...register('endereco')}
+        />
+        <input
+          type="text"
+          className="bg-gray-200 w-1/4 rounded-full px-4 py-2 my-2"
+          placeholder="Numero"
+          {...register('numero')}
+        />
+        <input
+          type="text"
+          className="bg-gray-200 w-3/5 rounded-full px-4 py-2 my-2"
+          placeholder="Bairro"
+          {...register('bairro')}
+        />
+        <input
+          type="text"
+          className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
+          placeholder="Complemento"
+        />
+        <input
+          type="text"
+          className="bg-gray-200 w-1/2 rounded-full px-4 py-2 my-2"
+          placeholder="Cidade"
+          {...register('cidade')}
+        />
+        <input
+          type="text"
+          className="bg-gray-200 w-3/2 rounded-full px-4 py-2 my-2"
+          placeholder="Estado"
+          {...register('estado')}
+        />
+      </form>
+    </div>
   )
 }

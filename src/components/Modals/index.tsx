@@ -7,33 +7,52 @@ import { AiOutlineClose } from "react-icons/ai";
 import { Link } from 'react-router-dom';
 import photo from '../../assets/produto.png'
 
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { BsThreeDotsVertical, BsTranslate } from "react-icons/bs";
 import DropdownModal from '../dropdownModal';
 import { Fade } from '@mui/material';
 import EnderecoUsuario from '../enderecoUsuario';
 
 const style = {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    top: {
+        xs: "20%",
+        sm: '20%',
+        md: '0%',
+        lg: '0%',
+        xl: '0%',
+    },
+    left: {
+        xs: "0%",
+        sm: '0%',
+        md: '30%',
+        lg: '50%',
+        xl: '60%',
+    },
+    /*     transform: 'translate(-50%, -50%)', */
     height: {
-        xs: "100%",
-        sm: 'auto',
-        md: 'auto',
-        lg: 'auto',
-        xl: 'auto',
+        xs: "80%",
+        sm: '80%',
+        md: '100%',
+        lg: '100%',
+        xl: '100%',
     },
     width: {
         xs: "100%",
-        sm: 500,
-        md: 550,
-        lg: 600,
-        xl: 650,
+        sm: "100%",
+        md: "70%",
+        lg: "50%",
+        xl: "40%",
     },
     bgcolor: 'background.paper',
     border: '0px solid #000',
     boxShadow: 24,
+    borderRadius: {
+        xs: "18px",
+        sm: "18px",
+        md: "18px",
+        lg: "18px",
+        xl: "18px",
+    },
     pt: 2,
     px: 4,
     pb: 3,
@@ -50,7 +69,7 @@ export function ChildModal() {
 
     return (
         <React.Fragment>
-            <Button style={{ color: "#fff", padding: "1px" }} onClick={handleOpen}>+ Adicionar meu Endereço</Button>
+            <button onClick={handleOpen}> + Adicionar meu endereço</button>
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -58,10 +77,13 @@ export function ChildModal() {
                 aria-describedby="child-modal-description"
             >
                 <Box sx={{ ...style }}>
-                    <div className='py-2'>
+                    <div className='py-2 mb-8'>
                         <h1 className="flex justify-center text-xl font-semibold mb-4">CADASTRAR ENDEREÇO</h1>
                         <EnderecoUsuario />
-                        <Button onClick={handleClose}>Voltar</Button>
+                    </div>
+                    <div className='flex flex-row justify-between'>
+                        <button onClick={handleClose} className='flex justify-center py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Voltar</button>
+                        <button className='flex justify-center py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Salvar Endereço</button>
                     </div>
                 </Box>
             </Modal>
@@ -91,7 +113,7 @@ export default function NestedModal() {
             >
                 <Fade in={open}>
                     <Box sx={{ ...style }}>
-                        <AiOutlineClose onClick={handleClose} className='flex right-0 mr-3 absolute cursor-pointer' size={26} color="#000" />
+                        <AiOutlineClose onClick={handleClose} className='flex right-4 mr-3 absolute cursor-pointer' size={26} color="#000" />
                         <div className='flex flex-col justify-center items-center my-5'>
                             <h1 className='font-black text-wine-light text-[1.5rem]'>CONFIRME SEU PEDIDO:</h1>
                         </div>
