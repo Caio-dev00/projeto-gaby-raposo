@@ -12,9 +12,11 @@ import { Variacoes } from "./pages/dashboard/variacoes";
 import { CadastrarTamanho } from "./pages/dashboard/variacoes/variacoes-tamanho";
 import { CadastrarCor } from "./pages/dashboard/variacoes/variacoes-cor";
 import { Banners } from "./pages/dashboard/banners";
+import { CadastrarBanner } from "./pages/dashboard/banners/cadastrar-banner";
 
 import { Layout } from "./components/layout";
 import { Private } from "./routes/Private";
+import Produtos from "./pages/produtos/produtos";
 
 
 const router = createBrowserRouter([
@@ -29,16 +31,20 @@ const router = createBrowserRouter([
         path: "/product/:id",
         element: <ProductDetail />
       },
+      {
+        path: "/produtos/:categoria/:tamanho",
+        element: <Produtos />
+      },
       
     ]
   },
   {
     path: "/login",
-    element: <Private><Login /></Private>
+    element: <Login />
   },
   {
-    path: "/register",
-    element: <Private><Register /></Private>
+    path: "/reg-gabi008",
+    element: <Register />
   },
   {
     path: "/dashboard",
@@ -87,7 +93,15 @@ const router = createBrowserRouter([
   {
     path: "/dashboard/banners",
     element: <Private><Banners/></Private>
-  }
+  },
+  {
+    path: "/dashboard/banners/cadastrar-banner",
+    element: <Private><CadastrarBanner/></Private>
+  },
+  {
+    path:  "/dashboard/banners/cadastrar-banner/:id",
+    element: <Private><CadastrarBanner/></Private>
+  },
 ])
 
 export { router }

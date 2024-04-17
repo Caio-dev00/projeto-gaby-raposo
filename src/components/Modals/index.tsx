@@ -1,87 +1,137 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import Button from '@mui/material/Button';
-import { FaShoppingBag } from "react-icons/fa";
+import { FaShoppingBag, FaTrash } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { Link } from 'react-router-dom';
-import photo from '../../assets/produto.png'
 
-import { BsThreeDotsVertical } from "react-icons/bs";
 import DropdownModal from '../dropDownModal';
 import { Fade } from '@mui/material';
+import EnderecoUsuario from '../enderecoUsuario';
+
+import { useCart } from '../../contexts/cartContext';
+import { useNavigate } from 'react-router-dom';
 
 const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  height: {
-    xs: "100%",
-    sm: 'auto',
-    md: 'auto',
-    lg: 'auto',
-    xl: 'auto',
-  },
-  width: {
-    xs: "100%",
-    sm: 500,
-    md: 550,
-    lg: 600,
-    xl: 650,
-  },
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
+    position: 'absolute',
+    top: {
+        xs: "20%",
+        sm: '20%',
+        md: '0%',
+        lg: '0%',
+        xl: '0%',
+    },
+    left: {
+        xs: "0%",
+        sm: '0%',
+        md: '30%',
+        lg: '50%',
+        xl: '60%',
+    },
+    /*     transform: 'translate(-50%, -50%)', */
+    height: {
+        xs: "80%",
+        sm: '80%',
+        md: '100%',
+        lg: '100%',
+        xl: '100%',
+    },
+    width: {
+        xs: "100%",
+        sm: "100%",
+        md: "70%",
+        lg: "50%",
+        xl: "40%",
+    },
+    bgcolor: 'background.paper',
+    border: '0px solid #000',
+    boxShadow: 24,
+    borderRadius: {
+        xs: "18px",
+        sm: "18px",
+        md: "18px",
+        lg: "18px",
+        xl: "18px",
+    },
+    pt: 2,
+    px: 4,
+    pb: 3,
 };
 
-function ChildModal() {
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-const handleClose = () => {
-    setOpen(false);
-  };
+export function ChildModal() {
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-  return (
-    <React.Fragment>
-      <Button onClick={handleOpen}>Open Child Modal</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
-      >
-        <Box sx={{ ...style}}>
-          <h2 className="font-bold">Text in a child modal</h2>
-          <p id="child-modal-description">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-          </p>
-          <Button onClick={handleClose}>Close Child Modal</Button>
-        </Box>
-      </Modal>
-    </React.Fragment>
-  );
+    return (
+        <React.Fragment>
+            <button onClick={handleOpen}> + Adicionar meu endereço</button>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="child-modal-title"
+                aria-describedby="child-modal-description"
+            >
+                <Box sx={{ ...style }}>
+                    <div className='py-2 mb-8'>
+                        <h1 className="flex justify-center text-xl font-semibold mb-4">CADASTRAR ENDEREÇO</h1>
+                        <EnderecoUsuario />
+                    </div>
+                    <div className='flex flex-row justify-between'>
+                        <button onClick={handleClose} className='flex justify-center py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Voltar</button>
+                        <button className='flex justify-center py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Salvar Endereço</button>
+                    </div>
+                </Box>
+            </Modal>
+        </React.Fragment>
+    );
 }
 
 export default function NestedModal() {
   const [open, setOpen] = React.useState(false);
+  const { cart, removeFromCart } = useCart();
+  const navigate = useNavigate();
+  const [totalPrice, setTotalPrice] = React.useState(0)
+
+  React.useEffect(() => {
+    const calculateTotalPrice = () => {
+      let total = 0;
+      cart.forEach(item => {
+        const quantidade = parseFloat(item.quantidade)
+        total += item.price * quantidade;
+      });
+      setTotalPrice(total)
+    }
+    calculateTotalPrice()
+  }, [cart])
+
+  function handleClickNavigate(){
+    navigate("/")
+    setOpen(false)
+  }
+
   const handleOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
+  console.log("Cart Data:", cart);
 
   return (
     <div>
-      <Button onClick={handleOpen}>
+      <button onClick={handleOpen}>
+      {cart.length >= 1 && (
+        <div className='absolute bg-wine-light w-5 h-5 mt-4 ml-[-5px] flex justify-center items-center rounded-full'>
+          <span className='text-white text-sm font-semibold'>{cart.length}</span>
+        </div>
+      )}
         <FaShoppingBag size={26} color="#000" />
-      </Button>
+        </button>
       <Modal
         open={open}
         onClose={handleClose}
@@ -94,52 +144,56 @@ export default function NestedModal() {
           <div className='flex flex-col justify-center items-center my-5'>
             <h1 className='font-black text-wine-light text-[1.5rem]'>CONFIRME SEU PEDIDO:</h1>
           </div>
-          <div className='flex flex-row justify-between items-center w-full my-5 '>
-                <button className='w-[40px] h-[40px] max-md:w-[40px] max-md:h-[40px] rounded-full'>
-                    <Link to="/product/:id">
-                        <img className='rounded-full' src={photo} alt="" />
-                    </Link>     
-                </button>
-                <span className='font-semibold '>1x - PRODUTO MODELO 1 (preto)</span>
-                <span className='font-bold'>R$99,00</span>
-                <button>
-                    <BsThreeDotsVertical />
-                </button>
+          {cart.map((item) => (
+            <div key={item.id} className='flex flex-row justify-between items-center w-full my-5 '>
+            <div className='flex justify-between w-full items-center'>
+              <div className='flex items-center'>
+              <button className='w-[40px] h-[40px] max-md:w-[40px] max-md:h-[40px] max-md:mr-2 rounded-full'>
+                <Link onClick={() => setOpen(false)} to={`/product/details?id=${item.id}`}>
+                    <img className='rounded-full' src={item.image[0].url} alt="" />
+                </Link>     
+            </button>
+            <span className='font-semibold ml-2'>{item.quantidade}x</span>
+            <span className='font-semibold ml-2 max-md:text-xs'>{item.name} </span>
+            <span className='font-semibold ml-2 text-xs max-md:text-xs'>({item.colorImage[0].name} - {item.size})</span>
+              </div>
+              <div className='flex items-center justify-center'>
+              <span className='font-bold max-md:mx-1 text-green-600 mr-2'>R${item.price.toFixed(2)}</span>
+              <button onClick={() => removeFromCart(item.id, item.variation)} className='hover:scale-110'>
+                  <FaTrash />
+              </button>
+              </div>
             </div>
+          
 
-            <div className='flex flex-row justify-between items-center w-full my-5 '>
-                <button className='w-[40px] h-[40px] max-md:w-[40px] max-md:h-[40px] rounded-full'>
-                    <Link to="/product/:id">
-                        <img className='rounded-full' src={photo} alt="" />
-                    </Link>     
-                </button>
-                <span className='font-semibold max-md:text-sm pl-2'>1x - PRODUTO MODELO 1 (preto)</span>
-                <span className='font-bold '>R$99,00</span>
-                <button>
-                    <BsThreeDotsVertical />
-                </button>
-            </div>
+      </div>
+          ))}
+          {cart.length >= 1 ? (
+            <h1 className='text-center font-bold mt-5'>TOTAL A PAGAR: R$ <span className='text-green-600 text-lg'>{totalPrice.toFixed(2)}</span></h1>
+          ) : (
+            <h1 className='text-center mt-5'>Adicione produtos ao seu carrinho</h1>
+          )}
 
             <button className='w-full flex justify-center items-center my-8'>
-                <span className='font-semibold bg-wine-light text-white text-[0.8rem] p-2 rounded-full w-[220px] hover:bg-wine-black hover:scale-105 duration-300'>
+                <span onClick={handleClickNavigate} className='font-semibold bg-wine-light text-white text-[0.8rem] p-2 rounded-full w-[220px] hover:bg-wine-black hover:scale-105 duration-300'>
                     CONTINUAR COMPRANDO
                 </span>
             </button>
 
-            <hr className=' w-full bg-wine-light border-wine-light my-8'></hr>
+                        <hr className=' w-full bg-wine-light border-wine-light my-8'></hr>
 
-            <div className='flex flex-col justify-center items-center my-5'>
-                <h1 className='font-black text-black text-[1.5rem]'>FRETE:</h1>
-            </div>
+                        <div className='flex flex-col justify-center items-center my-5'>
+                            <h1 className='font-black text-black text-[1.5rem]'>FRETE:</h1>
+                        </div>
 
-            <DropdownModal 
-            title='Retirar na Loja'
-            rua='São Judas Tadeu'
-            bairro='São Judas'
-            numero='139'
-            cep="19880-000"
-            />
-          <ChildModal />
+            <DropdownModal
+              title1='Retirar na Loja'
+              title2='Entregar no meu endereço'
+              rua='São Judas Tadeu'
+              bairro='São Judas'
+              numero='139'
+              cep="19880-000" 
+              cidade={''}            />
         </Box>
       </Fade>
        
