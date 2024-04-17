@@ -6,9 +6,9 @@ import { FaShoppingBag, FaTrash } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { Link } from 'react-router-dom';
 
-import DropdownModal from '../dropDownModal';
+import DropdownModal from '../dropdownModal';
 import { Fade } from '@mui/material';
-import EnderecoUsusario from '../enderecoUsuario';
+import EnderecoUsuario from '../enderecoUsuario';
 
 import { useCart } from '../../contexts/cartContext';
 import { useNavigate } from 'react-router-dom';
@@ -194,6 +194,7 @@ export default function NestedModal() {
             bairro='São Judas'
             numero='139'
             cep="19880-000"
+            cidade="Assis-SP"
             />
         </Box>
       </Fade>
