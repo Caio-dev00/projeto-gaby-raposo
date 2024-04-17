@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import photo from '../../assets/produto.png'
 
 import { BsThreeDotsVertical } from "react-icons/bs";
-import DropdownModal from '../dropdownModal';
+import DropdownModal from '../dropDownModal';
 import { Fade } from '@mui/material';
 
 const style = {
