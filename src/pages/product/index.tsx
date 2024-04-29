@@ -10,11 +10,33 @@ import { Container } from "../../components/container"
 import { useLocation } from 'react-router-dom';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
-import { productProps } from "../dashboard/new";
+import { Color, Variations, productProps } from "../dashboard/new";
 import { useCart } from "../../contexts/cartContext";
+import { v4 as uuidv4 } from 'uuid';
+
+
+const getUniqueSizes = (variations: Variations[]) => {
+  const sizes = variations.map((variation) => variation.size);
+  return [...new Set(sizes)];
+};
+
+// Função para obter cores disponíveis com base no tamanho selecionado
+const getAvailableColors = (variations: Variations[], selectedSize: string) => {
+  const colors: Color[] = [];
+  variations.forEach((variation) => {
+    if (variation.size === selectedSize) {
+      variation.colors.forEach((color) => {
+        if (!colors.some((c) => c.name === color.name)) {
+          colors.push(color);
+        }
+      });
+    }
+  });
+  return colors;
+};
 
 export function ProductDetail() {
-  const { addToCart, cart } = useCart();
+  const { addToCart } = useCart()
   const location = useLocation()
   const productId = new URLSearchParams(location.search).get("id")
 
@@ -22,20 +44,34 @@ export function ProductDetail() {
   const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
+  const [colorStock, setColorStock] = useState<number>(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
+  const [selectedColorName, setSelectedColorName] = useState<string | null>(null);
   const [observation, setObservation] = useState("");
 
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [defaultSize, setDefaultSize] = useState<string>("Selecione o Tamanho");
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+  const [availableColors, setAvailableColors] = useState<Color[]>([]);
 
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedColor]);
+  
+  useEffect(() => {
+    if (product) {
+      const uniqueSizes = getUniqueSizes(product.variations);
+      setAvailableSizes(uniqueSizes);
+    }
+  }, [product]);
 
   useEffect(() => {
     async function fetchProduct() {
       if (!productId) return;
 
       try {
-        const productDoc = await getDoc(doc(db, "Produtos", productId))
+        const productDoc = await getDoc(doc(db, "Produtos", productId));
         if (productDoc.exists()) {
           const productData = productDoc.data();
           if (productData) {
@@ -44,37 +80,89 @@ export function ProductDetail() {
               name: productData.name,
               owner: productData.owner,
               categoria: productData.categoria,
-              colors: productData.colors,
-              sizes: productData.sizes,
-              status: productData.status,
-              storage: productData.storage,
               price: productData.price,
               description: productData.description,
               image: productData.images,
-              colorImage: productData.colorImage,
-            }
-            setProduct(productCompleto)
+              status: productData.status,
+              size: productData.size,
+              variations: productData.variations
+            };
+            setProduct(productCompleto);
           }
         } else {
-          console.log("Produto não encontrado")
+          console.log("Produto não encontrado");
         }
       } catch (error) {
-        console.log("Error ao buscar produto")
+        console.error("Erro ao buscar produto:", error);
       }
     }
-    fetchProduct()
-  }, [productId])
+    fetchProduct();
+  }, [productId]);
 
-  const handleColorSelect = (color: string, index: number) => {
-    setSelectedColor(color);
-    setSelectedColorIndex(index);
+  const handleAddToCart = () => {
+    if (product && selectedSize && selectedColor && product.image && product.image.length > 0) {
+
+      const selectedProduct = {
+        id: uuidv4(),
+        name: product.name,
+        price: product.price,
+        image: product.image[0].url,
+        size: selectedSize,
+        color: {
+          name: selectedColorName || '', 
+          imageUrl: selectedColor,
+        },
+        stock: quantity,
+        observation: observation,
+      };
+  
+      addToCart(selectedProduct);
+      console.log("Produto adicionado ao carrinho:", selectedProduct);
+    } else {
+      console.error("Por favor, selecione o tamanho e a cor antes de adicionar ao carrinho.");
+    }
   };
 
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
-    setDefaultSize(size); // Atualiza o valor padrão do select de tamanho
+    setDefaultSize(size);
+    setSelectedColorIndex(null);
+    setSelectedColor(null)
+
+    const colors = getAvailableColors(product?.variations || [], size);
+    setAvailableColors(colors);
+
+    const selectedVariation = product?.variations.find(variation => variation.size === size);
+    if (selectedVariation && selectedColor) {
+
+      const selectedColorData = selectedVariation.colors.find(c => c.imageUrl === selectedColor);
+      if (selectedColorData) {
+
+        setQuantity(1);
+      }
+    }
   };
 
+  const handleColorSelect = async (color: string, index: number) => {
+    setSelectedColor(color);
+    setSelectedColorIndex(index);
+    if (!selectedSize) return;
+  
+    let selectedStock = 0;
+  
+    product?.variations.forEach(variation => {
+      if (variation.size === selectedSize) {
+        const selectedColorData = variation.colors.find(c => c.imageUrl === color);
+        if (selectedColorData) {
+          selectedStock = selectedColorData.estoque || 0;
+          setSelectedColorName(selectedColorData.name);
+        }
+      }
+    });
+  
+    // Atualize o estoque com base na quantidade disponível para a cor selecionada
+    setColorStock(selectedStock);
+  };
 
   const handleObservationsChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const observations = event.target.value;
@@ -92,71 +180,22 @@ export function ProductDetail() {
   };
 
   const incrementQuantity = () => {
-    const stockQuantity = parseInt(product?.storage || "0");
-    if (!isNaN(stockQuantity) && quantity < stockQuantity) {
-      setQuantity(quantity + 1);
+    if (selectedColor === null) return;
+  
+    // Atualize a quantidade apenas se ela for menor que o estoque disponível
+    if (quantity < colorStock) {
+      setQuantity(prevQuantity => prevQuantity + 1);
     }
   };
 
   const decrementQuantity = () => {
+    if (selectedColor === null) return;
+  
+    // Atualize a quantidade apenas se ela for maior que 1
     if (quantity > 1) {
-      setQuantity(quantity - 1);
+      setQuantity(prevQuantity => prevQuantity - 1);
     }
   };
-
-  const handleAddToCart = () => {
-
-
-    if (product && selectedColor && selectedSize) {
-      const price = parseFloat(product.price.replace(',', '.'));
-      const totalPrice = (price * quantity).toFixed(2);
-
-      const existingProductIndex = cart.findIndex(item =>
-        item.id === product.id && // Verifica se o ID do produto é o mesmo
-        item.size === selectedSize && // Verifica se o tamanho é o mesmo
-        item.selectedColorName === selectedColor // Verifica se a cor selecionada é a mesma
-      );
-
-      if (existingProductIndex !== -1) {
-        // Se o produto já existe no carrinho, não faz nada ou mostra uma mensagem para o usuário
-        console.log("Produto já existe no carrinho.");
-        return;
-      }
-  
-      // Se não existe um produto com as mesmas propriedades, adiciona ao carrinho
-      const colorImageItems = selectedColorIndex !== null ? [{
-        uid: product.colorImage[selectedColorIndex].name,
-        previewUrl: product.colorImage[selectedColorIndex].imageUrl,
-        url: product.colorImage[selectedColorIndex].imageUrl,
-        name: product.colorImage[selectedColorIndex].name,
-        imageUrl: product.colorImage[selectedColorIndex].imageUrl,
-      }] : [];
-  
-      addToCart({
-        id: product.id,
-        name: product.name,
-        size: selectedSize,
-        image: product.image,
-        price: parseFloat(totalPrice),
-        colorImage: colorImageItems,
-        quantidade: quantity.toString(),
-        observation: observation,
-        selectedColorIndex: selectedColorIndex !== null ? selectedColorIndex : undefined,
-        selectedColorName: selectedColor,
-        variation: quantity.toString()
-      }, selectedColorIndex !== null ? selectedColorIndex : undefined,
-        selectedColor);
-        
-      // Limpa os campos depois de adicionar ao carrinho
-      setObservation('');
-      setSelectedColor(null);
-      setSelectedColorIndex(null);
-      setSelectedSize(null);
-      setQuantity(1);
-      setDefaultSize("Selecione o Tamanho");
-    }
-  };
-
 
 
   const sliderSettings = {
@@ -179,8 +218,8 @@ export function ProductDetail() {
       {product && (
         <div className="flex flex-col md:flex-row justify-center mt-20 w-full">
           {product.image.length === 1 ? (
-            <div className="md:w-[600px] md:mr-8">
-              <img src={product.image[0].url} alt="" className="h-auto w-full object-contain" />
+            <div className="md:w-[600px] max-h-[600px] md:mr-8">
+              <img src={product.image[0].url} alt={product.name} className="rounded-md h-full w-full object-cover" />
               <div className="flex flex-col">
                 <span className="mt-5 mb-2 max-md:mt-10 text-xl font-semibold">Descrição do Produto:</span>
                 <p className="max-md:mb-2">{product.description}</p>
@@ -190,8 +229,8 @@ export function ProductDetail() {
             <div className="md:w-[600px] md:mr-8">
               <Slider {...sliderSettings}>
                 {product.image.map((item, index) => (
-                  <div key={index} onClick={() => openModal(index)}>
-                    <img src={item.url} alt="" className="h-full w-full object-contain" />
+                  <div className="md:w-[600px] max-h-[600px] md:mr-8" key={index} onClick={() => openModal(index)}>
+                    <img src={item.url} alt={item.name} className="rounded-md h-full w-full object-contain" />
                   </div>
                 ))}
               </Slider>
@@ -205,23 +244,27 @@ export function ProductDetail() {
             <div className="uppercase w-full h-full">
               <>
                 <h1 className="font-semibold text-[20px] text-gray-500">{product.name}</h1>
-                <h2 className="text-[32px] font-bold text-vinho-principal ">R${product.price}</h2>
+                <h2 className="text-[32px] font-bold text-vinho-principal text-wine-light">R${product.price}</h2>
                 <hr className="mt-[25px] w-60" />
                 <h3 className="font-bold mt-6">Tamanhos</h3>
               </>
               <div className="flex flex-row gap-2 uppercase font-semibold">
                 <select value={defaultSize} onChange={(event) => handleSizeSelect(event.target.value)} className="w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2">
                   <option disabled value="Selecione o Tamanho">Selecione o Tamanho</option>
-                  {product.sizes.map((size, index) => (
-                    <option key={index} value={size} >
+                  {availableSizes.map((size, index) => (
+                    <option key={index} value={size}>
                       {size}
                     </option>
                   ))}
                 </select>
               </div>
-              <h4 className="font-bold mt-6 ">Cores</h4>
+              {selectedSize !== null ? (
+                <h4 className="font-bold mt-6 ">Cores</h4>
+              ) : (
+                <div></div>
+              )}
               <div className="flex flex-row gap-2 uppercase font-semibold">
-                {product.colorImage.map((color, index) => (
+                {availableColors.map((color, index) => (
                   <div key={index}>
                     <button
                       className={`w-[30px] h-[30px] rounded-full border border-spacing-1 border-wine-black ${selectedColorIndex === index ? "border-4" : ""
@@ -233,16 +276,27 @@ export function ProductDetail() {
                   </div>
                 ))}
               </div>
-              <h5 className="font-bold mt-6">Quantidade</h5>
-              <div className="flex flex-row mt-2 ml-2 w-[90px] h-[30px] justify-around rounded-[12px] border-solid border-2 border-black">
-                <button className="font-bold" onClick={decrementQuantity}>
-                  -
-                </button>
-                <button className="font-bold">{quantity}</button>
-                <button className="font-bold" onClick={incrementQuantity}>
-                  +
-                </button>
-              </div>
+              {selectedColor !== null ? (
+                <h5 className="font-bold mt-6">Quantidade</h5>
+              ) : (
+                <div></div>
+              )}
+              {selectedColor !== null ? (
+                <div className="flex flex-row mt-2 ml-2 w-[90px] h-[30px] justify-around rounded-[12px] border-solid border-2 border-black">
+                  <>
+                    <button className="font-bold" onClick={decrementQuantity}>
+                      -
+                    </button>
+                    <button className="font-bold">{quantity}</button>
+                    <button className="font-bold" onClick={incrementQuantity}>
+                      +
+                    </button>
+                  </>
+
+                </div>
+              ) : (
+                <div></div>
+              )}
               <div className="flex flex-col my-6">
                 <span className="uppercase text-sm font-bold"> Observações do Pedido</span>
                 <textarea
@@ -269,7 +323,7 @@ export function ProductDetail() {
         <div onClick={closeModal} className="w-full h-full flex justify-center items-center">
           {selectedImageIndex !== null && (
             <img
-              src={product?.image[selectedImageIndex].previewUrl}
+              src={product?.image[selectedImageIndex].url}
               alt="Product Preview"
               className="w-96"
               onClick={closeModal}

@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { Link } from "react-router-dom";
-import { collection, deleteDoc, doc,  getDocs, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db, storage } from "../../../services/firebaseConnection";
 import { deleteObject, ref } from "firebase/storage";
 
@@ -47,17 +47,17 @@ export function Variacoes() {
         const q = query(tamanhosRef, orderBy("created", "desc"))
 
         await getDocs(q)
-            onSnapshot(q, (snapshot) => {
-                const lista = [] as tamanhoProps[]
-                snapshot.forEach((doc) => {
-                    lista.push({
-                        id: doc.id,
-                        name: doc.data().tamanho,
-                        owner: doc.data().owner
-                    })
-                    setTamanho(lista)
+        onSnapshot(q, (snapshot) => {
+            const lista = [] as tamanhoProps[]
+            snapshot.forEach((doc) => {
+                lista.push({
+                    id: doc.id,
+                    name: doc.data().tamanho,
+                    owner: doc.data().owner
                 })
+                setTamanho(lista)
             })
+        })
     }
 
     async function loadCores() {
@@ -65,40 +65,40 @@ export function Variacoes() {
         const q = query(coresRef, orderBy("created", "desc"))
 
         await getDocs(q)
-            onSnapshot(q, (snapshot) => {
-                const lista = [] as coresProps[]
-                snapshot.forEach((doc) => {
-                    lista.push({
-                        id: doc.id,
-                        name: doc.data().cor,
-                        owner: doc.data().owner,
-                        images: doc.data().images
-                    })
-                    setCores(lista)
+        onSnapshot(q, (snapshot) => {
+            const lista = [] as coresProps[]
+            snapshot.forEach((doc) => {
+                lista.push({
+                    id: doc.id,
+                    name: doc.data().cor,
+                    owner: doc.data().owner,
+                    images: doc.data().images
                 })
+                setCores(lista)
             })
+        })
     }
 
-    async function handleDeleteCor(item: coresProps){
+    async function handleDeleteCor(item: coresProps) {
         const corItem = item;
 
         const docRef = doc(db, "Cores", corItem.id)
         await deleteDoc(docRef)
 
-        corItem.images.map( async (image) => {
-        const imagePath = `images/${image.uid}/${image.name}`
-        const imageRef = ref(storage, imagePath)
+        corItem.images.map(async (image) => {
+            const imagePath = `images/${image.uid}/${image.name}`
+            const imageRef = ref(storage, imagePath)
 
-        try{
-            await deleteObject(imageRef)
-            setCores(cores.filter(cores => cores.id !== corItem.id))
-        }catch(error){
-            console.error("ERRO AO DELETAR IMAGEM", error)
-        }
+            try {
+                await deleteObject(imageRef)
+                setCores(cores.filter(cores => cores.id !== corItem.id))
+            } catch (error) {
+                console.error("ERRO AO DELETAR IMAGEM", error)
+            }
         })
     }
 
-    async function handleDeleteTamanho(item: tamanhoProps){
+    async function handleDeleteTamanho(item: tamanhoProps) {
         const tamanhoItem = item;
 
         const docRef = doc(db, "Tamanhos", tamanhoItem.id)
@@ -130,78 +130,75 @@ export function Variacoes() {
                 </div>
 
                 <div className="mt-10 flex flex-col justify-center items-center">
-                    <span className="text-wblack text-lg font-bold my-5">TAMANHOS</span>         
-                   {tamanho.length === 0 ? (
-                    <h1 className="mt-10">Nenhum tamanho encontrada</h1>
-                   ):(
-                    <table className="w-full text-center border-solid border my-2 p-0 table-fixed border-collapse max-sm:border-0">
-                        <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
-                            <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
-                                <th scope="col">Nome Variação</th>
-                                <th scope="col">Tipo de Variação</th>
-                                <th scope="col">Ações</th>
-                            </tr>
-                        </thead>
-                        {tamanho.map(item => (
-                            <tbody key={item.id}>
-                                <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
-                                    <td className="border-0 rounded-[4px] py-2" data-label="nome">{item.name}</td>
-                                    <td className="border-0 rounded-[4px] py-2" data-label="tipo da variacao">Tamanho</td>
+                    <span className="text-wblack text-lg font-bold my-5">TAMANHOS</span>
+                    {tamanho.length === 0 ? (
+                        <h1 className="mt-10">Nenhum tamanho encontrada</h1>
+                    ) : (
+                        <table className="w-full text-center border-solid border my-2 p-0 table-fixed border-collapse max-sm:border-0">
+                            <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
+                                <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
+                                    <th scope="col">Nome Variação</th>
 
-                                    <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                        <button>
-                                            <div className="flex gap-3">
-                                                <Link to={`/dashboard/variacoes/variacoes-tamanho?id=${item.id}`}>
-                                                    <FiEdit2 size={17} color="#000" />
-                                                </Link>
-                                                <button onClick={() => handleDeleteTamanho(item)}>
-                                                    <FaTrashCan size={17} color="#000" />
-                                                </button>
-                                            </div>
-                                        </button>
-                                    </td>
+                                    <th scope="col">Ações</th>
                                 </tr>
-                            </tbody>
-                        ))}
-                    </table>
-                   )} 
+                            </thead>
+                            {tamanho.map(item => (
+                                <tbody key={item.id}>
+                                    <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
+                                        <td className="border-0 rounded-[4px] py-2" data-label="nome">{item.name}</td>
+                                        <td className="border-0 rounded-[4px] py-2" data-label="ações">
+                                            <button>
+                                                <div className="flex gap-3">
+                                                    <Link to={`/dashboard/variacoes/variacoes-tamanho?id=${item.id}`}>
+                                                        <FiEdit2 size={17} color="#000" />
+                                                    </Link>
+                                                    <button onClick={() => handleDeleteTamanho(item)}>
+                                                        <FaTrashCan size={17} color="#000" />
+                                                    </button>
+                                                </div>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            ))}
+                        </table>
+                    )}
                 </div>
 
                 <div className="mt-10 flex flex-col justify-center items-center">
-                <span className="text-wblack text-lg font-bold my-5">CORES</span> 
-                   {cores.length === 0 ? (
+                    <span className="text-wblack text-lg font-bold my-5">CORES</span>
+                    {cores.length === 0 ? (
                         <h1 className="mt-10">Nenhuma cor encontrada...</h1>
-                   ):(       
-                    <table className="w-full text-center border-solid border mb-32 my-2 p-0 table-fixed border-collapse max-sm:border-0">
-                        <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
-                            <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
-                                <th scope="col">Nome Variação</th>
-                                <th scope="col">Tipo de Variação</th>
-                                <th scope="col">Ações</th>
-                            </tr>
-                        </thead>
-                        {cores.map(item => (
-                            <tbody key={item.id}>
-                                <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
-                                    <td className="border-0 rounded-[4px] py-2" data-label="nome">{item.name}</td>
-                                    <td className="border-0 rounded-[4px] py-2" data-label="tipo da variacao">Cor</td>
-                                    <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                        <button>
-                                            <div className="flex gap-3">
-                                                <Link to={`/dashboard/variacoes/variacoes-cor?id=${item.id}`}>
-                                                    <FiEdit2 size={17} color="#000" />
-                                                </Link>
-                                                <button onClick={() => handleDeleteCor(item)}>
-                                                    <FaTrashCan size={17} color="#000" />
-                                                </button>
-                                            </div>
-                                        </button>
-                                    </td>
+                    ) : (
+                        <table className="w-full text-center border-solid border mb-32 my-2 p-0 table-fixed border-collapse max-sm:border-0">
+                            <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
+                                <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
+                                    <th scope="col">Nome Variação</th>
+                                    <th scope="col">Ações</th>
                                 </tr>
-                            </tbody>
-                        ))}
-                    </table>
-                   )}
+                            </thead>
+                            {cores.map(item => (
+                                <tbody key={item.id}>
+                                    <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
+                                        <td className="border-0 rounded-[4px] py-2" data-label="nome">{item.name}</td>
+
+                                        <td className="border-0 rounded-[4px] py-2" data-label="ações">
+                                            <button>
+                                                <div className="flex gap-3">
+                                                    <Link to={`/dashboard/variacoes/variacoes-cor?id=${item.id}`}>
+                                                        <FiEdit2 size={17} color="#000" />
+                                                    </Link>
+                                                    <button onClick={() => handleDeleteCor(item)}>
+                                                        <FaTrashCan size={17} color="#000" />
+                                                    </button>
+                                                </div>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            ))}
+                        </table>
+                    )}
                 </div>
 
             </div>
