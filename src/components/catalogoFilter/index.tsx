@@ -16,10 +16,10 @@ function CatalogoFilter() {
     async function fetchProdutos() {
       const produtosRef = collection(db, "Produtos");
 
-      const q = query(produtosRef, where("categoria", "==", categoria), where("sizes", "array-contains", tamanho));
+      const q = query(produtosRef, where("categoria", "==", categoria), where("size", "array-contains", tamanho));
 
       const querySnapshot = await getDocs(q);
-      const produtosData: productProps[] = [];
+      const produtosData: productProps[] = [] ;
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -27,21 +27,18 @@ function CatalogoFilter() {
           id: doc.id,
           name: data.name,
           description: data.description,
-          sizes: data.sizes,
           categoria: data.categoria,
-          colorImage: data.colorImage,
-          colors: data.colors,
           image: data.images,
           owner: data.owner,
           price: data.price,
           status: data.status,
-          storage: data.storage
+          variations: data.variations,
+          size: data.size,
         });
       });
 
       console.log("Produtos encontrados:", produtosData);
       setProdutos(produtosData);
-
     }
 
     fetchProdutos();
@@ -60,16 +57,16 @@ function CatalogoFilter() {
             <>
               <div className="w-full flex flex-col">
                 <div className="flex justify-center items-center mt-10 w-full rounded-md p-2 bg-wine-light">
-                <h1 className="text-center text-xl pr-2 text-white">Categoria:</h1>
-                <span className="font-bold text-center text-white">{item.categoria}</span>
+                  <h1 className="text-center text-xl pr-2 text-white">Categoria:</h1>
+                  <span className="font-bold text-center text-white">{item.categoria}</span>
                 </div>
-                
+
                 <div className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
                   <div>
                     <Link key={index} to={`/product/details?id=${item.id}`}>
                       <img
                         className=' max-h-[300px] w-[305px] max-md:h-[170px] rounded-ss-lg rounded-se-lg'
-                        src={item.image?.[0]?.url} // Usando o operador opcional de encadeamento
+                        src={item.image[0].url} // Usando o operador opcional de encadeamento
                         alt="Product photo"
                       />
                     </Link>

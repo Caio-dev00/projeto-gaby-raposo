@@ -61,7 +61,7 @@ export function Home() {
           })
           setCategory(listCategories)
         })
-      }
+    }
     loadTamanhos()
     loadBanner()
     getCategory()
@@ -78,14 +78,14 @@ export function Home() {
         snapshot.forEach(doc => {
           const bannerData = doc.data();
 
-          if(bannerData.status === "Ativo")
-          listBanner.push({
-            id: doc.id,
-            name: bannerData.name,
-            images: bannerData.images,
-            owner:bannerData.owner,
-            status: bannerData.status,
-          })
+          if (bannerData.status === "Ativo")
+            listBanner.push({
+              id: doc.id,
+              name: bannerData.name,
+              images: bannerData.images,
+              owner: bannerData.owner,
+              status: bannerData.status,
+            })
         })
         setBanner(listBanner)
       })
@@ -110,13 +110,19 @@ export function Home() {
     })
   }
 
+
+
+
   const toggleCategory = (index: number) => {
     setIsOpen((prev) => {
       const newState = [...prev];
-      newState[index] = !newState[index]
-      return newState;
+      const updatedState = newState.map((state, idx) => idx === index ? !state : false);
+      return updatedState;
     })
   }
+
+
+
   return (
     <Container>
       <div className="mt-15 max-md:p-2 mt-10">
@@ -141,7 +147,7 @@ export function Home() {
 
           <Slider settings={settings2}>
 
-            {category.map((item, index) =>
+          {category.map((item, index) =>
               <SwiperSlide key={item.id}>
                 <div className="flex flex-col items-center w-[340px] rounded-lg mt-20">
                   <div className="relative w-[60px] h-[60px] max-md:w-[50px] max-md:h-[50px] bg-black rounded-full hover:bg-salmon duration-300">
@@ -182,16 +188,14 @@ export function Home() {
                 </div>
               </SwiperSlide>
             )}
-
-
-
           </Slider>
         </div>
       </div>
       <div id="catalogo">
         <h1 className="text-center font-extrabold text-xl mt-60 my-10 max-md:text-lg max-md:mb-5 max-md:mt-32">CATÁLOGO</h1>
       </div>
-          <Catalogo />
+      <Catalogo />
     </Container>
   )
 }
+

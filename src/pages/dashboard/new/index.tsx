@@ -14,7 +14,7 @@ import { HeaderDashboard } from "../../../components/headerDashboard";
 import Input from "../../../components/input";
 import Title from "../../../components/titleDahsboard";
 
-import { FiTrash, FiUpload } from 'react-icons/fi';
+import { FiTrash, FiTrash2, FiUpload } from 'react-icons/fi';
 import { tamanhoProps } from '../variacoes';
 import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -24,21 +24,26 @@ export interface productProps {
   name: string;
   owner: string;
   price: string;
-  sizes: string[];
+  size: string;
   status: string;
-  storage: string;
   categoria: string;
-  colors: colorProps[];
   description: string;
   image: ImageItemProps[];
-  colorImage: Color[];
+  variations: Variations[];
 }
-export type Color = {
+
+export type Variations = {
+  size: string;
+  colors: Color[];
+}
+
+export interface Color {
   uid: string;
   url: string;
   previewUrl: string;
   imageUrl: string;
   name: string;
+  estoque: number;
 }
 
 export interface categoryProps {
@@ -50,7 +55,7 @@ export interface colorProps {
   name: string;
   id: string;
   images: ImageItemProps[]
-  
+
 }
 
 export interface sizeProps {
@@ -69,7 +74,6 @@ const schema = z.object({
   name: z.string().min(1, "O campo é obrigatorio!"),
   price: z.string().min(1, "O campo é obrigatorio!"),
   description: z.string().min(1, "O campo é obrigatorio!"),
-  storage: z.string().min(1, "A quantidade é obrigatoria!"),
 })
 
 type FormData = z.infer<typeof schema>
@@ -95,8 +99,11 @@ export function New() {
   const [loadSize, setLoadSize] = useState(true)
 
   const [categoria, setCategoria] = useState<number>(0);
-  const [colorSelected, setColorSelected] = useState<string[]>([])
-  const [sizeSelected, setSizeSelected] = useState<string[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [colorSelected, setColorSelected] = useState<string | null>(null)
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [defaultSize, setDefaultSize] = useState<string>("Selecione o Tamanho");
+  const [defaultColor, setDefaultColor] = useState<string | "Selecione a cor">("Selecione a cor");
   const [status, setStatus] = useState("Ativo")
 
   const location = useLocation();
@@ -105,29 +112,19 @@ export function New() {
 
   const [name, setName] = useState("")
   const [price, setPrice] = useState("")
-  const [storageEdit, setStorageEdit] = useState("")
   const [description, setDescription] = useState("")
-
-  async function fetchColorImage(colorNames: string[]): Promise<{ name: string; imageUrl: string }[]> {
-    try {
-      const colorImages: { name: string; imageUrl: string }[] = [];
-
-      for (const colorName of colorNames) {
-        const selectedColor = color.find((c: colorProps) => c.name === colorName);
-        if (selectedColor) {
-          const imageUrl = selectedColor.images.length > 0 ? selectedColor.images[0].url : '';
-          colorImages.push({ name: colorName, imageUrl: imageUrl });
-        } else {
-          console.log(`Imagem não encontrada para a cor ${colorName}`);
-        }
-      }
-
-      return colorImages;
-    } catch (error) {
-      console.log("Erro ao buscar imagem da cor:", error);
-      return [];
-    }
-  }
+  const [variations, setVariations] = useState<Variations[]>([]);
+  const [selectedVariation, setSelectedVariation] = useState<Variations>({
+    size: "",
+    colors: [],
+  });
+  const [editVariations, setEditVariations] = useState<Variations[]>([])
+  const [estoque, setEstoque] = useState<number>(0)
+  const [productImagesFromDB, setProductImagesFromDB] = useState<ImageItemProps[]>([]);
+  const [existingImages, setExistingImages] = useState<ImageItemProps[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [deletedImages, setDeletedImages] = useState<ImageItemProps[]>([]);
+  const [categories, setCategories] = useState<categoryProps[]>([]);
 
 
   useEffect(() => {
@@ -144,23 +141,22 @@ export function New() {
               name: productData.name,
               owner: productData.owner,
               categoria: productData.categoria,
-              colors: productData.colors,
-              sizes: productData.sizes,
               status: productData.status,
-              storage: productData.storage,
               price: productData.price,
+              size: productData.size,
               description: productData.description,
               image: productData.images,
-              colorImage: productData.colorImage,
+              variations: productData.variations
             };
 
             setName(productCompleto.name);
             setPrice(productCompleto.price);
-            setStorageEdit(productCompleto.storage);
             setDescription(productCompleto.description);
             setStatus(productCompleto.status);
-            setColor(productCompleto.colors);
-            
+            setEditVariations(productCompleto.variations);
+
+            // Atualize o estado com o nome da categoria
+            setSelectedCategory(productCompleto.categoria);
           }
         } else {
           console.log("Produto não encontrado");
@@ -176,89 +172,9 @@ export function New() {
     fetchProduct();
   }, [productId, navigate]);
 
-  async function onSubmit(data: FormData) {
-    try {
-      const colorImages = await fetchColorImage(colorSelected);
-
-      const newProduct = {
-        name: data.name.toUpperCase(),
-        categoria: category[categoria].name,
-        colors: colorSelected.map(name => ({ name })),
-        sizes: sizeSelected,
-        price: data.price,
-        storage: data.storage,
-        description: data.description,
-        status: status,
-        created: new Date(),
-        owner: user?.name,
-        id: user?.uid,
-        images: productImage,
-        colorImage: colorImages,
-      };
-
-      await addDoc(collection(db, "Produtos"), newProduct);
-
-      reset();
-      toast.success("Produto Cadastrado!")
-      setProductImage([]);
-      setColorSelected([]);
-      setSizeSelected([]);
-
-      console.log("PRODUTO CADASTRADO COM SUCESSO!");
-    } catch (error) {
-      console.error("ERRO AO CADASTRAR PRODUTO", error);
-      toast.error("Erro ao cadastrar o")
-    }
-  }
-
-  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files[0]) {
-      const image = e.target.files[0]
-
-      if (image.type === "image/jpeg" || image.type === "image/png") {
-        await handleUpload(image)
-      } else {
-        alert("Envie uma imagem jpeg ou png")
-        return;
-      }
-    }
-  }
-
-  async function handleUpload(image: File) {
-    if (!user?.uid) {
-      return;
-    }
-
-    const currentUid = user?.uid;
-    const uidImage = uuidV4();
-
-    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`)
-
-    uploadBytes(uploadRef, image)
-      .then((snapshot) => {
-        getDownloadURL(snapshot.ref).then((downloadUrl) => {
-          const imageItem = {
-            name: uidImage,
-            uid: currentUid,
-            previewUrl: URL.createObjectURL(image),
-            url: downloadUrl
-          }
-          setProductImage((images) => [...images, imageItem])
-        })
-      })
-  }
-
-  async function handleDeleteImage(item: ImageItemProps) {
-    const imagePath = `images/${item.uid}/${item.name}`;
-    const imageRef = ref(storage, imagePath)
-
-    try {
-      await deleteObject(imageRef)
-      setProductImage(productImage.filter((image) => image.url !== item.url))
-    } catch (error) {
-      console.log("ERROR AO DELETAR")
-    }
-  }
+  useEffect(() => {
+    console.log('Variações salvas:', variations);
+  }, [variations]);
 
   useEffect(() => {
     async function loadCategory() {
@@ -289,6 +205,8 @@ export function New() {
           setCategory([{ id: '1', name: 'FREELA' }])
         })
     }
+
+
     async function loadCores() {
       await getDocs(listCoresRef)
         .then((snapshot) => {
@@ -353,6 +271,242 @@ export function New() {
     loadTamanho();
   }, [])
 
+  async function loadCategories() {
+    try {
+      const categoriesSnapshot = await getDocs(listRef);
+      const categoriesData = categoriesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+      }));
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Erro ao carregar as categorias:", error);
+    }
+  }
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    async function fetchProductImages() {
+      if (!productId) return;
+
+      try {
+        const productDoc = await getDoc(doc(db, "Produtos", productId));
+        if (productDoc.exists()) {
+          const productData = productDoc.data();
+          if (productData && productData.images) {
+            setProductImagesFromDB(productData.images);
+            setExistingImages(productData.images);
+          }
+        } else {
+          console.log("Produto não encontrado");
+          toast.error("Produto não encontrado!");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar imagens do produto:", error);
+        toast.error("Erro ao buscar imagens do produto!");
+      }
+    }
+
+    fetchProductImages();
+  }, [productId]);
+
+  const handleDeleteImageFromDB = async (item: ImageItemProps) => {
+    try {
+      const updatedImages = productImagesFromDB.filter(image => image.name !== item.name);
+      setProductImagesFromDB(updatedImages);
+
+      // Update the state to track deleted images
+      setDeletedImages([...deletedImages, item]);
+
+      toast.success("Imagem excluída com sucesso!");
+    } catch (error) {
+      console.error("Erro ao excluir imagem do produto:", error);
+      toast.error("Erro ao excluir imagem do produto!");
+    }
+  };
+
+  async function handleFileEdit(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedImages = Array.from(e.target.files);
+
+      // Filtrar apenas as novas imagens
+      const newImagesArray = selectedImages.filter(image => !existingImages.some(existingImage => existingImage.name === image.name));
+
+      // Adicionar novas imagens ao estado
+      setNewImages([...newImages, ...newImagesArray]);
+
+      // Realizar o upload das novas imagens
+      for (const image of newImagesArray) {
+        if (image.type === "image/jpeg" || image.type === "image/png") {
+          await handleUploadEdit(image);
+        } else {
+          alert("Envie apenas imagens jpeg ou png");
+          return;
+        }
+      }
+    }
+  }
+
+  async function handleUploadEdit(image: File) {
+    if (!user?.uid) {
+      return;
+    }
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
+
+    try {
+      const snapshot = await uploadBytes(uploadRef, image);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+
+      setProductImage((images) => [...images, {
+        name: uidImage,
+        uid: currentUid,
+        previewUrl: URL.createObjectURL(image),
+        url: downloadUrl,
+      }]);
+    } catch (error) {
+      console.error("Erro ao fazer upload da imagem:", error);
+    }
+  }
+
+  async function onSubmit(data: FormData) {
+    try {
+      const newVariations: Variations[] = variations.map(variation => ({
+        size: variation.size,
+        colors: variation.colors,
+      }));
+
+      const sizesArray = variations.map(variation => variation.size);
+
+      const newProduct = {
+        name: data.name.toUpperCase(),
+        categoria: category[categoria].name,
+        price: data.price,
+        description: data.description,
+        status: status,
+        created: new Date(),
+        owner: user?.name,
+        size: sizesArray,
+        id: user?.uid,
+        images: productImage,
+        variations: newVariations
+      };
+
+      await addDoc(collection(db, "Produtos"), newProduct);
+
+      reset();
+      toast.success("Produto Cadastrado!")
+      setProductImage([]);
+      setColorSelected('');
+      navigate('/dashboard')
+      console.log("PRODUTO CADASTRADO COM SUCESSO!");
+    } catch (error) {
+      console.error("ERRO AO CADASTRAR PRODUTO", error);
+      toast.error("Erro ao cadastrar o")
+    }
+  }
+
+  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      const image = e.target.files[0]
+
+      if (image.type === "image/jpeg" || image.type === "image/png") {
+        await handleUpload(image)
+      } else {
+        alert("Envie uma imagem jpeg ou png")
+        return;
+      }
+    }
+  }
+
+  async function handleUpload(image: File) {
+    if (!user?.uid) {
+      return;
+    }
+
+    const currentUid = user?.uid;
+    const uidImage = uuidV4();
+
+    const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`)
+
+    // Você precisa aguardar a resolução da Promise aqui
+    try {
+      const snapshot = await uploadBytes(uploadRef, image);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+
+      const imageItem = {
+        name: uidImage,
+        uid: currentUid,
+        previewUrl: URL.createObjectURL(image),
+        url: downloadUrl
+      };
+
+      setProductImage((images) => [...images, imageItem]);
+    } catch (error) {
+      console.error("Erro ao fazer upload da imagem:", error);
+    }
+  }
+
+  async function handleDeleteImage(item: ImageItemProps) {
+    const imagePath = `images/${item.uid}/${item.name}`;
+    const imageRef = ref(storage, imagePath)
+
+    try {
+      await deleteObject(imageRef)
+      setProductImage(productImage.filter((image) => image.url !== item.url))
+    } catch (error) {
+      console.log("ERROR AO DELETAR")
+    }
+  }
+
+  const handleDeleteVariation = (index: number) => {
+    const newVariations = [...variations];
+    newVariations.splice(index, 1);
+    setVariations(newVariations);
+  };
+
+  const handleDeleteVariationEdit = async (index: number) => {
+    try {
+      const productDoc = await getDoc(doc(db, "Produtos", productId!));
+
+      if (productDoc.exists()) {
+        const productData = productDoc.data();
+
+        if (productData && productData.variations && productData.variations.length > 0) {
+
+          if (productData.variations.length > 1) {
+            const updatedVariations = [...productData.variations];
+            updatedVariations.splice(index, 1);
+
+            await updateDoc(doc(db, "Produtos", productId!), {
+              variations: updatedVariations
+            });
+
+            toast.success("Variação excluída com sucesso!");
+
+            setEditVariations(updatedVariations);
+          } else {
+            toast.error("É necessário manter pelo menos uma variação cadastrada!");
+          }
+        } else {
+          toast.error("Nenhuma variação encontrada para excluir!");
+        }
+      } else {
+        toast.error("Produto não encontrado!");
+      }
+    } catch (error) {
+      console.error("Erro ao excluir variação:", error);
+      toast.error("Erro ao excluir variação!");
+    }
+  };
+
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handleChangeCategory(e: any): void {
     setCategoria(e.target.value)
@@ -372,70 +526,160 @@ export function New() {
     setPrice(e.target.value)
   }
 
-  function handleStorageChange(e: ChangeEvent<HTMLInputElement>) {
-    setStorageEdit(e.target.value)
-  }
-
   function handleDescriptionChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setDescription(e.target.value)
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size);
+    setDefaultSize(size);
+
+    setSelectedVariation((prevVariation) => ({
+      ...prevVariation,
+      size: size,
+    }));
+  };
+
+
+  const handleColorChange = (name: string) => {
+    setColorSelected(name);
+    setDefaultColor(name);
+  };
 
   const editSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
+      // Atualiza os detalhes do produto
       await updateDoc(doc(db, "Produtos", productId!), {
         name: name,
-        categorias: category.map(cat => cat.name),
         price: price,
-        storage: storageEdit,
         description: description,
         status: status,
-        color: color.map(color => color.name),
-        size: size.map(size => size.name),
+        categoria: selectedCategory || categoria
       });
-      alert("Produto editado com sucesso!");
-      toast.success("Produto editado!")
-      navigate("/dashboard"); // Redireciona de volta para a lista de categorias
+
+      // Atualiza as imagens do produto (adicionando as novas e removendo as excluídas)
+      const updatedImages = [...existingImages, ...productImage].filter(image => !deletedImages.some(deletedImage => deletedImage.name === image.name));
+      await updateDoc(doc(db, "Produtos", productId!), {
+        images: updatedImages,
+      });
+
+      // Atualiza as variações do produto
+      await updateDoc(doc(db, "Produtos", productId!), {
+        variations: editVariations,
+      });
+
+      // Clear the deleted images state
+      setDeletedImages([]);
+
+      toast.success("Produto editado!");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Erro ao editar produto:", error);
-      toast.error("Erro ao editar produto!")
+      toast.error("Erro ao editar produto!");
       navigate("/dashboard");
     }
   };
 
-  const handleCheckboxChangeSize = (name: string) => {
-    const currentIndex = sizeSelected.indexOf(name);
-    const newSelectedOptions = [...sizeSelected];
-
-    if (currentIndex === -1) {
-      newSelectedOptions.push(name);
-    } else {
-      newSelectedOptions
-
-        .splice(currentIndex, 1);
+  const handleSaveVariation = () => {
+    if (!selectedSize || !colorSelected || estoque <= 0) {
+      return;
     }
-    setSizeSelected(newSelectedOptions);
-    console.log(newSelectedOptions)
+
+    const newVariation = { ...selectedVariation };
+
+    const selectedColorObj = color.find((c) => c.name === colorSelected);
+
+    if (selectedColorObj && selectedColorObj.images.length > 0) {
+      const selectedColorImage = selectedColorObj.images[0];
+
+      newVariation.colors.push({
+        uid: uuidV4(),
+        name: colorSelected,
+        imageUrl: selectedColorImage.url,
+        previewUrl: selectedColorImage.previewUrl,
+        url: selectedColorImage.url,
+        estoque: estoque,
+      });
+
+      // Adicione a nova variação ao estado de variações
+      setVariations([...variations, newVariation]);
+
+      // Limpe o estado de seleção de variação e estoque
+      setSelectedVariation({ size: "", colors: [] });
+      setDefaultSize("Selecione o Tamanho");
+      setDefaultColor("Selecione a cor");
+
+      setSelectedSize("");
+      setColorSelected("");
+      setEstoque(0);
+    } else {
+      console.error(`Imagem não encontrada para a cor ${colorSelected}`);
+    }
   };
 
-  const handleCheckboxChangeColor = (name: string) => {
-    const currentIndex = colorSelected.indexOf(name);
-    const newSelectedOptions = [...colorSelected];
+  const handleSaveVariationEdit = async () => {
+    try {
+      if (!selectedSize || !colorSelected || estoque <= 0) {
+        return;
+      }
 
-    if (currentIndex === -1) {
-      newSelectedOptions.push(name);
-    } else {
-      newSelectedOptions.splice(currentIndex, 1);
+      const selectedColorObj = color.find((c) => c.name === colorSelected);
+
+      if (selectedColorObj && selectedColorObj.images.length > 0) {
+        const selectedColorImage = selectedColorObj.images[0];
+
+        const newVariation = {
+          size: selectedSize,
+          colors: [
+            {
+              uid: uuidV4(),
+              name: colorSelected,
+              imageUrl: selectedColorImage.url,
+              previewUrl: selectedColorImage.previewUrl,
+              url: selectedColorImage.url,
+              estoque: estoque,
+            }
+          ]
+        };
+
+        // Adicione a nova variação ao estado de variações editadas
+        const updatedVariations = [...editVariations, newVariation];
+        setEditVariations(updatedVariations);
+
+        // Limpe o estado de seleção de variação e estoque
+        setSelectedVariation({ size: "", colors: [] });
+        setDefaultSize("Selecione o Tamanho");
+        setDefaultColor("Selecione a cor");
+        setSelectedSize("");
+        setColorSelected("");
+        setEstoque(0);
+
+        toast.success("Variação adicionada com sucesso!");
+      } else {
+        console.error(`Imagem não encontrada para a cor ${colorSelected}`);
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar variação:", error);
+      toast.error("Erro ao adicionar variação!");
     }
+  };
 
-    setColorSelected(newSelectedOptions);
+  const handleStockChange = (e: ChangeEvent<HTMLInputElement>, variationIndex: number, colorIndex: number) => {
+    const newVariations = [...editVariations];
+    newVariations[variationIndex].colors[colorIndex].estoque = parseInt(e.target.value);
+    setEditVariations(newVariations);
+  };
+
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
   };
 
   return (
     <div>
       <HeaderDashboard />
-
 
       <div className="ml-[300px] pt-[1px] px-[16px] max-md:ml-0">
         {productId ? (
@@ -451,7 +695,52 @@ export function New() {
 
         {productId ? (
           <div className='bg-white p-10 rounded-md shadow-md'>
+            <div className='flex'>
+              <button className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
+                <div className="absolute cursor-pointer ">
+                  <FiUpload size={30} color="#000" />
+                </div>
+                <div className="cursor-pointer ">
+                  <input
+                    className="opacity-0 cursor-pointer"
+                    onChange={handleFileEdit}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                  />
+                </div>
+              </button>
+
+              {productImage.map(item => (
+                <div className='h-32 flex items-center justify-center relative ' key={item.name}>
+                  <button className="absolute flex text-black" onClick={() => handleDeleteImage(item)}>
+                    <FiTrash2 size={24} color="#FFF" />
+                  </button>
+                  <img
+                    src={item.previewUrl}
+                    className="rounded-lg w-full h-32 object-cover ml-2 "
+                  />
+                </div>
+              ))}
+            </div>
+            <h1 className='text-xl font-semibold my-8'>Imagens do produto:</h1>
+            <div className='flex items-centerr my-3'>
+              {productImagesFromDB.map(item => (
+                <div key={item.uid} className="flex items-center">
+                  <div className='flex flex-col'>
+                    <img src={item.url} alt={item.name} className="w-24 h-24 object-cover mr-4 rounded-lg" />
+                    <button className='flex items-center' onClick={() => handleDeleteImageFromDB(item)}>Excluir<FiTrash2 /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <form onSubmit={editSubmit} className='flex flex-col'>
+              {/* Permitir que o usuário adicione novas imagens */}
+              <div className="w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
+
+
+              </div>
               <label>Nome do Produto:</label>
               <input
                 className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
@@ -461,25 +750,6 @@ export function New() {
                 type='text'
               />
               <div className='flex flex-col w-full'>
-                <label className='mt-4'>Selecione a Categoria</label>
-                {
-                  loadCategory ? (
-                    <input type="text" disabled={true} value="Carregando..." />
-                  ) : (
-                    <select
-                      className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                      value={categoria}
-                      onChange={handleChangeCategory}>
-                      {category.map((item, index) => {
-                        return (
-                          <option key={index} value={index}>
-                            {item.name}
-                          </option>
-                        )
-                      })}
-                    </select>
-                  )
-                }
                 <label>Preço:</label>
                 <input
                   className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
@@ -488,15 +758,21 @@ export function New() {
                   onChange={handlePriceChange}
                   type='text'
                 />
-                <label>Estoque:</label>
-                <input
-                  className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
-                  placeholder="Editar estoque do produto"
-                  value={storageEdit}
-                  onChange={handleStorageChange}
-                  type='text'
-                />
               </div>
+
+              <label>Editar Categoria:</label>
+              <select
+                className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                value={selectedCategory || ''}
+                onChange={handleCategoryChange}
+              >
+                <option disabled value="">Selecione a categoria</option>
+                {categories.map((item) => (
+                  <option key={item.id} value={item.name} selected={item.name === selectedCategory}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
 
               <h1 className='my-1 text-xl font-semibold'>Variação do Produto:</h1>
 
@@ -528,9 +804,120 @@ export function New() {
                 placeholder='Editar descrição do produto...'
               />
               <button type='submit' className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
-                <span className='text-white font-bold'>Editar Produto</span>
+                <span className='text-white font-bold'>Salvar alterações</span>
               </button>
             </form>
+
+            <h1 className='font-semibold text-xl mt-10'>Editar Variações</h1>
+            {editVariations.map((variation, index) => (
+              <div key={index} className="flex flex-col w-auto bg-wine-black mt-2 rounded-md pl-5 py-3">
+                <span className='text-white font-semibold mb-1'>Variação {index + 1}</span>
+                <span className='text-white'>
+                  <span className='font-semibold'>Tamanho:</span> {variation.size}
+                </span>
+
+                {variation.colors.map((color, colorIndex) => (
+                  <span key={colorIndex} className='text-white'>
+                    <span className='font-semibold'>Cor:</span> {color.name}
+                  </span>
+                ))}
+                <div className='flex w-full justify-between'>
+                  {variation.colors.map((color, colorIndex) => (
+                    <div className='flex items-center' key={color.uid}>
+                      <span className='text-white font-semibold pr-1'>Qtd:</span>
+                      <input
+                        className='block w-14 rounded-md border-2 border-gray-400 p-1 text-gray-600 md:text-sm my-2'
+                        type="number"
+                        placeholder='ex: 55'
+                        value={color.estoque}
+                        onChange={(e) => handleStockChange(e, index, colorIndex)}
+                      />
+                    </div>
+                  ))}
+                  <div className='flex mr-5'>
+                    <button onClick={() => handleDeleteVariationEdit(index)}>
+                      <FiTrash2 size={22} color='#FFF' />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <h1 className='mt-10 mb-2 text-xl font-semibold'>Adicionar variação:</h1>
+            {/* ---SELECIONE O TAMANHO--- */}
+            <label>Selecione o Tamanho</label>
+            {
+              loadSize ? (
+                <input type="text" disabled={true} value="Carregando..." />
+              ) : (
+                <select
+                  className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                  value={defaultSize}
+                  onChange={(event) => handleSizeSelect(event.target.value)}>
+                  <option disabled value="Selecione o Tamanho">Selecione o Tamanho</option>
+                  {size.map((item) => {
+                    return (
+                      <option key={item.id} value={item.name}>
+                        {item.name}
+                      </option>
+                    )
+                  })}
+                </select>
+              )
+            }
+
+            {/* ---SELECIONE A COR--- */}
+            <label>Selecione a cor</label>
+            {
+              loadColor ? (
+                <input type="text" disabled={true} value="Carregando..." />
+              ) : (
+                <select
+                  className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                  value={defaultColor}
+                  onChange={(event) => handleColorChange(event.target.value)}>
+                  <option disabled value="Selecione a cor">Selecione a cor</option>
+                  {color.map((item) => {
+                    return (
+                      <option key={item.id} value={item.name}>
+                        {item.name}
+                      </option>
+                    )
+                  })}
+                </select>
+              )
+            }
+
+            <label>Estoque:</label>
+            <input
+              className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
+              type="number"
+              placeholder='ex: 55'
+              value={estoque}
+              onChange={(e) => setEstoque(parseInt(e.target.value))}
+            />
+            {/* Renderiza as variações */}
+            {variations.map((variation, index) => (
+              <div key={index} className="flex flex-col w-auto bg-wine-black mt-2 rounded-md p-1">
+                <span className='text-white font-semibold mb-1'>Variação {index + 1}</span>
+                {variation.colors.map((color, colorIndex) => (
+                  <span key={colorIndex} className='text-white'>
+                    <span className='font-semibold'>Cor:</span> {color.name}
+                  </span>
+                ))}
+                <span className='text-white mt-1'><span className='font-semibold'>Tamanho:</span> {variation.size}</span>
+                <div className='flex justify-between'>
+                  {variation.colors.map((item, index) => (
+                    <span key={index} className='text-white mt-1'><span className='font-semibold'>Estoque:</span>{item.estoque}</span>
+                  ))}
+                  <button onClick={() => handleDeleteVariation(index)}>
+                    <FiTrash2 size={20} color='#FFF' />
+                  </button>
+                </div>
+              </div>
+            ))}
+            <button onClick={handleSaveVariationEdit} className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
+              <span className='text-white font-bold'>Adicionar variação</span>
+            </button>
           </div>
         ) : (
           //FORMULARIO CADASTRO
@@ -601,57 +988,7 @@ export function New() {
                   error={errors.price?.message}
                   register={register}
                 />
-                <label>Estoque:</label>
-                <Input
-                  placeholder="ex: 14"
-                  name='storage'
-                  type='text'
-                  error={errors.storage?.message}
-                  register={register}
-                />
               </div>
-
-              <h1 className='my-5 text-xl font-semibold'>Variação do Produto:</h1>
-
-              {/* ---SELECIONE A COR--- */}
-              <label>Selecione a cor</label>
-              {
-                loadColor ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  color.map((item) => (
-
-
-                    <div key={item.id} className='flex flex-row'>
-                      <input
-                        type="checkbox"
-                        checked={colorSelected.includes(item.name)}
-                        onChange={() => handleCheckboxChangeColor(item.name)}
-                      />
-                      <label className='pl-1'>{item.name}</label>
-                    </div>
-                  ))
-                )
-              }
-
-              {/* ---SELECIONE O TAMANHO--- */}
-              <label>Selecione o Tamanho</label>
-              {
-                loadSize ? (
-                  <input type="text" disabled={true} value="Carregando..." />
-                ) : (
-                  size.map((item) => (
-                    <div key={item.id} className='flex flex-row'>
-                      <input
-                        type="checkbox"
-                        checked={sizeSelected.includes(item.name)}
-                        onChange={() => handleCheckboxChangeSize(item.name)}
-                      />
-                      <label className='pl-1'>{item.name}</label>
-                    </div>
-                  ))
-                )
-              }
 
               <label className='mt-4'>Status</label>
               <div>
@@ -679,10 +1016,87 @@ export function New() {
                 placeholder='Adicionar descrição do produto...'
                 {...register('description')}
               />
+              <h1 className='my-5 text-xl font-semibold'>Variações do Produto:</h1>
+              {/* ---SELECIONE O TAMANHO--- */}
+              <label>Selecione o Tamanho</label>
+              {
+                loadSize ? (
+                  <input type="text" disabled={true} value="Carregando..." />
+                ) : (
+                  <select
+                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                    value={defaultSize}
+                    onChange={(event) => handleSizeSelect(event.target.value)}>
+                    <option disabled value="Selecione o Tamanho">Selecione o Tamanho</option>
+                    {size.map((item) => {
+                      return (
+                        <option key={item.id} value={item.name}>
+                          {item.name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                )
+              }
+
+              {/* ---SELECIONE A COR--- */}
+              <label>Selecione a cor</label>
+              {
+                loadColor ? (
+                  <input type="text" disabled={true} value="Carregando..." />
+                ) : (
+                  <select
+                    className='w-full max-w-50 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
+                    value={defaultColor}
+                    onChange={(event) => handleColorChange(event.target.value)}>
+                    <option disabled value="Selecione a cor">Selecione a cor</option>
+                    {color.map((item) => {
+                      return (
+                        <option key={item.id} value={item.name}>
+                          {item.name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                )
+              }
+
+              <label>Estoque:</label>
+              <input
+                className='block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm'
+                type="number"
+                placeholder='ex: 55'
+                value={estoque}
+                onChange={(e) => setEstoque(parseInt(e.target.value))}
+              />
+              {/* Renderiza as variações */}
+              {variations.map((variation, index) => (
+                <div key={index} className="flex flex-col w-auto bg-wine-black mt-2 rounded-md p-1">
+                  <span className='text-white font-semibold mb-1'>Variação {index + 1}</span>
+                  {variation.colors.map((color, colorIndex) => (
+                    <span key={colorIndex} className='text-white'>
+                      <span className='font-semibold'>Cor:</span> {color.name}
+                    </span>
+                  ))}
+                  <span className='text-white mt-1'><span className='font-semibold'>Tamanho:</span> {variation.size}</span>
+                  <div className='flex justify-between'>
+                    {variation.colors.map((item, index) => (
+                      <span key={index} className='text-white mt-1'><span className='font-semibold'>Estoque:</span>{item.estoque}</span>
+                    ))}
+                    <button onClick={() => handleDeleteVariation(index)}>
+                      <FiTrash2 size={20} color='#FFF' />
+                    </button>
+                  </div>
+
+                </div>
+              ))}
               <button type='submit' className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
                 <span className='text-white font-bold'>Cadastrar Produto</span>
               </button>
             </form>
+            <button onClick={handleSaveVariation} className='bg-wine-black w-48 mt-5 p-2 rounded-md hover:bg-wine-light hover:scale-[1.02] duration-300'>
+              <span className='text-white font-bold'>Salvar variação</span>
+            </button>
           </div>
         )}
       </div>
