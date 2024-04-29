@@ -32,7 +32,7 @@ export function Home() {
         spaceBetween: 40,
       },
       200: {
-        slidesPerView: 5
+        slidesPerView: 5,
       }
     }
   }
@@ -116,6 +116,7 @@ export function Home() {
   const toggleCategory = (index: number) => {
     setIsOpen((prev) => {
       const newState = [...prev];
+
       const updatedState = newState.map((state, idx) => idx === index ? !state : false);
       return updatedState;
     })
@@ -154,7 +155,7 @@ export function Home() {
                     <img
                       className="rounded-full absolute object-cover w-[60px] h-[60px] max-md:w-[50px] max-md:h-[50px]"
                       src={item.images[0].url}
-                      alt="" />
+                      alt={item.name} />
                   </div>
 
                   {
