@@ -1,43 +1,39 @@
 import { ReactNode, createContext, useContext, useState } from 'react';
-import { ImageItemProps } from '../pages/dashboard/new';
 
 interface CartProviderProps{
     children: ReactNode;
 }
 
-interface Color {
-    imageUrl: string;
+interface ProductProps {
+    id: string;
     name: string;
+    price: string;
+    image: string;
+    size: string;
+    color: Color;
+    stock: number;
+    observation?: string;
 }
 
-interface ProductProps {
-    id: string,
-    name: string,
-    size: string;
-    image: ImageItemProps[];
-    price: number,
-    colorImage: Color[],
-    quantidade: string,
-    observation?: string
-    selectedColorIndex?: number,
-    selectedColorName: string ,
-    variation: string
+interface Color {
+    name: string;
+    imageUrl: string
 }
 
 interface CartContextData {
     cart: ProductProps[];
-    setCart: React.Dispatch<React.SetStateAction<ProductProps[]>>;
-    addToCart: (product: ProductProps, selectedColorIndex?: number, selectedColorName?: string) => void;
-    removeFromCart: (productId: string, variation: string) => void;
+    removeFromCart: (productId: string) => void;
+    addToCart: (product: ProductProps) => void;
     clearCart: () => void;
+    setCart: React.Dispatch<React.SetStateAction<ProductProps[]>>;
 }
 
 const CartContext = createContext<CartContextData>({
     cart: [],
-    setCart: () => [],
-    addToCart: () => {},
-    removeFromCart: () => {},
     clearCart: () => {},
+    removeFromCart: () => {},
+    addToCart: () => {},
+    setCart: () => [],
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -48,28 +44,20 @@ export const useCart = () => {
 export function CartProvider  ({children}: CartProviderProps) {
     const [cart, setCart] = useState<ProductProps[]>([]);
 
-    const addToCart = (product: ProductProps, selectedColorIndex?: number, selectedColorName?: string) => {
-        const newProduct = { ...product };
-        if (selectedColorIndex !== undefined) {
-            newProduct.selectedColorIndex = selectedColorIndex;
-        }
-        if (selectedColorName) {
-            newProduct.selectedColorName = selectedColorName;
-        }
-        setCart([...cart, newProduct]);
+    const removeFromCart = (productId: string) => {
+      setCart(prevCart => prevCart.filter(item => item.id !== productId));
     };
-
-    const removeFromCart = (productId: string, variation: string) => {
-        setCart(cart.filter(item => item.id !== productId || item.variation !== variation));
-      };
-      
-
+  
+    const addToCart = (product: ProductProps) => {
+      setCart(prevCart => [...prevCart, product]);
+    };
+  
     const clearCart = () => {
-        setCart([]);
+      setCart([]);
     };
 
     return (
-        <CartContext.Provider value={{ cart, setCart, addToCart, removeFromCart, clearCart }}>
+        <CartContext.Provider value={{ cart, setCart, removeFromCart, addToCart, clearCart}}>
             {children}
         </CartContext.Provider>
     );

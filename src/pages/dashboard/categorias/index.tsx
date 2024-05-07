@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react"
 import { db, storage } from "../../../services/firebaseConnection"
-import { collection, getDocs, orderBy, query, where, deleteDoc, doc } from "firebase/firestore"
+import { collection, getDocs, orderBy, query, deleteDoc, doc } from "firebase/firestore"
 import { deleteObject, ref } from "firebase/storage"
 
 import { HeaderDashboard } from "../../../components/headerDashboard"
@@ -32,14 +32,12 @@ interface categoryImageProps {
 export function Categorias() {
     const { user } = useContext(AuthContext)
     const [category, setCategory] = useState<categoryProp[]>([]);
-    const [input, setInput] = useState("");
 
     useEffect(() => {
         loadCategories();
-        handleSearch();
         return () => { }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user, input])
+    }, [user])
 
     async function loadCategories() {
         const categoriesRef = collection(db, 'categorias')
@@ -59,37 +57,6 @@ export function Categorias() {
                 })
                 setCategory(listCategories)
             })
-    }
-
-    async function handleSearch() {
-        if (input === "") {
-            loadCategories();
-            return;
-        }
-
-        setCategory([]);
-
-
-        const q = query(collection(db, "categorias"),
-            where("name", ">=", input.toUpperCase()),
-            where("name", "<=", input.toUpperCase() + "\uf8ff"),
-            where("uid", "==", user?.uid)
-        )
-        getDocs(q)
-            .then((snapshot) => {
-                const listCategory = [] as categoryProp[];
-
-                snapshot.forEach(doc => {
-                    listCategory.push({
-                        id: doc.id,
-                        name: doc.data().name,
-                        owner: doc.data().owner,
-                        images: doc.data().images
-                    })
-                })
-                setCategory(listCategory)
-            })
-
     }
 
     async function handleDeleteCategory(item: categoryProp) {
@@ -127,16 +94,6 @@ export function Categorias() {
                         <span className="text-white text-xs p-1 font-semibold max-sm:text-[12px]">CADASTRAR CATEGORIA</span>
                     </Link>
                 </button>
-                <div className="flex justify-center items-center mb-5 mr-4 w-full max-sm:text-[0.9rem]">
-                    <input
-                        placeholder="Buscar Categorias"
-                        className="w-full p-3 rounded-full border-2 max-sm:p-1"
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                    />
-
-                </div>
                 <>
                     {category.length === 0 ? (
                         <div className="flex justify-center">

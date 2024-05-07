@@ -1,13 +1,12 @@
-import { useContext, useEffect, useState } from "react"
-import { AuthContext } from "../../contexts/AuthContext"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { FaUser } from "react-icons/fa"
-import { FiEdit2 } from "react-icons/fi"
+import { FiEdit2, FiSearch } from "react-icons/fi"
 
 import Title from "../../components/titleDahsboard"
 import { HeaderDashboard } from "../../components/headerDashboard"
 import './dashboard.css'
-import { collection, deleteDoc, doc, getDocs, orderBy, query } from "firebase/firestore"
+import { collection, deleteDoc, doc, getDocs, orderBy, query, where } from "firebase/firestore"
 import { db, storage } from "../../services/firebaseConnection"
 import { FaTrashCan } from "react-icons/fa6"
 import { deleteObject, ref } from "firebase/storage"
@@ -16,40 +15,56 @@ import { productProps } from "./new"
 
 
 export function Dashboard() {
-    const { user } = useContext(AuthContext);
     const [products, setProducts] = useState<productProps[]>([]);
     const [input, setInput] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+
 
     useEffect(() => {
-        loadProducts();
-    }, [user]);
+        if (searchTerm) {
+            loadProducts(searchTerm);
+        } else {
+            loadProducts();
+        }
+    }, [searchTerm]);
 
-    async function loadProducts() {
+    async function loadProducts(searchTerm?: string) {
         const productRef = collection(db, 'Produtos');
-        const q = query(productRef, orderBy("created", "desc"));
-
+        let q = query(productRef, orderBy("created", "desc"));
+    
+     
+        if (searchTerm) {
+            const searchTermLowerCase = searchTerm.toLowerCase();
+            q = query(productRef, where("categoria", "==", searchTermLowerCase))
+        }
         const snapshot = await getDocs(q);
         const productList: productProps[] = [];
-
+    
         snapshot.forEach(doc => {
             const productData = doc.data();
             productList.push({
                 id: doc.id,
                 name: productData.name,
                 categoria: productData.categoria,
-                colors: productData.colors, // Suponha que isso seja um array de cores
-                sizes: productData.sizes, // Suponha que isso seja um array de tamanhos
                 price: productData.price,
-                storage: productData.storage,
                 status: productData.status,
                 description: productData.description,
                 owner: productData.owner,
-                colorImage: productData.colorImage,
-                image: productData.image
+                size: productData.size,
+                image: productData.image,
+                variations: productData.variations
             });
         });
-
+    
         setProducts(productList);
+    }
+
+    async function handleSearchProducts() {
+        const searchTermLowerCase = input.toLowerCase(); // Converte o termo de busca para minúsculas
+        setSearchTerm(searchTermLowerCase); // Define o termo de busca com base no input
+    
+        // Chama loadProducts com o termo de busca correto
+        await loadProducts(searchTermLowerCase);
     }
 
     async function handleDeleteProduct(item: productProps) {
@@ -92,9 +107,12 @@ export function Dashboard() {
                     <input
                         value={input}
                         onChange={e => setInput(e.target.value)}
-                        placeholder="Buscar Produtos"
+                        placeholder="Buscar produtos por categoria"
                         className="w-full p-3 rounded-full border-2 max-sm:p-1"
                         type="text" />
+                        <button onClick={handleSearchProducts} className="w-20 h-12 rounded-full ml-2 flex justify-center items-center bg-wine-black">
+                            <FiSearch size={22} color="#FFF"/>
+                        </button>
                 </div>
                 <>
                     {products.length === 0 ? (
@@ -109,9 +127,7 @@ export function Dashboard() {
                                     <th scope="col">Produto</th>
                                     <th scope="col">Categoria</th>
                                     <th scope="col">Tamanho</th>
-                                    <th scope="col">Cor</th>
                                     <th scope="col">Preço</th>
-                                    <th scope="col">Estoque</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Ações</th>
                                 </tr>
@@ -127,23 +143,14 @@ export function Dashboard() {
                                                 className='w-full max-w-12 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
                                                 value={''}
                                             >
-                                                {item.sizes.map((size, index) => (
-                                                    <option key={index}>{size[0]}</option>
+                                                {item.variations.map((variation, index) => (
+                                                    <option key={index}>{variation.size}</option>
                                                 ))}
                                             </select>
                                         </td>
-                                        <td className="border-0 rounded-[4px] py-2" data-label="cor">
-                                            <select
-                                                className='w-full max-w-40 h-10 border-0 border-black text-black bg-gray-200 py-1 rounded-md mb-2'
-                                                value={''}
-                                            >
-                                                {item.colors.map((color, index) => (
-                                                    <option key={index}>{color.name}</option>
-                                                ))}
-                                            </select>
-                                        </td>
+
                                         <td className="border-0 rounded-[4px] py-2" data-label="preco">R$ {item.price}</td>
-                                        <td className="border-0 rounded-[4px] py-2" data-label="estoque">{item.storage}</td>
+                    
                                         <td className="border-0 p-[3px]" data-label="status">
                                             {item.status === "Ativo" ? (
                                                 <span className=" p-2 text-[12px] text-white rounded-full bg-green-500 max-sm:text-[10px]">{item.status}</span>
