@@ -4,6 +4,16 @@ interface CartProviderProps{
     children: ReactNode;
 }
 
+export interface AddressProps {
+    rua: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    cep: string;
+    complemento?: string;
+    numero: string; 
+}
+
 interface ProductProps {
     id: string;
     name: string;
@@ -26,6 +36,9 @@ interface CartContextData {
     addToCart: (product: ProductProps) => void;
     clearCart: () => void;
     setCart: React.Dispatch<React.SetStateAction<ProductProps[]>>;
+    address: AddressProps | null;
+    setAddress: React.Dispatch<React.SetStateAction<AddressProps | null>>;
+    updateAddress: (newAddress: AddressProps) => void; 
 }
 
 const CartContext = createContext<CartContextData>({
@@ -34,6 +47,9 @@ const CartContext = createContext<CartContextData>({
     removeFromCart: () => {},
     addToCart: () => {},
     setCart: () => [],
+    address: null,
+    setAddress: () => null,
+    updateAddress: () => {}
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -43,6 +59,7 @@ export const useCart = () => {
 
 export function CartProvider  ({children}: CartProviderProps) {
     const [cart, setCart] = useState<ProductProps[]>([]);
+    const [address, setAddress] = useState<AddressProps | null>(null);
 
     const removeFromCart = (productId: string) => {
       setCart(prevCart => prevCart.filter(item => item.id !== productId));
@@ -56,8 +73,12 @@ export function CartProvider  ({children}: CartProviderProps) {
       setCart([]);
     };
 
+    const updateAddress = (newAddress: AddressProps) => {
+        setAddress(newAddress);
+    };
+
     return (
-        <CartContext.Provider value={{ cart, setCart, removeFromCart, addToCart, clearCart}}>
+        <CartContext.Provider value={{ cart, setCart, removeFromCart, addToCart, clearCart, address, setAddress, updateAddress}}>
             {children}
         </CartContext.Provider>
     );

@@ -1,9 +1,8 @@
-import React from 'react';
 import { FaInstagram, FaTiktok, FaFacebook, FaMapMarkerAlt } from 'react-icons/fa';
 
 const Footer = () => {
   return (
-    <footer className="w-full flex flex-col lg:items-center bg-gray-200 mt-8 px-2 py-4 xl:px-10">
+    <footer className="w-full flex flex-col lg:items-center bg-gray-200 mt-40 px-2 py-4 xl:px-10">
 
       <div className="flex flex-col justify-between xl:mx-24 2xl:mx-36 lg:flex-row lg:w-3/4 lg:max-w-5xl">
         <div className='flex flex-col items-center gap-4 lg:flex-row lg:w-3/4'>

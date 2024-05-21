@@ -13,6 +13,8 @@ import { db } from "../../services/firebaseConnection";
 import { Color, Variations, productProps } from "../dashboard/new";
 import { useCart } from "../../contexts/cartContext";
 import { v4 as uuidv4 } from 'uuid';
+import Footer from "../../components/Footer";
+import toast from "react-hot-toast";
 
 
 const getUniqueSizes = (variations: Variations[]) => {
@@ -117,9 +119,8 @@ export function ProductDetail() {
       };
   
       addToCart(selectedProduct);
-      console.log("Produto adicionado ao carrinho:", selectedProduct);
     } else {
-      console.error("Por favor, selecione o tamanho e a cor antes de adicionar ao carrinho.");
+      toast.error("Por favor, selecione o tamanho e a cor antes de adicionar ao carrinho.");
     }
   };
 
@@ -214,12 +215,13 @@ export function ProductDetail() {
   };
 
   return (
+    <>
     <Container>
       {product && (
         <div className="flex flex-col md:flex-row justify-center mt-20 w-full">
           {product.image.length === 1 ? (
-            <div className="md:w-[600px] max-h-[600px] md:mr-8">
-              <img src={product.image[0].url} alt={product.name} className="rounded-md h-full w-full object-cover" />
+            <div className="md:w-[600px] h-full md:mr-8 ">
+              <img src={product.image[0].url} alt={product.name} className="rounded-md h-[600px] max-md:h-[400px] w-full object-contain" />
               <div className="flex flex-col">
                 <span className="mt-5 mb-2 max-md:mt-10 text-xl font-semibold">Descrição do Produto:</span>
                 <p className="max-md:mb-2">{product.description}</p>
@@ -230,7 +232,7 @@ export function ProductDetail() {
               <Slider {...sliderSettings}>
                 {product.image.map((item, index) => (
                   <div className="md:w-[600px] max-h-[600px] md:mr-8" key={index} onClick={() => openModal(index)}>
-                    <img src={item.url} alt={item.name} className="rounded-md h-full w-full object-contain" />
+                    <img src={item.url} alt={item.name} className="rounded-md h-full w-full object-cover" />
                   </div>
                 ))}
               </Slider>
@@ -332,6 +334,9 @@ export function ProductDetail() {
         </div>
       </Modal>
     </Container>
+    <div id="footer"></div>
+    <Footer/>
+    </>
 
   )
 }

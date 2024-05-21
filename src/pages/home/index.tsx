@@ -12,6 +12,7 @@ import { BannerProps } from "../dashboard/banners"
 import { categoryProp } from "../dashboard/categorias"
 import { tamanhoProps } from "../dashboard/variacoes"
 import { Link } from "react-router-dom"
+import Footer from "../../components/Footer"
 
 
 
@@ -125,7 +126,9 @@ export function Home() {
 
 
   return (
-    <Container>
+    <>
+      <Container>
+      <div id="home"></div>
       <div className="mt-15 max-md:p-2 mt-10">
         <Slider settings={settings}>
           {banner.map((item, index) => (
@@ -197,6 +200,9 @@ export function Home() {
       </div>
       <Catalogo />
     </Container>
+    <div id="footer"></div>
+    <Footer/>
+    </>
   )
 }
 
