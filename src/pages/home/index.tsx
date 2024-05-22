@@ -153,7 +153,7 @@ export function Home() {
 
           {category.map((item, index) =>
               <SwiperSlide key={item.id}>
-                <div className="flex flex-col items-center w-[340px] rounded-lg mt-20">
+                <div className="flex flex-col items-center w-[340px] rounded-lg mt-5 max-md:mt-20">
                   <div className="relative w-[60px] h-[60px] max-md:w-[50px] max-md:h-[50px] bg-black rounded-full hover:bg-salmon duration-300">
                     <img
                       className="rounded-full absolute object-cover w-[60px] h-[60px] max-md:w-[50px] max-md:h-[50px]"

@@ -17,6 +17,7 @@ import { HeaderDashboard } from "../../../../components/headerDashboard";
 import Title from "../../../../components/titleDahsboard";
 import Input from "../../../../components/input";
 import { coresProps } from "..";
+import toast from "react-hot-toast";
 
 const schema = z.object({
     cor: z.string().min(1, "Digite a cor corretamente !")
@@ -57,9 +58,10 @@ export function CadastrarCor() {
             .then(() => {
                 reset();
                 setCorImage([])
-                console.log("COR CADASTRADA COM SUCESSO")
+                toast.success("COR CADASTRADA COM SUCESSO")
             })
             .catch((error) => {
+                toast.error("ERRO AO CADASTRAR COR")
                 console.error("ERRO AO CADASTRAR VARIAÇÃO", error)
             })
     }

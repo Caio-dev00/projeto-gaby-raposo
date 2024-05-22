@@ -377,13 +377,9 @@ export function New() {
 
   async function onSubmit(data: FormData) {
     try {
-      const newVariations: Variations[] = variations.map(variation => ({
-        size: variation.size,
-        colors: variation.colors,
-      }));
-
-      const sizesArray = variations.map(variation => variation.size);
-
+      // Extrair tamanhos únicos das variações
+      const sizesArray = Array.from(new Set(variations.map(variation => variation.size)));
+  
       const newProduct = {
         name: data.name.toUpperCase(),
         categoria: category[categoria].name,
@@ -392,23 +388,23 @@ export function New() {
         status: status,
         created: new Date(),
         owner: user?.name,
-        size: sizesArray,
+        size: sizesArray, // Armazena os tamanhos únicos
         id: user?.uid,
         images: productImage,
-        variations: newVariations
+        variations: variations // Salvar variações diretamente
       };
-
+  
       await addDoc(collection(db, "Produtos"), newProduct);
-
+  
       reset();
-      toast.success("Produto Cadastrado!")
+      toast.success("Produto Cadastrado!");
       setProductImage([]);
       setColorSelected('');
-      navigate('/dashboard')
+      navigate('/dashboard');
       console.log("PRODUTO CADASTRADO COM SUCESSO!");
     } catch (error) {
       console.error("ERRO AO CADASTRAR PRODUTO", error);
-      toast.error("Erro ao cadastrar o")
+      toast.error("Erro ao cadastrar o produto!");
     }
   }
 
@@ -587,31 +583,46 @@ export function New() {
     if (!selectedSize || !colorSelected || estoque <= 0) {
       return;
     }
-
-    const newVariation = { ...selectedVariation };
-
+  
     const selectedColorObj = color.find((c) => c.name === colorSelected);
-
+  
     if (selectedColorObj && selectedColorObj.images.length > 0) {
       const selectedColorImage = selectedColorObj.images[0];
-
-      newVariation.colors.push({
-        uid: uuidV4(),
-        name: colorSelected,
-        imageUrl: selectedColorImage.url,
-        previewUrl: selectedColorImage.previewUrl,
-        url: selectedColorImage.url,
-        estoque: estoque,
-      });
-
-      // Adicione a nova variação ao estado de variações
-      setVariations([...variations, newVariation]);
-
-      // Limpe o estado de seleção de variação e estoque
+  
+      // Verificar se já existe uma variação com o tamanho selecionado
+      const existingVariationIndex = variations.findIndex((variation) => variation.size === selectedSize);
+  
+      if (existingVariationIndex >= 0) {
+        // Se a variação com o tamanho já existe, adicionar a nova cor a essa variação
+        variations[existingVariationIndex].colors.push({
+          uid: uuidV4(),
+          name: colorSelected,
+          imageUrl: selectedColorImage.url,
+          previewUrl: selectedColorImage.previewUrl,
+          url: selectedColorImage.url,
+          estoque: estoque,
+        });
+      } else {
+        // Se a variação com o tamanho não existe, criar uma nova variação
+        const newVariation = {
+          size: selectedSize,
+          colors: [{
+            uid: uuidV4(),
+            name: colorSelected,
+            imageUrl: selectedColorImage.url,
+            previewUrl: selectedColorImage.previewUrl,
+            url: selectedColorImage.url,
+            estoque: estoque,
+          }]
+        };
+  
+        setVariations([...variations, newVariation]);
+      }
+  
+      // Limpar estado de seleção de variação e estoque
       setSelectedVariation({ size: "", colors: [] });
       setDefaultSize("Selecione o Tamanho");
       setDefaultColor("Selecione a cor");
-
       setSelectedSize("");
       setColorSelected("");
       setEstoque(0);
