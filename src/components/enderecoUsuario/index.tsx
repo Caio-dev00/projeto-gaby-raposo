@@ -4,6 +4,7 @@ import { useCart } from "../../contexts/cartContext";
 interface CepData {
   logradouro: string;
   bairro: string;
+  name: string;
   localidade: string;
   uf: string;
   erro: boolean;
@@ -13,6 +14,7 @@ interface CepData {
 
 export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
   const [cep, setCep] = useState<string>('');
+  const [name, setName] = useState<string>('');
   const [endereco, setEnderecoLocal] = useState<string>('');
   const [bairro, setBairro] = useState<string>('');
   const [numero, setNumero] = useState<string>('');
@@ -30,6 +32,7 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
       bairro: bairro,
       numero: numero,
       cep: cep,
+      name: name,
       cidade: cidade,
       complemento: complemento,
       estado: estado
@@ -44,6 +47,7 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
     if (cep.trim() === '' || cep.length !== 8 || isNaN(parseInt(cep))) {
       setErroCep('Digite um CEP válido');
       setFormAvailable(false);
+      setName('')
       setBairro('');
       setCidade('');
       setEstado('');
@@ -75,6 +79,7 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
         setErroCep('CEP não encontrado');
         setFormAvailable(false);
         setEnderecoLocal('');
+        setName('')
         setBairro('');
         setCidade('');
         setEstado('');
@@ -87,6 +92,13 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
     <div className="mt-10">
       {erroCep && <span className="flex justify-center" id='erro'>{erroCep}</span>}
       <form onSubmit={(e) => { e.preventDefault(); salvarEndereco(); }} className="flex flex-wrap justify-between w-full">
+      <input
+          type="text"
+          className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
+          placeholder="Nome Completo"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <input
           type="text"
           className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"

@@ -7,6 +7,7 @@ interface CartProviderProps{
 export interface AddressProps {
     rua: string;
     bairro: string;
+    name: string;
     cidade: string;
     estado: string;
     cep: string;

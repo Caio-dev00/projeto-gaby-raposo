@@ -90,14 +90,14 @@ export default function NestedModal() {
   React.useEffect(() => {
     const calculateTotalPrice = () => {
       let total = 0;
-      cart.forEach((item) => {
-        const quantidade = item.stock;
-        total += parseFloat(item.price) * quantidade;
+      cart.forEach(item => {
+        const quantidade = (item.stock)
+        total += item.price * quantidade;
       });
-      setTotalPrice(total);
-    };
-    calculateTotalPrice();
-  }, [cart]);
+      setTotalPrice(total)
+    }
+    calculateTotalPrice()
+  }, [cart])
 
   const handleClickNavigate = () => {
     navigate("/");
@@ -113,22 +113,22 @@ export default function NestedModal() {
     let message = "";
     if (deliveryOption === "Retirar na loja") {
       message =
-        "Olá! Gostaria de fazer um pedido para retirar na loja. Aqui está a lista de produtos:\n";
+        `Olá! Gostaria de fazer um pedido para retirar na loja. Aqui está a lista de produtos:\n`;
     } else {
       if (!address) {
         toast.error("Salve um endereço para entrega");
         return;
       }
-      message = `Olá! Gostaria de fazer um pedido para entrega no endereço:\n${address.rua}, ${address.numero}, ${address.bairro}, ${address.cidade}, ${address.estado}, ${address.cep}\n\nAqui está a lista de produtos:\n`;
+      message = `Olá! sou ${address.name},  Gostaria de fazer um pedido para entrega no endereço:\n: ${address.rua}, ${address.numero}, ${address.bairro}, ${address.cidade}, ${address.estado}, ${address.cep}\n Aqui está a lista de produtos:\n`;
     }
 
     cart.forEach((item) => {
-      message += `${item.stock}x - ${item.name} (${item.color.name} - ${item.size}) - R$${item.price}\n`;
+      message += `${item.stock} - ${item.name} (${item.color.name} - ${item.size}) - R$${item.price} - Observação: ${item.observation}\n`;
     });
 
     message += `\nTotal a pagar: R$${totalPrice.toFixed(2)}`;
 
-    const phoneNumber = "551899682002";
+    const phoneNumber = "5518996812002";
     const encodedMessage = encodeURIComponent(message);
     const encodedPhoneNumber = encodeURIComponent(phoneNumber);
     const whatsappURL = `https://wa.me/${encodedPhoneNumber}?text=${encodedMessage}`;
@@ -208,9 +208,9 @@ export default function NestedModal() {
             ))}
             {cart.length >= 1 ? (
               <h1 className="text-center font-bold mt-5">
-                TOTAL A PAGAR: R${" "}
+                TOTAL A PAGAR: R$
                 <span className="text-green-600 text-lg">
-                  {totalPrice.toFixed(2)}
+                   {totalPrice.toFixed(2)}
                 </span>
               </h1>
             ) : (
