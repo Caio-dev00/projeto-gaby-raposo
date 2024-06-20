@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import logoImg from '../../assets/logo.png';
 import { AiOutlineClose } from "react-icons/ai";
 import { Container } from "../container";
-import NestedModal from '../Modals/NestedModal';
+import NestedModal from "../Modals";
 
 export default function Header() {
     const [toggleButton, setToggleButton] = useState(false)
