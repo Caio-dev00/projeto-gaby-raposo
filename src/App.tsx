@@ -43,7 +43,7 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
-    path: "/reg-gabi008",
+    path: "/adm-2024",
     element: <Register />
   },
   {
