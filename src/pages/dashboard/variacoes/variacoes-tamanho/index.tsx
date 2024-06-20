@@ -12,6 +12,7 @@ import { tamanhoProps } from "..";
 import Input from "../../../../components/input";
 import Title from "../../../../components/titleDahsboard";
 import { HeaderDashboard } from "../../../../components/headerDashboard";
+import toast from "react-hot-toast";
 
 const schema = z.object({
     tamanho: z.string().min(1, "Digite o tamanho corretamente !")
@@ -68,9 +69,10 @@ export function CadastrarTamanho() {
         })
             .then(() => {
                 reset();
-                console.log("TAMANHO CADASTRADO COM SUCESSO")
+                toast.success("TAMANHO CADASTRADO COM SUCESSO")
             })
             .catch((error) => {
+                toast.error("ERRO AO CADASTRAR TAMANHO")
                 console.error("ERRO AO CADASTRAR VARIAÇÃO", error)
             })
     }

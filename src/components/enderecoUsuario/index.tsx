@@ -1,36 +1,58 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useCart } from "../../contexts/cartContext";
 
 interface CepData {
   logradouro: string;
   bairro: string;
+  name: string;
   localidade: string;
   uf: string;
   erro: boolean;
   numero: string | boolean;
-  complemento: string | boolean;
+  complemento: string;
 }
 
-
-export default function EnderecoUsuario() {
-
-  const { register, setValue } = useForm();
+export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
+  const [cep, setCep] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [endereco, setEnderecoLocal] = useState<string>('');
+  const [bairro, setBairro] = useState<string>('');
+  const [numero, setNumero] = useState<string>('');
+  const [cidade, setCidade] = useState<string>('');
+  const [estado, setEstado] = useState<string>('');
+  const [complemento, setComplemento] = useState<string>('');
   const [erroCep, setErroCep] = useState<string | null>(null);
   const [formAvailable, setFormAvailable] = useState<boolean>(false);
+
+  const { updateAddress } = useCart();
+
+  const salvarEndereco = () => {
+    const enderecoSalvo = {
+      rua: endereco,
+      bairro: bairro,
+      numero: numero,
+      cep: cep,
+      name: name,
+      cidade: cidade,
+      complemento: complemento,
+      estado: estado
+    };
+    updateAddress(enderecoSalvo);
+    onClose(); // Fechar o modal após salvar o endereço
+  };
 
   const checkCEP = (e: React.FocusEvent<HTMLInputElement>) => {
     const cep = e.target.value.replace(/D/g, '');
 
     if (cep.trim() === '' || cep.length !== 8 || isNaN(parseInt(cep))) {
       setErroCep('Digite um CEP válido');
-      console.log(`'CEP Inválido: ${cep}`);
       setFormAvailable(false);
-      setValue('endereco', '');
-      setValue('bairro', '');
-      setValue('cidade', '');
-      setValue('estado', '');
-      setValue('numero', '');
-      setValue('complemento', '');
+      setName('')
+      setBairro('');
+      setCidade('');
+      setEstado('');
+      setNumero('');
+      setComplemento('');
       return;
     }
 
@@ -42,14 +64,13 @@ export default function EnderecoUsuario() {
         return res.json();
       })
       .then((data: CepData) => {
-        console.log(data);
         if (data.erro) {
           throw new Error('CEP não encontrado');
         }
-        setValue('endereco', data.logradouro,);
-        setValue('bairro', data.bairro);
-        setValue('cidade', data.localidade);
-        setValue('estado', data.uf);
+        setEnderecoLocal(data.logradouro);
+        setBairro(data.bairro);
+        setCidade(data.localidade);
+        setEstado(data.uf);
         setErroCep(null);
         setFormAvailable(true);
       })
@@ -57,67 +78,85 @@ export default function EnderecoUsuario() {
         console.error('Erro ao buscar CEP:', error);
         setErroCep('CEP não encontrado');
         setFormAvailable(false);
-        setValue('endereco', '');
-        setValue('bairro', '');
-        setValue('cidade', '');
-        setValue('estado', '');
-        setValue('numero', '');
-        setValue('complemento', '');
+        setEnderecoLocal('');
+        setName('')
+        setBairro('');
+        setCidade('');
+        setEstado('');
+        setNumero('');
+        setComplemento('');
       });
   }
 
   return (
     <div className="mt-10">
-      {erroCep && <span className="flex justify-center"id='erro'>{erroCep}</span>}
-      <form className="flex flex-wrap justify-between w-full">
+      {erroCep && <span className="flex justify-center" id='erro'>{erroCep}</span>}
+      <form onSubmit={(e) => { e.preventDefault(); salvarEndereco(); }} className="flex flex-wrap justify-between w-full">
+      <input
+          type="text"
+          className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
+          placeholder="Nome Completo"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <input
           type="text"
           className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
           placeholder="CEP"
-          onBlur={checkCEP}
+          onBlur={(e) => {
+            setCep(e.target.value);
+            checkCEP(e);
+          }}
         />
         <input
           type="text"
           className="bg-gray-200 outline-none w-full rounded-full px-4 py-2 my-2"
           placeholder="Endereço"
-          {...register('endereco')}
+          value={endereco}
+          onChange={(e) => setEnderecoLocal(e.target.value)}
           readOnly
         />
         <input
           type="text"
           className="bg-gray-200 w-1/4 rounded-full px-4 py-2 my-2"
           placeholder="Numero"
-          {...register('numero')}
+          value={numero}
+          onChange={(e) => setNumero(e.target.value)}
           disabled={!formAvailable}
         />
         <input
           type="text"
           className="bg-gray-200 outline-none w-3/5 rounded-full px-4 py-2 my-2"
           placeholder="Bairro"
-          {...register('bairro')}
+          value={bairro}
+          onChange={(e) => setBairro(e.target.value)}
           readOnly
         />
         <input
           type="text"
           className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
           placeholder="Complemento"
-          {...register('complemento')}
+          value={complemento}
+          onChange={(e) => setComplemento(e.target.value)}
           disabled={!formAvailable}
         />
         <input
           type="text"
           className="bg-gray-200 outline-none w-1/2 rounded-full px-4 py-2 my-2"
           placeholder="Cidade"
-          {...register('cidade')}
+          value={cidade}
+          onChange={(e) => setCidade(e.target.value)}
           readOnly
         />
         <input
           type="text"
           className="bg-gray-200 outline-none w-3/2 rounded-full px-4 py-2 my-2"
           placeholder="Estado"
-          {...register('estado')}
+          value={estado}
+          onChange={(e) => setEstado(e.target.value)}
           readOnly
         />
+        <button type="submit" className='flex justify-center py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Salvar Endereço</button>
       </form>
     </div>
   )

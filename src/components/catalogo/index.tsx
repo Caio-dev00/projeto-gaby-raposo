@@ -76,14 +76,14 @@ export default function Catalogo() {
                 <div>Nenhum produto encontrado</div>
             )}
             {products.map((item) => (
-                <div key={item.id} className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
+                <div key={item.id} className="flex flex-col mt-5 w-full max-w-[305px] max-md:w-[170px] cursor-pointer">
                     <div>
                       <Link to={`/product/details?id=${item.id}`}>
-                        <img className='max-h-[300px] w-[305px] max-md:h-[170px] rounded-ss-lg rounded-se-lg' src={item.image[0].url} alt="Product photo" />
+                        <img className='h-[300px] max-h-[300px] w-[305px] max-md:h-[170px] rounded-ss-lg rounded-se-lg' src={item.image[0].url} alt="Product photo" />
                       </Link>
                     </div>
                     <span className='text-gray-500 pl-4 pt-2 font-semibold max-md:text-[0.80rem] max-md:pb-1'>{item.name}</span>
-                        <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[1rem]'>R$R${item.price}</span>
+                        <span className='text-wine-light pl-4 mt-[-7px] font-medium text-[1.5rem] max-md:text-[1rem]'>R${item.price}</span>
                     <div className='flex justify-center bg-wine-light w-full max-md:w-[170px] rounded-ee-lg rounded-es-lg h-10 mb-10 hover:bg-wine-black'>
                         <Link to={`/product/details?id=${item.id}`} className='text-white font-bold hover:scale-105 duration-300 max-md:text-[0.70rem] flex items-center'>
                             VER PRODUTO

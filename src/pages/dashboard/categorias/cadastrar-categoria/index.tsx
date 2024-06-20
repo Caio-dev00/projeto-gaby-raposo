@@ -18,6 +18,7 @@ import Title from "../../../../components/titleDahsboard";
 import Input from "../../../../components/input";
 
 import { categoryProp } from '..';
+import toast from 'react-hot-toast';
 
 const schema = z.object({
   name: z.string().min(1, "O campo é obrigatório"),
@@ -87,9 +88,10 @@ export function CadastrarCategoria() {
       .then(() => {
         reset();
         setCategoryImage([])
-        console.log("CATEGORIA CADASTRADA COM SUCESSO!")
+        toast.success("CATEGORIA CADASTRADA COM SUCESSO!")
       })
       .catch((error) => {
+        toast.error("ERRO AO CADASTRAR CATEGORIA")
         console.error("ERRO AO CADASTRAR CATEGORIA", error)
       })
   }
