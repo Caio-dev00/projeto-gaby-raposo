@@ -91,13 +91,13 @@ export default function NestedModal() {
     const calculateTotalPrice = () => {
       let total = 0;
       cart.forEach(item => {
-        const quantidade = (item.stock)
+        const quantidade = item.stock;
         total += item.price * quantidade;
       });
-      setTotalPrice(total)
-    }
-    calculateTotalPrice()
-  }, [cart])
+      setTotalPrice(total);
+    };
+    calculateTotalPrice();
+  }, [cart]);
 
   const handleClickNavigate = () => {
     navigate("/");
@@ -126,7 +126,7 @@ export default function NestedModal() {
       message += `${item.stock} - ${item.name} (${item.color.name} - ${item.size}) - R$ ${item.price} - Observação: ${item.observation}\n`;
     });
 
-    message += `\nTotal a pagar: R$ ${totalPrice.toFixed(2)}`;
+    message += `\nTotal a pagar: R$ ${totalPrice}`;
 
     const phoneNumber = "5518996812002";
     const encodedMessage = encodeURIComponent(message);

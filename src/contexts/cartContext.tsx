@@ -18,7 +18,7 @@ export interface AddressProps {
 interface ProductProps {
     id: string;
     name: string;
-    price: string;
+    price: number;
     image: string;
     size: string;
     color: Color;
