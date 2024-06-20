@@ -123,10 +123,10 @@ export default function NestedModal() {
     }
 
     cart.forEach((item) => {
-      message += `${item.stock} - ${item.name} (${item.color.name} - ${item.size}) - R$${item.price} - Observação: ${item.observation}\n`;
+      message += `${item.stock} - ${item.name} (${item.color.name} - ${item.size}) - R$ ${item.price} - Observação: ${item.observation}\n`;
     });
 
-    message += `\nTotal a pagar: R$${totalPrice.toFixed(2)}`;
+    message += `\nTotal a pagar: R$ ${totalPrice.toFixed(2)}`;
 
     const phoneNumber = "5518996812002";
     const encodedMessage = encodeURIComponent(message);
