@@ -23,7 +23,7 @@ export interface productProps {
   id: string;
   name: string;
   owner: string;
-  price: string;
+  price: number;
   size: string;
   status: string;
   categoria: string;
@@ -379,11 +379,13 @@ export function New() {
     try {
       // Extrair tamanhos únicos das variações
       const sizesArray = Array.from(new Set(variations.map(variation => variation.size)));
+
+      const formattedPrice = data.price.replace(",", ".");
   
       const newProduct = {
         name: data.name.toUpperCase(),
         categoria: category[categoria].name,
-        price: data.price,
+        price: formattedPrice,
         description: data.description,
         status: status,
         created: new Date(),
@@ -519,7 +521,7 @@ export function New() {
   }
 
   function handlePriceChange(e: ChangeEvent<HTMLInputElement>) {
-    setPrice(e.target.value)
+    setPrice(e.target.value);
   }
 
   function handleDescriptionChange(e: ChangeEvent<HTMLTextAreaElement>) {
@@ -547,10 +549,11 @@ export function New() {
     e.preventDefault();
 
     try {
+      const formattedPrice = price.replace(",", ".");
       // Atualiza os detalhes do produto
       await updateDoc(doc(db, "Produtos", productId!), {
         name: name,
-        price: price,
+        price: formattedPrice,
         description: description,
         status: status,
         categoria: selectedCategory || categoria
@@ -993,7 +996,7 @@ export function New() {
                 }
                 <label>Preço:</label>
                 <Input
-                  placeholder="ex: 99,90"
+                  placeholder="ex: 99.90"
                   name='price'
                   type='text'
                   error={errors.price?.message}
