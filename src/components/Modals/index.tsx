@@ -209,8 +209,8 @@ export default function NestedModal() {
             {cart.length >= 1 ? (
               <h1 className="text-center font-bold mt-5">
                 TOTAL A PAGAR: R$
-                <span className="text-green-600 text-lg">
-                   {totalPrice.toFixed(2)}
+                <span className="text-green-600 text-lg pl-1">
+                  {totalPrice.toFixed(2)}
                 </span>
               </h1>
             ) : (
