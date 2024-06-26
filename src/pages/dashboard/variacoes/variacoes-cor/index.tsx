@@ -10,7 +10,7 @@ import { db, storage } from "../../../../services/firebaseConnection";
 import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
-import { FiUpload, FiTrash } from "react-icons/fi";
+import { FiUpload, FiTrash, FiTrash2 } from "react-icons/fi";
 import { FaEdit } from "react-icons/fa";
 
 import { HeaderDashboard } from "../../../../components/headerDashboard";
@@ -36,6 +36,11 @@ export function CadastrarCor() {
     const location = useLocation();
     const navigate = useNavigate();
     const corId = new URLSearchParams(location.search).get("id")
+
+    const [colorImagesFromDB, setColorImagesFromDB] = useState<ImageItemProps[]>([]);
+    const [existingImages, setExistingImages] = useState<ImageItemProps[]>([]);
+    const [newImages, setNewImages] = useState<File[]>([]);
+    const [deletedImages, setDeletedImages] = useState<ImageItemProps[]>([]);
     const [cor, setCor] = useState<coresProps | null>(null)
     const [name, setName] = useState("");
 
@@ -114,6 +119,95 @@ export function CadastrarCor() {
         }
     }
 
+    /* FUNÇÕES PARA EDIÇAO DE IMAGEM */
+
+    useEffect(() => {
+        async function fetchColorImages() {
+          if (!corId) return;
+    
+          try {
+            const colorDoc = await getDoc(doc(db, "Cores", corId));
+            if (colorDoc.exists()) {
+              const colorData = colorDoc.data();
+              if (colorData && colorData.images) {
+                setColorImagesFromDB(colorData.images);
+                setExistingImages(colorData.images);
+              }
+            } else {
+              console.log("Cor não encontrada");
+              toast.error("Cor não encontrada!");
+            }
+          } catch (error) {
+            console.error("Erro ao buscar variação de cor:", error);
+            toast.error("Erro ao buscar variação de cor!");
+          }
+        }
+    
+        fetchColorImages();
+      }, [corId]);
+
+      async function handleFileEdit(e: ChangeEvent<HTMLInputElement>) {
+        if (e.target.files && e.target.files.length > 0) {
+          const selectedImages = Array.from(e.target.files);
+    
+          // Filtrar apenas as novas imagens
+          const newImagesArray = selectedImages.filter(image => !existingImages.some(existingImage => existingImage.name === image.name));
+    
+          // Adicionar novas imagens ao estado
+          setNewImages([...newImages, ...newImagesArray]);
+    
+          // Realizar o upload das novas imagens
+          for (const image of newImagesArray) {
+            if (image.type === "image/jpeg" || image.type === "image/png") {
+              await handleUploadEdit(image);
+            } else {
+              alert("Envie apenas imagens jpeg ou png");
+              return;
+            }
+          }
+        }
+      }
+
+      async function handleUploadEdit(image: File) {
+        if (!user?.uid) {
+          return;
+        }
+    
+        const currentUid = user?.uid;
+        const uidImage = uuidV4();
+    
+        const uploadRef = ref(storage, `images/${currentUid}/${uidImage}`);
+    
+        try {
+          const snapshot = await uploadBytes(uploadRef, image);
+          const downloadUrl = await getDownloadURL(snapshot.ref);
+    
+          setCorImage((images) => [...images, {
+            name: uidImage,
+            uid: currentUid,
+            previewUrl: URL.createObjectURL(image),
+            url: downloadUrl,
+          }]);
+        } catch (error) {
+          console.error("Erro ao fazer upload da imagem:", error);
+        }
+      }
+
+      const handleDeleteImageFromDB = async (item: ImageItemProps) => {
+        try {
+          const updatedImages = colorImagesFromDB.filter(image => image.name !== item.name);
+          setColorImagesFromDB(updatedImages);
+    
+          // Update the state to track deleted images
+          setDeletedImages([...deletedImages, item]);
+    
+          toast.success("Imagem excluída com sucesso!");
+        } catch (error) {
+          console.error("Erro ao excluir imagem:", error);
+          toast.error("Erro ao excluir imagem!");
+        }
+      };
+
 
     useEffect(() => {
         async function fetchCores() {
@@ -156,6 +250,13 @@ export function CadastrarCor() {
             await updateDoc(doc(db, "Cores", corId!), {
                 cor: name
             });
+            const updatedImages = [...existingImages, ...corImage].filter(image => !deletedImages.some(deletedImage => deletedImage.name === image.name));
+            await updateDoc(doc(db, "Cores", corId!), {
+              images: updatedImages,
+            });
+
+            setDeletedImages([])
+
             alert("Cor atualizada com sucesso!");
             navigate("/dashboard/variacoes")
         } catch (error) {
@@ -163,6 +264,8 @@ export function CadastrarCor() {
             navigate("/dashboard/variacoes")
         }
     }
+
+    
 
     return (
         <div>
@@ -180,7 +283,50 @@ export function CadastrarCor() {
                 )}
 
                 {corId ? (
-                    <div></div>
+                    <div>
+                    <div className='flex justify-center'>
+                      <button className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
+                        <div className="absolute cursor-pointer ">
+                          <FiUpload size={30} color="#000" />
+                        </div>
+                        <div className="cursor-pointer ">
+                          <input
+                            className="opacity-0 cursor-pointer"
+                            onChange={handleFileEdit}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                          />
+                        </div>
+                      </button>
+        
+                      {corImage.map(item => (
+                        <div className='h-32 flex items-center justify-center relative ' key={item.name}>
+                          <button className="absolute flex text-black" onClick={() => handleDeleteImage(item)}>
+                            <FiTrash2 size={24} color="#FFF" />
+                          </button>
+                          <img
+                            src={item.previewUrl}
+                            className="rounded-lg w-40 h-32 object-cover ml-2 "
+                          />
+                        </div>
+                      ))}
+                    </div>
+        
+        
+        
+                    <h1 className='text-xl font-semibold my-8'>Imagem da categoria:</h1>
+                    <div className='flex items-center my-3'>
+                      {colorImagesFromDB.map(item => (
+                        <div key={item.uid} className="flex items-center">
+                          <div className='flex flex-col'>
+                            <img src={item.url} alt={item.name} className="w-24 h-24 object-cover mr-4 rounded-lg" />
+                            <button className='flex items-center' onClick={() => handleDeleteImageFromDB(item)}>Excluir<FiTrash2 /></button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ) : (
                     <div className="w-full justify-center p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
                         <button
@@ -223,7 +369,7 @@ export function CadastrarCor() {
                                     value={name}
                                     onChange={handleNomeCorChange}
                                 />
-                                <button type='submit' className=" w-full max-w-[250px] mt-10 bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Editar Cor</button>
+                                <button type='submit' className=" w-full max-w-[250px] mt-10 bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Salvar alteração</button>
                             </form>
                             <div className="flex w-full justify-around mt-2 p-2">
                                 <div>

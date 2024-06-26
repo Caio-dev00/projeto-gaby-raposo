@@ -8,7 +8,7 @@ import { IoMdArrowBack, IoMdArrowForward } from "react-icons/io";
 
 import { Container } from "../../components/container"
 import { useLocation } from 'react-router-dom';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../services/firebaseConnection";
 import { Color, Variations, productProps } from "../dashboard/new";
 import { useCart } from "../../contexts/cartContext";
@@ -69,36 +69,38 @@ export function ProductDetail() {
   }, [product]);
 
   useEffect(() => {
-    async function fetchProduct() {
-      if (!productId) return;
+    if (!productId) return;
 
-      try {
-        const productDoc = await getDoc(doc(db, "Produtos", productId));
-        if (productDoc.exists()) {
-          const productData = productDoc.data();
-          if (productData) {
-            const productCompleto: productProps = {
-              id: productDoc.id,
-              name: productData.name,
-              owner: productData.owner,
-              categoria: productData.categoria,
-              price: productData.price,
-              description: productData.description,
-              image: productData.images,
-              status: productData.status,
-              size: productData.size,
-              variations: productData.variations
-            };
-            setProduct(productCompleto);
-          }
-        } else {
-          console.log("Produto não encontrado");
+    const productDocRef = doc(db, "Produtos", productId);
+    
+    const unsubscribe = onSnapshot(productDocRef, (productDoc) => {
+      if (productDoc.exists()) {
+        const productData = productDoc.data();
+        if (productData) {
+          const productCompleto: productProps = {
+            id: productDoc.id,
+            name: productData.name,
+            owner: productData.owner,
+            categoria: productData.categoria,
+            price: productData.price,
+            description: productData.description,
+            image: productData.images,
+            status: productData.status,
+            size: productData.size,
+            variations: productData.variations
+          };
+          setProduct(productCompleto);
         }
-      } catch (error) {
-        console.error("Erro ao buscar produto:", error);
+      } else {
+        console.log("Produto não encontrado");
       }
-    }
-    fetchProduct();
+    }, (error) => {
+      console.error("Erro ao buscar produto:", error);
+    });
+
+    // Limpa o listener ao desmontar o componente
+    return () => unsubscribe();
+
   }, [productId]);
 
   const handleAddToCart = () => {
@@ -273,7 +275,7 @@ export function ProductDetail() {
                         }`}
                       onClick={() => handleColorSelect(color.imageUrl, index)}
                     >
-                      <img className="rounded-full" src={color.imageUrl} alt={color.name} />
+                      <img className="rounded-full w-full h-full" src={color.imageUrl} alt={color.name} />
                     </button>
                   </div>
                 ))}
