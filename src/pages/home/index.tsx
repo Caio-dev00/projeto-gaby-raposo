@@ -180,7 +180,7 @@ export function Home() {
                       {isOpen[index] && (
                         <div className=" w-[80px] flex p-1 hover:bg-wine-black  ">
                           <div className="flex w-full max-w[100px]">
-                          <Link to={`/produtos/${item.name}/${tamanhoItem.name}?`} className="text-black flex w-full justify-center items-center hover:text-white cursor-pointer max-md:text-[0.7em]">
+                            <Link to={`/produtos/${item.name}/${tamanhoItem.name}?`} className="text-black flex w-full justify-center items-center hover:text-white cursor-pointer max-md:text-[0.7em]">
                               <p className="text-[0.9rem] max-md:text-[0.6rem] text-center">Tamanho {tamanhoItem.name}</p>
                             </Link>
                           </div>
