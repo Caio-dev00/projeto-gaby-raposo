@@ -59,6 +59,7 @@ function CatalogoFilter() {
                 <div className="flex justify-center items-center mt-10 w-full rounded-md p-2 bg-wine-light">
                   <h1 className="text-center text-xl pr-2 text-white">Categoria:</h1>
                   <span className="font-bold text-center text-white">{item.categoria}</span>
+                  <span className="font-bold text-center text-white">{tamanho}</span>
                 </div>
 
                 <div className="flex flex-col mt-5 w-[305px] max-md:w-[170px] cursor-pointer">
