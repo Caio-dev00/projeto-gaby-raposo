@@ -92,7 +92,7 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
     <div className="mt-10">
       {erroCep && <span className="flex justify-center" id='erro'>{erroCep}</span>}
       <form onSubmit={(e) => { e.preventDefault(); salvarEndereco(); }} className="flex flex-wrap justify-between w-full">
-      <input
+        <input
           type="text"
           className="bg-gray-200 w-full rounded-full px-4 py-2 my-2"
           placeholder="Nome Completo"
@@ -156,7 +156,7 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
           onChange={(e) => setEstado(e.target.value)}
           readOnly
         />
-        <button type="submit" className='flex justify-center py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Salvar Endereço</button>
+        <button type="submit" className='py-2 px-4 bg-wine-light text-white font-semibold rounded-full'>Salvar Endereço</button>
       </form>
     </div>
   )

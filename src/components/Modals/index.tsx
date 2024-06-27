@@ -119,14 +119,14 @@ export default function NestedModal() {
         toast.error("Salve um endereço para entrega");
         return;
       }
-      message = `Olá! sou ${address.name},  Gostaria de fazer um pedido para entrega no endereço:\n: ${address.rua}, ${address.numero}, ${address.bairro}, ${address.cidade}, ${address.estado}, ${address.cep}\n Aqui está a lista de produtos:\n`;
+      message = `Olá! sou ${address.name},  Gostaria de fazer um pedido para entrega no endereço:\n: ${address.rua}, ${address.numero}, ${address.complemento}, ${address.bairro}, ${address.cidade}, ${address.estado}, ${address.cep}\n Aqui está a lista de produtos:\n`;
     }
 
     cart.forEach((item) => {
       message += `${item.stock} - ${item.name} (${item.color.name} - ${item.size}) - R$ ${item.price} - Observação: ${item.observation}\n`;
     });
 
-    message += `\nTotal a pagar: R$ ${totalPrice}`;
+    message += `\nTotal a pagar: R$ ${totalPrice.toFixed(2)}`;
 
     const phoneNumber = "5518996812002";
     const encodedMessage = encodeURIComponent(message);
