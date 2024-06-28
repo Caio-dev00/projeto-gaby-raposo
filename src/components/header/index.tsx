@@ -50,33 +50,33 @@ export default function Header() {
           </div> 
           
           {toggleButton && (
-            <div className="none max-w-[90%] w-full md:hidden md:w-auto absolute pt-[18rem] z-10">
-              <ul className="w-full max-w-[500px] font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <div className="none max-w-[90%] w-full md:hidden absolute pt-[18rem] z-10">
+              <ul className="w-full font-medium flex flex-col p-4 mt-4 rounded-lg bg-wine-light ">
                 <li>
-                  <a href="#home" className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Pagina Incial</a>
+                  <a href="#home" className="block py-2 px-3 text-gray-100 rounded">Pagina Incial</a>
                 </li>
                 <li>
-                  <a href="#catalogo" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Catálogo</a>
+                  <a href="#catalogo" className="block py-2 px-3 text-gray-100 rounded">Catálogo</a>
                 </li>
                 <li>
-                  <a href="#footer" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Sobre</a>
+                  <a href="#footer" className="block py-2 px-3 text-gray-100 rounded">Sobre</a>
                 </li>
                 <li>
-                  <a href="#footer" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contato</a>
+                  <a href="#footer" className="block py-2 px-3 text-gray-100 rounded">Contato</a>
                 </li>
               </ul>
            </div>
           )}     
 
         {toggleButton ? (
-            <button onClick={handleToggleButton} className="absolute z-20 inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+            <button onClick={handleToggleButton} className="flex justify-center items-center absolute z-20 w-10 h-10 md:hidden">
              <div className="w-5 h-5" aria-hidden="true">
                <AiOutlineClose size={19} color="#000"/>
              </div>
             </button>
          
         ): (
-          <button onClick={handleToggleButton} className="absolute inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">  
+                <button onClick={handleToggleButton} className="absolute flex justify-center items-center z-20 w-10 h-10 md:hidden">  
             <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
                 <path stroke="currentColor" strokeLinecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
             </svg>
