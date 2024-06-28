@@ -5,7 +5,7 @@ import { FaShoppingBag, FaTrash } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { Link } from 'react-router-dom';
 
-import DropdownModal from '../dropdownModal';
+import DropdownModal from '../dropDownModal';
 import { Fade } from '@mui/material';
 import EnderecoUsuario from '../enderecoUsuario';
 
