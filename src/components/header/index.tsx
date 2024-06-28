@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import logoImg from '../../assets/logo.png';
 import { AiOutlineClose } from "react-icons/ai";
 import { Container } from "../container";
 import NestedModal from "../Modals";
@@ -30,14 +29,14 @@ export default function Header() {
   }, []);
 
     return (
-      <div className="w-full flex items-center justify-center h-20 bg-salmon">
+      <div className="w-full flex items-center h-20 bg-salmon">
        <Container>
-       <header className="flex w-full max-7xl items-center justify-between px-4 mx-auto">
+          <header className="flex w-full max-7xl items-center justify-between">
             
             <Link to="/">
                 <img 
-                className="w-20 max-w-20 max-md:hidden" 
-                src={logoImg} 
+                className="w-10 max-w-10 max-md:hidden"
+                src="/src/assets/logo.png"
                 alt="Logo Header" />
             </Link>
 
@@ -83,10 +82,10 @@ export default function Header() {
             </svg>
           </button>
         )}
-            <Link to="/" className="pl-[4rem]">
+            <Link to="/" className="">
                 <img 
-                className="w-20 max-w-20 md:hidden max-md:block" 
-                src={logoImg} 
+                className="w-10 max-w-10 md:hidden max-md:block" 
+                src="/src/assets/logo.png" 
                 alt="Logo Header" />
             </Link>
 
