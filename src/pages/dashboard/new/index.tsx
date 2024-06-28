@@ -482,8 +482,12 @@ export function New() {
             const updatedVariations = [...productData.variations];
             updatedVariations.splice(index, 1);
 
+             // Atualize os tamanhos únicos
+            const sizesArray = Array.from(new Set(updatedVariations.map(variation => variation.size)));
+
             await updateDoc(doc(db, "Produtos", productId!), {
-              variations: updatedVariations
+              variations: updatedVariations,
+              size: sizesArray,
             });
 
             toast.success("Variação excluída com sucesso!");
@@ -550,13 +554,15 @@ export function New() {
 
     try {
       const formattedPrice = price.replace(",", ".");
+      const sizesArray = Array.from(new Set(editVariations.map(variation => variation.size)));
       // Atualiza os detalhes do produto
       await updateDoc(doc(db, "Produtos", productId!), {
         name: name,
         price: formattedPrice,
         description: description,
         status: status,
-        categoria: selectedCategory || categoria
+        categoria: selectedCategory || categoria,
+        size: sizesArray,
       });
 
       // Atualiza as imagens do produto (adicionando as novas e removendo as excluídas)
@@ -662,6 +668,13 @@ export function New() {
         // Adicione a nova variação ao estado de variações editadas
         const updatedVariations = [...editVariations, newVariation];
         setEditVariations(updatedVariations);
+
+        // Atualize o tamanho no banco de dados
+        const sizesArray = Array.from(new Set(updatedVariations.map(variation => variation.size)));
+        await updateDoc(doc(db, "Produtos", productId!), {
+          variations: updatedVariations,
+          size: sizesArray,
+        });
 
         // Limpe o estado de seleção de variação e estoque
         setSelectedVariation({ size: "", colors: [] });

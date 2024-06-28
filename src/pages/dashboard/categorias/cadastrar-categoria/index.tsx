@@ -40,8 +40,6 @@ export function CadastrarCategoria() {
 
   const [category, setCategory] = useState<categoryProp | null>(null)
   const [categoryImagesFromDB, setCategoryImagesFromDB] = useState<ImageItemProps[]>([]);
-  const [existingImages, setExistingImages] = useState<ImageItemProps[]>([]);
-  const [newImages, setNewImages] = useState<File[]>([]);
   const [deletedImages, setDeletedImages] = useState<ImageItemProps[]>([]);
   const [name, setName] = useState("")
 
@@ -51,7 +49,7 @@ export function CadastrarCategoria() {
     resolver: zodResolver(schema),
     mode: "onChange"
   })
-  const [categoryImage, setCategoryImage] = useState<ImageItemProps[]>([])
+  const [categoryImage, setCategoryImage] = useState<ImageItemProps | null>(null)
 
   useEffect(() => {
     async function fetchCategory() {
@@ -88,11 +86,11 @@ export function CadastrarCategoria() {
       created: new Date(),
       owner: user?.name,
       uid: user?.uid,
-      images: categoryImage,
+      images: categoryImage ? [categoryImage] : [],
     })
       .then(() => {
         reset();
-        setCategoryImage([])
+        setCategoryImage(null)
         toast.success("CATEGORIA CADASTRADA COM SUCESSO!")
       })
       .catch((error) => {
@@ -102,7 +100,7 @@ export function CadastrarCategoria() {
   }
 
   useEffect(() => {
-    async function fetchProductImages() {
+    async function fetchCategoryImages() {
       if (!categoryId) return;
 
       try {
@@ -111,7 +109,6 @@ export function CadastrarCategoria() {
           const categoryData = categoryDoc.data();
           if (categoryData && categoryData.images) {
             setCategoryImagesFromDB(categoryData.images);
-            setExistingImages(categoryData.images);
           }
         } else {
           console.log("Produto não encontrado");
@@ -123,7 +120,7 @@ export function CadastrarCategoria() {
       }
     }
 
-    fetchProductImages();
+    fetchCategoryImages();
   }, [categoryId]);
 
   const handleDeleteImageFromDB = async (item: ImageItemProps) => {
@@ -168,12 +165,20 @@ export function CadastrarCategoria() {
       const snapshot = await uploadBytes(uploadRef, image);
       const downloadUrl = await getDownloadURL(snapshot.ref);
 
-      setCategoryImage((images) => [...images, {
+      const imageItem = {
         name: uidImage,
         uid: currentUid,
         previewUrl: URL.createObjectURL(image),
         url: downloadUrl,
-      }]);
+      };
+
+          // Delete the existing image from storage
+          if (categoryImage) {
+            await handleDeleteImage(categoryImage);
+          }
+
+          setCategoryImage(imageItem);
+
     } catch (error) {
       console.error("Erro ao fazer upload da imagem:", error);
     }
@@ -198,7 +203,7 @@ export function CadastrarCategoria() {
             previewUrl: URL.createObjectURL(image),
             url: downloadUrl
           }
-          setCategoryImage((images) => [...images, imageItem])
+          setCategoryImage(imageItem)
         })
       })
   }
@@ -209,7 +214,7 @@ export function CadastrarCategoria() {
 
     try {
       await deleteObject(imageRef)
-      setCategoryImage(categoryImage.filter((image) => image.url !== item.url))
+      setCategoryImage(null)
     } catch (error) {
       console.log("ERROR AO DELETAR")
     }
@@ -223,47 +228,32 @@ export function CadastrarCategoria() {
     e.preventDefault();
 
     try {
-      await updateDoc(doc(db, "categorias", categoryId!), {
-        name: name,
-      });
+        await updateDoc(doc(db, "categorias", categoryId!), {
+            name: name,
+            images: categoryImage ? [categoryImage] : []
+        });
+        setDeletedImages([])
 
-      const updatedImages = [...existingImages, ...categoryImage].filter(image => !deletedImages.some(deletedImage => deletedImage.name === image.name));
-      await updateDoc(doc(db, "categorias", categoryId!), {
-        images: updatedImages,
-      });
-
-      setDeletedImages([]);
-
-      toast.success("Categoria atualizada com sucesso!");
-      navigate("/dashboard/categorias");
+        alert("Categoria atualizada com sucesso!");
+        navigate("/dashboard/categorias")
     } catch (error) {
-      console.error("Erro ao atualizar categoria:", error);
-      toast.error("Erro ao atualizar categoria");
-      navigate("/dashboard/categorias");
+        console.log("Erro ao atualizar categoria: ", error)
+        navigate("/dashboard/categorias")
     }
-  };
+}
 
-  async function handleFileEdit(e: ChangeEvent<HTMLInputElement>) {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedImages = Array.from(e.target.files);
+async function handleFileEdit(e: ChangeEvent<HTMLInputElement>) {
+  if (e.target.files && e.target.files[0]) {
+    const image = e.target.files[0];
 
-      // Filtrar apenas as novas imagens
-      const newImagesArray = selectedImages.filter(image => !existingImages.some(existingImage => existingImage.name === image.name));
-
-      // Adicionar novas imagens ao estado
-      setNewImages([...newImages, ...newImagesArray]);
-
-      // Realizar o upload das novas imagens
-      for (const image of newImagesArray) {
-        if (image.type === "image/jpeg" || image.type === "image/png") {
-          await handleUploadEdit(image);
-        } else {
-          alert("Envie apenas imagens jpeg ou png");
-          return;
-        }
-      }
+    if (image.type === "image/jpeg" || image.type === "image/png") {
+      await handleUploadEdit(image);
+    } else {
+      alert("Envie apenas imagens jpeg ou png");
+      return;
     }
   }
+}
 
 
   return (
@@ -275,38 +265,38 @@ export function CadastrarCategoria() {
         </Title>
 
         {categoryId ? (
-         <div>
-           <div className='flex justify-center'>
-          <button className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
-            <div className="absolute cursor-pointer ">
-              <FiUpload size={30} color="#000" />
-            </div>
-            <div className="cursor-pointer ">
-              <input
-                className="opacity-0 cursor-pointer"
-                onChange={handleFileEdit}
-                type="file"
-                accept="image/*"
-                multiple
-              />
-            </div>
-          </button>
+          <div>
+            <div className='flex justify-center'>
+              <button className="border-2 w-48 rounded-lg flex items-center justify-center cursor-pointer border-gray-600 h-32 md:w-48">
+                <div className="absolute cursor-pointer ">
+                  <FiUpload size={30} color="#000" />
+                </div>
+                <div className="cursor-pointer ">
+                  <input
+                    className="opacity-0 cursor-pointer"
+                    onChange={handleFileEdit}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                  />
+                </div>
+              </button>
 
-          {categoryImage.map(item => (
-              <div className='h-32 flex items-center justify-center relative ' key={item.name}>
-                <button className="absolute flex text-black" onClick={() => handleDeleteImage(item)}>
-                  <FiTrash2 size={24} color="#FFF" />
-                </button>
-                <img
-                  src={item.previewUrl}
-                  className="rounded-lg w-40 h-32 object-cover ml-2 "
-                />
-              </div>
-            ))}
-          </div>
+              {categoryImage && (
+                <div className='h-32 flex items-center justify-center relative ' key={categoryImage.name}>
+                  <button className="absolute flex text-black" onClick={() => handleDeleteImage(categoryImage)}>
+                    <FiTrash2 size={24} color="#FFF" />
+                  </button>
+                  <img
+                    src={categoryImage.previewUrl}
+                    className="rounded-lg w-40 h-32 object-cover ml-2 "
+                  />
+                </div>
+              )}
+            </div>
 
-            
-            
+
+
             <h1 className='text-xl font-semibold my-8'>Imagem da categoria:</h1>
             <div className='flex items-center my-3'>
               {categoryImagesFromDB.map(item => (
@@ -318,9 +308,9 @@ export function CadastrarCategoria() {
                 </div>
               ))}
             </div>
-         </div>
-         
-          
+          </div>
+
+
         ) : (
           <div className="w-full justify-center p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2">
             <button
@@ -337,17 +327,17 @@ export function CadastrarCategoria() {
               </div>
             </button>
 
-            {categoryImage.map(item => (
-              <div className='w-[60px] h-[60px] flex items-center justify-center relative' key={item.name}>
-                <button className="flex absolute mt-24" onClick={() => handleDeleteImage(item)}>
+            {categoryImage && (
+              <div className='w-[60px] h-[60px] flex items-center justify-center relative' key={categoryImage.name}>
+                <button className="flex absolute mt-24" onClick={() => handleDeleteImage(categoryImage)}>
                   <FiTrash size={15} color="#000" />
                 </button>
                 <img
-                  src={item.previewUrl}
+                  src={categoryImage.previewUrl}
                   className="rounded-lg w-full h-[60px] object-fill"
                 />
               </div>
-            ))}
+            )}
           </div>
         )}
 
@@ -386,17 +376,17 @@ export function CadastrarCategoria() {
                   error={errors.name?.message}
                   type="text"
                 />
-                  <button type='submit' className="w-full max-w-[250px] mt-10 self-center bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Salvar Categoria</button>
+                <button type='submit' className="w-full max-w-[250px] mt-10 self-center bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Salvar Categoria</button>
               </form>
-                <div className="flex w-full justify-around mt-5 p-2">
-                  <div>
-                    <button className=" bg-inherit border-2 rounded-2xl p-2 border-wine-light text-wine-black font-semibold hover:bg-wine-black hover:bg-opacity-15" >
-                      <Link to="/dashboard/categorias">
-                        <span>Voltar e Fechar</span>
-                      </Link>
-                    </button>
-                  </div>
+              <div className="flex w-full justify-around mt-5 p-2">
+                <div>
+                  <button className=" bg-inherit border-2 rounded-2xl p-2 border-wine-light text-wine-black font-semibold hover:bg-wine-black hover:bg-opacity-15" >
+                    <Link to="/dashboard/categorias">
+                      <span>Voltar e Fechar</span>
+                    </Link>
+                  </button>
                 </div>
+              </div>
             </>
           )}
         </div>
