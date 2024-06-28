@@ -86,6 +86,7 @@ export default function NestedModal() {
   const navigate = useNavigate();
   const [totalPrice, setTotalPrice] = React.useState(0);
   const [deliveryOption, setDeliveryOption] = React.useState("");
+  const [clientName, setClientName] = React.useState("");
 
   React.useEffect(() => {
     const calculateTotalPrice = () => {
@@ -104,6 +105,12 @@ export default function NestedModal() {
     setOpen(false);
   };
 
+  const resetModalValues = () => {
+    setAddress(null);
+    setDeliveryOption("");
+    setClientName("");
+  };
+
   const handleFinalizarCompra = () => {
     if (!deliveryOption) {
       toast.error("Selecione um modo de entrega");
@@ -112,8 +119,12 @@ export default function NestedModal() {
 
     let message = "";
     if (deliveryOption === "Retirar na loja") {
+      if (!clientName.trim()) {
+        toast.error("Por favor, insira seu nome completo.");
+        return;
+      }
       message =
-        `Olá! Gostaria de fazer um pedido para retirar na loja. Aqui está a lista de produtos:\n`;
+        `Olá! sou ${clientName}, gostaria de fazer um pedido para retirar na loja. Aqui está a lista de produtos:\n`;
     } else {
       if (!address) {
         toast.error("Salve um endereço para entrega");
@@ -135,11 +146,17 @@ export default function NestedModal() {
 
     window.open(whatsappURL);
     setDeliveryOption("");
+    setClientName("")
+    resetModalValues();
+    setOpen(false)
   };
 
   const handleDeleteAddress = () => setAddress(null);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    resetModalValues();
+  }
 
   return (
     <div>
@@ -230,6 +247,8 @@ export default function NestedModal() {
 
             <hr className="w-full bg-wine-light border-wine-light my-8"></hr>
 
+            
+
             <DropdownModal
               title1="Retirar na Loja"
               title2="Entregar no meu endereço"
@@ -240,6 +259,18 @@ export default function NestedModal() {
               setDeliveryOption={setDeliveryOption}
               selectedOption={deliveryOption}
             />
+
+          {deliveryOption === "Retirar na loja" && (
+              <div className="flex flex-col w-full mt-4">
+                <label className="mb-2 font-semibold">Nome Completo:</label>
+                <input
+                  type="text"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  className="p-2 border rounded-md"
+                />
+              </div>
+            )}
 
             {address && (
               <div className="flex flex-col w-full mt-7 bg-wine-light rounded-md p-2">
