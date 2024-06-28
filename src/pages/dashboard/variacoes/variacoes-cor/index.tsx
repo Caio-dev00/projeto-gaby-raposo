@@ -38,8 +38,6 @@ export function CadastrarCor() {
     const corId = new URLSearchParams(location.search).get("id")
 
     const [colorImagesFromDB, setColorImagesFromDB] = useState<ImageItemProps[]>([]);
-    const [existingImages, setExistingImages] = useState<ImageItemProps[]>([]);
-    const [newImages, setNewImages] = useState<File[]>([]);
     const [deletedImages, setDeletedImages] = useState<ImageItemProps[]>([]);
     const [cor, setCor] = useState<coresProps | null>(null)
     const [name, setName] = useState("");
@@ -49,7 +47,7 @@ export function CadastrarCor() {
         resolver: zodResolver(schema),
         mode: "onChange"
     })
-    const [corImage, setCorImage] = useState<ImageItemProps[]>([])
+    const [corImage, setCorImage] = useState<ImageItemProps | null>(null)
 
 
     function onSubmit(data: FormData) {
@@ -58,11 +56,11 @@ export function CadastrarCor() {
             created: new Date(),
             owner: user?.name,
             uid: user?.uid,
-            images: corImage,
+            images: corImage ? [corImage] : [],
         })
             .then(() => {
                 reset();
-                setCorImage([])
+                setCorImage(null)
                 toast.success("COR CADASTRADA COM SUCESSO")
             })
             .catch((error) => {
@@ -103,7 +101,7 @@ export function CadastrarCor() {
                         previewUrl: URL.createObjectURL(image),
                         url: getDownloadUrl
                     }
-                    setCorImage((images) => [...images, imageItem])
+                    setCorImage(imageItem)
                 })
             })
     }
@@ -113,7 +111,7 @@ export function CadastrarCor() {
 
         try {
             await deleteObject(imageRef)
-            setCorImage(corImage.filter((image) => image.url !== item.url))
+            setCorImage(null)
         } catch (error) {
             console.log("ERRO AO DELETAR", error)
         }
@@ -131,7 +129,7 @@ export function CadastrarCor() {
               const colorData = colorDoc.data();
               if (colorData && colorData.images) {
                 setColorImagesFromDB(colorData.images);
-                setExistingImages(colorData.images);
+                
               }
             } else {
               console.log("Cor não encontrada");
@@ -147,23 +145,14 @@ export function CadastrarCor() {
       }, [corId]);
 
       async function handleFileEdit(e: ChangeEvent<HTMLInputElement>) {
-        if (e.target.files && e.target.files.length > 0) {
-          const selectedImages = Array.from(e.target.files);
+        if (e.target.files && e.target.files[0]) {
+          const image = e.target.files[0];
     
-          // Filtrar apenas as novas imagens
-          const newImagesArray = selectedImages.filter(image => !existingImages.some(existingImage => existingImage.name === image.name));
-    
-          // Adicionar novas imagens ao estado
-          setNewImages([...newImages, ...newImagesArray]);
-    
-          // Realizar o upload das novas imagens
-          for (const image of newImagesArray) {
-            if (image.type === "image/jpeg" || image.type === "image/png") {
-              await handleUploadEdit(image);
-            } else {
-              alert("Envie apenas imagens jpeg ou png");
-              return;
-            }
+          if (image.type === "image/jpeg" || image.type === "image/png") {
+            await handleUploadEdit(image);
+          } else {
+            alert("Envie apenas imagens jpeg ou png");
+            return;
           }
         }
       }
@@ -182,12 +171,19 @@ export function CadastrarCor() {
           const snapshot = await uploadBytes(uploadRef, image);
           const downloadUrl = await getDownloadURL(snapshot.ref);
     
-          setCorImage((images) => [...images, {
+          const imageItem = {
             name: uidImage,
             uid: currentUid,
             previewUrl: URL.createObjectURL(image),
             url: downloadUrl,
-          }]);
+          };
+          
+          // Delete the existing image from storage
+          if (corImage) {
+            await handleDeleteImage(corImage);
+          }
+
+          setCorImage(imageItem);
         } catch (error) {
           console.error("Erro ao fazer upload da imagem:", error);
         }
@@ -244,26 +240,22 @@ export function CadastrarCor() {
     }
 
     const editSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+      e.preventDefault();
 
-        try {
-            await updateDoc(doc(db, "Cores", corId!), {
-                cor: name
-            });
-            const updatedImages = [...existingImages, ...corImage].filter(image => !deletedImages.some(deletedImage => deletedImage.name === image.name));
-            await updateDoc(doc(db, "Cores", corId!), {
-              images: updatedImages,
-            });
+      try {
+          await updateDoc(doc(db, "Cores", corId!), {
+              cor: name,
+              images: corImage ? [corImage] : []
+          });
+          setDeletedImages([])
 
-            setDeletedImages([])
-
-            alert("Cor atualizada com sucesso!");
-            navigate("/dashboard/variacoes")
-        } catch (error) {
-            console.log("Erro ao atualizar categoria: ", error)
-            navigate("/dashboard/variacoes")
-        }
-    }
+          alert("Cor atualizada com sucesso!");
+          navigate("/dashboard/variacoes")
+      } catch (error) {
+          console.log("Erro ao atualizar categoria: ", error)
+          navigate("/dashboard/variacoes")
+      }
+  }
 
     
 
@@ -300,17 +292,17 @@ export function CadastrarCor() {
                         </div>
                       </button>
         
-                      {corImage.map(item => (
-                        <div className='h-32 flex items-center justify-center relative ' key={item.name}>
-                          <button className="absolute flex text-black" onClick={() => handleDeleteImage(item)}>
-                            <FiTrash2 size={24} color="#FFF" />
-                          </button>
-                          <img
-                            src={item.previewUrl}
-                            className="rounded-lg w-40 h-32 object-cover ml-2 "
-                          />
-                        </div>
-                      ))}
+                      {corImage && (
+                                <div className='h-32 flex items-center justify-center relative ' key={corImage.name}>
+                                    <button className="absolute flex text-black" onClick={() => handleDeleteImage(corImage)}>
+                                        <FiTrash2 size={24} color="#FFF" />
+                                    </button>
+                                    <img
+                                        src={corImage.previewUrl}
+                                        className="rounded-lg w-40 h-32 object-cover ml-2 "
+                                    />
+                                </div>
+                            )}
                     </div>
         
         
@@ -343,18 +335,18 @@ export function CadastrarCor() {
                             </div>
                         </button>
 
-                        {corImage.map(item => (
-                            <div className='w-[60px] h-[60px] flex items-center justify-center relative' key={item.name}>
-                                <button className="flex absolute mt-24" onClick={() => handleDeleteImage(item)}>
+                        {corImage && (
+                            <div className='w-[60px] h-[60px] flex items-center justify-center relative' key={corImage.name}>
+                                <button className="flex absolute mt-24" onClick={() => handleDeleteImage(corImage)}>
 
                                     <FiTrash size={15} color="#000" />
                                 </button>
                                 <img
-                                    src={item.previewUrl}
+                                    src={corImage.previewUrl}
                                     className="rounded-lg w-full h-[60px] object-fill"
                                 />
                             </div>
-                        ))}
+                        )}
                     </div>
                 )}
 

@@ -20,7 +20,7 @@ export interface categoryProp {
     name: string,
     owner: string,
     id: string,
-    images: categoryImageProps[]
+    images: categoryImageProps[],
 }
 
 interface categoryImageProps {

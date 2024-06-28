@@ -4,16 +4,20 @@ import { Slider } from "../../components/slideBanner/Slider"
 
 import Catalogo from "../../components/catalogo"
 import { useEffect, useState } from "react"
-import { collection, getDocs, onSnapshot, orderBy, query } from "firebase/firestore"
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore"
 import { db } from "../../services/firebaseConnection"
 import { AiOutlineCaretUp, AiOutlineCaretDown } from "react-icons/ai";
 import { BannerProps } from "../dashboard/banners"
 
 import { categoryProp } from "../dashboard/categorias"
-import { tamanhoProps } from "../dashboard/variacoes"
 import { Link } from "react-router-dom"
 import Footer from "../../components/Footer"
 
+
+interface Product {
+  category: string;
+  size: string[];
+}
 
 
 export function Home() {
@@ -39,34 +43,65 @@ export function Home() {
   }
 
   const [isOpen, setIsOpen] = useState<boolean[]>([])
-  const [category, setCategory] = useState<categoryProp[]>([])
-  const [tamanho, setTamanho] = useState<tamanhoProps[]>([])
+  const [categoriesWithSizes, setCategoriesWithSizes] = useState<categoryProp[]>([]);
   const [banner, setBanner] = useState<BannerProps[]>([])
+  const [categorySizes, setCategorySizes] = useState<{ [key: string]: string[] }>({});
 
   useEffect(() => {
 
-    async function getCategory() {
-      const categoryref = collection(db, 'categorias')
-
-      await getDocs(categoryref)
-        .then((snapshot) => {
-          const listCategories = [] as categoryProp[]
-
-          snapshot.forEach(doc => {
-            listCategories.push({
-              id: doc.id,
-              name: doc.data().name,
-              owner: doc.data().owner,
-              images: doc.data().images
-            })
-          })
-          setCategory(listCategories)
-        })
+    async function loadCategoriesWithSizes() {
+      const categoryRef = collection(db, "categorias");
+      const snapshot = await getDocs(categoryRef);
+      const categoriesWithSizes: categoryProp[] = [];
+    
+      const newCategorySizes: { [key: string]: string[] } = {}; // Novo objeto para armazenar tamanhos
+    
+      for (const doc of snapshot.docs) {
+        const categoryData = doc.data() as categoryProp;
+        const category = { ...categoryData, id: doc.id };
+    
+        // Load sizes for this category
+        const sizes = await loadSizesForCategory(category.name);
+    
+        // Check if sizes are available
+        if (sizes.length > 0) {
+          categoriesWithSizes.push(category);
+          newCategorySizes[category.name] = sizes; // Adiciona os tamanhos ao novo objeto
+        }
+      }
+    
+      setCategoriesWithSizes(categoriesWithSizes);
+      setCategorySizes((prevSizes) => ({ ...prevSizes, ...newCategorySizes })); // Atualiza o estado com os novos tamanhos
+      setIsOpen(Array(categoriesWithSizes.length).fill(false));
     }
-    loadTamanhos()
+
+    async function loadSizesForCategory(categoryName: string): Promise<string[]> {
+      const productRef = collection(db, "Produtos");
+      const q = query(productRef, where("categoria", "==", categoryName));
+    
+      const snapshot = await getDocs(q);
+      const sizes: string[] = [];
+    
+      snapshot.forEach((doc) => {
+        const productData = doc.data() as Product;
+        if (productData.size && productData.size.length > 0) {
+          productData.size.forEach((size) => {
+            if (!sizes.includes(size)) {
+              sizes.push(size);
+            }
+          });
+        }
+      });
+    
+      return sizes;
+    }
+
+    
     loadBanner()
-    getCategory()
+    loadCategoriesWithSizes();
   }, [])
+
+  
 
   async function loadBanner() {
     const bannerRef = collection(db, "Banners")
@@ -91,28 +126,6 @@ export function Home() {
         setBanner(listBanner)
       })
   }
-
-  async function loadTamanhos() {
-    const tamanhosRef = collection(db, "Tamanhos")
-    const q = query(tamanhosRef, orderBy("created", "desc"))
-
-    await getDocs(q)
-    onSnapshot(q, (snapshot) => {
-      const lista = [] as tamanhoProps[]
-      snapshot.forEach((doc) => {
-        lista.push({
-          id: doc.id,
-          name: doc.data().tamanho,
-          owner: doc.data().owner
-        })
-        setTamanho(lista)
-        setIsOpen(Array(lista.length).fill(false))
-      })
-    })
-  }
-
-
-
 
   const toggleCategory = (index: number) => {
     setIsOpen((prev) => {
@@ -151,7 +164,7 @@ export function Home() {
 
           <Slider settings={settings2}>
 
-          {category.map((item, index) =>
+          {categoriesWithSizes.map((item, index) =>
               <SwiperSlide key={item.id}>
                 <div className="flex flex-col items-center w-[340px] rounded-lg mt-5 max-md:mt-20">
                   <div className="relative w-[60px] h-[60px] max-md:w-[50px] max-md:h-[50px] bg-black rounded-full hover:bg-salmon duration-300">
@@ -160,8 +173,6 @@ export function Home() {
                       src={item.images[0].url}
                       alt={item.name} />
                   </div>
-
-                  {
 
                     <button onClick={() => toggleCategory(index)} className=" w-full flex items-center justify-center tracking-wider active:text-salmon duration-300 max-md:text-[0.8rem]">
                       <span className="text-[0.9rem] max-md:text-[0.9em]">{item.name}</span>
@@ -172,23 +183,19 @@ export function Home() {
                       )}
                     </button>
 
-
-                  }
-
-                  {tamanho.map((tamanhoItem, tamanhoIndex) => (
-                    <div key={tamanhoIndex}>
-                      {isOpen[index] && (
-                        <div className=" w-[80px] flex p-1 hover:bg-wine-black  ">
+                    {isOpen[index] &&
+                      categorySizes[item.name]?.map((tamanho, tamanhoIndex) => (
+                        <div key={tamanhoIndex} className="w-[80px] flex p-1 hover:bg-wine-black">
                           <div className="flex w-full max-w[100px]">
-                            <Link to={`/produtos/${item.name}/${tamanhoItem.name}?`} className="text-black flex w-full justify-center items-center hover:text-white cursor-pointer max-md:text-[0.7em]">
-                              <p className="text-[0.9rem] max-md:text-[0.6rem] text-center">Tamanho {tamanhoItem.name}</p>
+                            <Link
+                              to={`/produtos/${item.name}/${tamanho}?`}
+                              className="text-black flex w-full justify-center items-center hover:text-white cursor-pointer max-md:text-[0.7em]"
+                            >
+                              <p className="text-[0.9rem] max-md:text-[0.6rem] text-center">Tamanho {tamanho}</p>
                             </Link>
                           </div>
                         </div>
-
-                      )}
-                    </div>
-                  ))}
+                      ))}
                 </div>
               </SwiperSlide>
             )}
