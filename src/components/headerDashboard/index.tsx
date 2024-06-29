@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { PiSignOutBold } from "react-icons/pi";
+import logoFooter from "/src/assets/logoFooter.png"
 
 export function HeaderDashboard() {
   const { user, logOut } = useContext(AuthContext)
@@ -15,7 +16,7 @@ export function HeaderDashboard() {
         <img
           onClick={() => navigate("/")}
           className=" cursor-pointer pb- w-[90px] h-[90px] block m-auto rounded-[50px] object-cover drop-shadow-md"
-          src="/src/assets/logoFooter.png"
+          src={logoFooter}
           alt="logo" />
 
         <div className="flex justify-center items-center">

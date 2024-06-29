@@ -1,5 +1,6 @@
 import { FaInstagram, FaTiktok, FaFacebook, FaMapMarkerAlt } from 'react-icons/fa';
 import { Container } from '../container';
+import logoFooter from '/src/assets/logoFooter.png';
 
 const Footer = () => {
   return (
@@ -11,7 +12,7 @@ const Footer = () => {
           <div className='flex flex-col items-center gap-14 lg:flex-row'>
             <img
               className='w-36 h-36 max-lg:hidden'
-              src='/src/assets/logoFooter.png'
+              src={logoFooter}
               alt='Logo Footer'>
             </img>
             <div className='flex flex-col items-center md:w-96 lg:items-start'>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";
 import { Container } from "../container";
 import NestedModal from "../Modals";
+import logo from "/src/assets/logo.png"
 
 export default function Header() {
   const [toggleButton, setToggleButton] = useState(false);
@@ -49,7 +50,7 @@ export default function Header() {
           <Link to="/">
             <img
               className="w-10 max-w-10 max-md:hidden"
-              src="/src/assets/logo.png"
+              src={logo}
               alt="Logo Header"
             />
           </Link>
