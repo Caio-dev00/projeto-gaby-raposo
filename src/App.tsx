@@ -36,20 +36,20 @@ const router = createBrowserRouter([
         path: "/produtos/:categoria/:tamanho",
         element: <Produtos />
       },
+      {
+        path: "/login",
+        element: <Login />
+      },
+      {
+        path: "/adm-2024",
+        element: <ProtectedRegister /> // Usar o novo componente para proteger o registro
+      },
+      {
+        path: "/adm-2024/admin",
+        element: <Register />
+      },
       
     ]
-  },
-  {
-    path: "/login",
-    element: <Login />
-  },
-  {
-    path: "/adm-2024",
-    element: <ProtectedRegister /> // Usar o novo componente para proteger o registro
-  },
-  {
-    path: "/adm-2024/admin",
-    element: <Register />
   },
   {
     path: "/dashboard",
