@@ -118,7 +118,7 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
         />
         <input
           type="text"
-          className="bg-gray-200 w-1/4 rounded-full px-4 py-2 my-2"
+          className="bg-gray-200 w-32 rounded-full px-4 py-2 my-2"
           placeholder="Numero"
           value={numero}
           onChange={(e) => setNumero(e.target.value)}
@@ -150,13 +150,13 @@ export default function EnderecoUsuario({ onClose }: { onClose: () => void }) {
         />
         <input
           type="text"
-          className="bg-gray-200 outline-none w-3/2 rounded-full px-4 py-2 my-2"
+          className="bg-gray-200 outline-none w-40 rounded-full px-4 py-2 my-2 sm:ml-10 md:w-60 lg:ml-20 "
           placeholder="Estado"
           value={estado}
           onChange={(e) => setEstado(e.target.value)}
           readOnly
         />
-        <button type="submit" className='flex justify-center py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Salvar Endereço</button>
+        <button type="submit" className='flex justify-center my-4 py-2 px-4 bg-wine-light text-white font-medium rounded-full'>Salvar Endereço</button>
       </form>
     </div>
   )

@@ -16,7 +16,7 @@ const Footer = () => {
             </img>
             <div className='flex flex-col items-center md:w-96 lg:items-start'>
               <h2 className="text-xl font-semibold text-black my-2">Sobre nós</h2>
-              <p className='w-full text-sm font-medium text-black text-center lg:text-left'>
+              <p className='text-sm font-medium text-black text-center md:w-[28rem] lg:text-left'>
                 Empoderamos nossos clientes com peças íntimas e selecionadas para elevar sua autoestima e confiança. Em 2023, nosso compromisso com a excelência foi recompensado ao sermos eleitos como a melhor loja de lingerie da nossa região. Venha nos conhecer pessoalmente e vista-se de poder !
               </p>
             </div>

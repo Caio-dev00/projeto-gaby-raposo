@@ -247,7 +247,7 @@ export default function NestedModal() {
 
             <hr className="w-full bg-wine-light border-wine-light my-8"></hr>
 
-            
+
 
             <DropdownModal
               title1="Retirar na Loja"
@@ -259,8 +259,8 @@ export default function NestedModal() {
               setDeliveryOption={setDeliveryOption}
               selectedOption={deliveryOption}
             />
-
-          {deliveryOption === "Retirar na loja" && (
+            
+            {deliveryOption === "Retirar na loja" && (
               <div className="flex flex-col w-full mt-4">
                 <label className="mb-2 font-semibold">Nome Completo:</label>
                 <input
@@ -271,6 +271,8 @@ export default function NestedModal() {
                 />
               </div>
             )}
+
+
 
             {address && (
               <div className="flex flex-col w-full mt-7 bg-wine-light rounded-md p-2">

@@ -59,6 +59,7 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
         {isOpen && (
           <div className="flex w-full ml-2">
             <div className="flex flex-col w-full justify-start gap-1">
+              
               <h3 className="font-semibold text-lg">Endereço:</h3>
               <h3 className="font-medium text-base">{rua}, {numero} - {bairro}, {cep}</h3>
               <button className="flex justify-start items-center my-2">
