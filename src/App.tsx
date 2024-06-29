@@ -17,6 +17,7 @@ import { CadastrarBanner } from "./pages/dashboard/banners/cadastrar-banner";
 import { Layout } from "./components/layout";
 import { Private } from "./routes/Private";
 import Produtos from "./pages/produtos/produtos";
+import ProtectedRegister from "./pages/register/RegisterProtected";
 
 
 const router = createBrowserRouter([
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/adm-2024",
+    element: <ProtectedRegister /> // Usar o novo componente para proteger o registro
+  },
+  {
+    path: "/adm-2024/admin",
     element: <Register />
   },
   {
