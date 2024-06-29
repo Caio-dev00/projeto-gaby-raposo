@@ -11,7 +11,7 @@ const Footer = () => {
           <div className='flex flex-col items-center gap-14 lg:flex-row'>
             <img
               className='w-36 h-36 max-lg:hidden'
-              src='/src/assets/logo-footer.png'
+              src='/src/assets/logoFooter.png'
               alt='Logo Footer'>
             </img>
             <div className='flex flex-col items-center md:w-96 lg:items-start'>

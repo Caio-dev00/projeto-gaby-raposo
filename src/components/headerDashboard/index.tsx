@@ -15,7 +15,7 @@ export function HeaderDashboard() {
         <img
           onClick={() => navigate("/")}
           className=" cursor-pointer pb- w-[90px] h-[90px] block m-auto rounded-[50px] object-cover drop-shadow-md"
-          src="/src/assets/logo-footer.png"
+          src="/src/assets/logoFooter.png"
           alt="logo" />
 
         <div className="flex justify-center items-center">
