@@ -258,19 +258,9 @@ export default function NestedModal() {
               cep="19806-172 - Assis-SP"
               setDeliveryOption={setDeliveryOption}
               selectedOption={deliveryOption}
+              clientName={clientName}
+              setClientName={setClientName}
             />
-
-          {deliveryOption === "Retirar na loja" && (
-              <div className="flex flex-col w-full mt-4">
-                <label className="mb-2 font-semibold">Nome Completo:</label>
-                <input
-                  type="text"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  className="p-2 border rounded-md"
-                />
-              </div>
-            )}
 
             {address && (
               <div className="flex flex-col w-full mt-7 bg-wine-light rounded-md p-2">

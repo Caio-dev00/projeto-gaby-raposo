@@ -14,16 +14,18 @@ interface EnderecoProps {
   cep: number | string;
   setDeliveryOption: React.Dispatch<React.SetStateAction<string>>;
   selectedOption: string;
+  clientName: string;
+  setClientName: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function DropdownModal({ title1, title2, rua, bairro, cep, numero, setDeliveryOption, selectedOption  }: EnderecoProps) {
+export default function DropdownModal({ title1, title2, rua, bairro, cep, numero, setDeliveryOption, selectedOption, clientName, setClientName  }: EnderecoProps) {
   const [selectedValue, setSelectedValue] = React.useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenInput, setIsOpenInput] = useState(false);
 
   React.useEffect(() => {
     if (selectedOption === '') {
-      setDeliveryOption(''); // Define o estado deliveryOption como vazio se nenhuma opção estiver selecionada
+      setDeliveryOption('');
     }
   }, [selectedOption, setDeliveryOption]);
 
@@ -56,6 +58,19 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
         />
         <span>{title1}</span>
 
+        {selectedOption === "Retirar na loja" && (
+        <div className="flex flex-col w-full my-2">
+          <label className="mb-2 font-semibold">Nome Completo:</label>
+          <input
+            type="text"
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
+            className="p-2 border rounded-md"
+            placeholder='Digite seu nome completo'
+          />
+        </div>
+      )}
+
         {isOpen && (
           <div className="flex w-full ml-2">
             <div className="flex flex-col w-full justify-start gap-1">
@@ -68,6 +83,7 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
           </div>
         )}
       </div>
+      
 
       <div>
         <Radio
@@ -90,6 +106,7 @@ export default function DropdownModal({ title1, title2, rua, bairro, cep, numero
           )}
         </div>
       </div>
+     
     </div>
   );
 }
