@@ -1,25 +1,24 @@
-import { RegisterOptions, UseFormRegister } from 'react-hook-form';
+import { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
-interface InputProps {
+interface InputProps<T extends FieldValues> {
   type: string;
   placeholder: string;
-  name: string;
-  register: UseFormRegister;
+  name: keyof T & Path<T>;
+  register: UseFormRegister<T>;
   error?: string;
-  rules?: RegisterOptions;
 }
 
-export default function Input({ name, register, type, error, rules, placeholder }: InputProps) {
+export default function Input<T extends FieldValues>({ name, register, type, error, placeholder }: InputProps<T>) {
   return (
     <div>
       <input
         className="block w-full rounded-md border-2 border-gray-400 py-3 px-2 text-gray-600 md:text-sm"
         type={type}
-        {...register(name, rules)}
-        id={name}
+        {...register(name)}
+        id={name as string}
         placeholder={placeholder}
       />
       {error && <p className='my-1 text-red-500'>{error}</p>}
     </div>
-  )
+  );
 }

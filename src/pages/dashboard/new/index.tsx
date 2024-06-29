@@ -76,7 +76,7 @@ const schema = z.object({
   description: z.string().min(1, "O campo é obrigatorio!"),
 })
 
-type FormData = z.infer<typeof schema>
+export type FormData = z.infer<typeof schema>
 
 const listRef = collection(db, "categorias")
 const listCoresRef = collection(db, "Cores")
@@ -150,7 +150,7 @@ export function New() {
             };
 
             setName(productCompleto.name);
-            setPrice(productCompleto.price);
+            setPrice(productCompleto.price.toString());
             setDescription(productCompleto.description);
             setStatus(productCompleto.status);
             setEditVariations(productCompleto.variations);
@@ -541,6 +541,7 @@ export function New() {
       ...prevVariation,
       size: size,
     }));
+    console.log(selectedVariation)
   };
 
 
