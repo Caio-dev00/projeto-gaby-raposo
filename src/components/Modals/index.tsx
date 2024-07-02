@@ -15,40 +15,28 @@ import toast from 'react-hot-toast';
 
 const style = {
   position: 'absolute',
-  top: {
-    xs: "20%",
-    sm: '20%',
-    md: '0%',
-    lg: '0%',
-    xl: '0%',
+  transform: 'translate(-50%, -50%)',
+  top: '55%',
+  width: {
+    xs: '100%',
+    sm: '80%',
+    md: '40%',
+    lg: '40%',
+    xl: '40%',
   },
   left: {
-    xs: "0%",
-    sm: '0%',
-    md: '30%',
-    lg: '50%',
-    xl: '60%',
+    xs: '50%',
+    sm: '60%',
+    md: '63%',
+    lg: '63%',
+    xl: '63%',
   },
-  height: {
-    xs: "80%",
-    sm: '80%',
-    md: '100%',
-    lg: '100%',
-    xl: '100%',
-  },
-  width: {
-    xs: "100%",
-    sm: "100%",
-    md: "70%",
-    lg: "50%",
-    xl: "40%",
-  },
+  maxHeight: '90vh',
+  overflowY: 'auto',
   bgcolor: 'background.paper',
   boxShadow: 24,
-  borderRadius: "18px",
-  pt: 2,
-  px: 4,
-  pb: 3,
+  borderRadius: '18px',
+  p: 4,
 };
 
 export function ChildModal() {
@@ -137,7 +125,7 @@ export default function NestedModal() {
       message += `${item.stock} - ${item.name} (${item.color.name} - ${item.size}) - R$ ${item.price} - Observação: ${item.observation}\n`;
     });
 
-    message += `\nTotal a pagar: R$ ${totalPrice}`;
+    message += `\nTotal a pagar: R$ ${totalPrice.toFixed(2)}`;
 
     const phoneNumber = "5518996812002";
     const encodedMessage = encodeURIComponent(message);
@@ -172,13 +160,12 @@ export default function NestedModal() {
         open={open}
         onClose={handleClose}
         aria-labelledby="parent-modal-title"
-        aria-describedby="parent-modal-description"
-      >
-        <Fade in={open}>
+        aria-describedby="parent-modal-description">
+        <Fade in={open} timeout={300}>
           <Box sx={{ ...style }}>
             <AiOutlineClose
               onClick={handleClose}
-              className="flex right-0 mr-3 absolute cursor-pointer"
+              className="flex right-1 top-4 mr-3 absolute cursor-pointer"
               size={26}
               color="#000"
             />
@@ -190,8 +177,7 @@ export default function NestedModal() {
             {cart.map((item) => (
               <div
                 key={item.id}
-                className="flex flex-row justify-between items-center w-full my-5"
-              >
+                className="flex flex-row justify-between items-center w-full my-5">
                 <div className="flex justify-between w-full items-center">
                   <div className="flex items-center">
                     <Link
