@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";
 import { Container } from "../container";
 import NestedModal from "../Modals";
+import logo from "/src/assets/logo.png"
 
 export default function Header() {
   const [toggleButton, setToggleButton] = useState(false);
@@ -49,7 +50,7 @@ export default function Header() {
           <Link to="/">
             <img
               className="w-10 max-w-10 max-md:hidden"
-              src="/src/assets/logo.png"
+              src={logo}
               alt="Logo Header"
             />
           </Link>
@@ -72,29 +73,13 @@ export default function Header() {
           </div>
 
           {toggleButton && (
-            <div className="none max-w-[90%] w-full md:hidden absolute pt-[18rem] z-10">
+            <div className="none max-w-[90%] w-full md:hidden absolute pl-2 pt-[8rem] z-10">
               <ul
                 ref={divRef}
-                className="w-3/4 font-medium flex flex-col p-4 mt-4 rounded-lg bg-wine-light"
-              >
+                className="w-3/4 font-medium flex flex-col p-4 mt-4 rounded-lg bg-wine-light">
                 <li>
-                  <a href="#" className="block py-2 px-3 text-gray-100 rounded">
+                  <a href="/" className="block py-2 px-3 text-gray-100 rounded">
                     Pagina Incial
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="block py-2 px-3 text-gray-100 rounded">
-                    Catálogo
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="block py-2 px-3 text-gray-100 rounded">
-                    Sobre
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="block py-2 px-3 text-gray-100 rounded">
-                    Contato
                   </a>
                 </li>
               </ul>
@@ -135,7 +120,7 @@ export default function Header() {
           <Link to="/" className="">
             <img
               className="w-10 max-w-10 md:hidden max-md:block"
-              src="/src/assets/logo.png"
+              src={logo}
               alt="Logo Header"
             />
           </Link>
