@@ -98,14 +98,14 @@ export function Dashboard() {
                     <FaUser size={25} color="#FFF" />
                 </Title>
 
-                <button className="mb-4 flex justify-center items-center w-[250px] h-[40px] float-right ml-2 bg-wine-black rounded-full hover:scale-105 duration-300 max-sm:w-[180px]">
-                    <Link to="/dashboard/new">
+              
+                    <Link className="mb-4 flex justify-center items-center w-[250px] h-[40px] float-right ml-2 bg-wine-black rounded-full hover:scale-105 duration-300 max-sm:w-[180px]" to="/dashboard/new">
                         <span className="text-white text-[0.8rem] p-1 font-semibold max-sm:text-[12px]">CADASTRAR PRODUTO</span>
                     </Link>
-                </button>
+           
                 <div className="flex justify-center items-center mb-5 mr-4 w-full max-sm:text-[0.9rem]">
                     <input
-                        value={input}
+                        defaultValue={input}
                         onChange={e => setInput(e.target.value)}
                         placeholder="Buscar produtos por categoria"
                         className="w-full p-3 rounded-full border-2 max-sm:p-1"
@@ -123,7 +123,6 @@ export function Dashboard() {
                         <table className="w-full text-center border-solid border m-0 p-0 table-fixed border-collapse max-sm:border-0">
                             <thead className="max-sm:border-none max-sm:m-[-1px] max-sm:h-[1px] max-sm:overflow-hidden max-sm:p-0 max-sm:w-[1px]">
                                 <tr className="bg-slate-100 border border-solid border-zinc-500 text-[0.85em] uppercase max-md:text-[0.7rem] max-sm:text-[0.5rem]">
-                                    <th scope="col">Código</th>
                                     <th scope="col">Produto</th>
                                     <th scope="col">Categoria</th>
                                     <th scope="col">Tamanho</th>
@@ -135,7 +134,6 @@ export function Dashboard() {
                             {products.map((item, index) => (
                                 <tbody key={index}>
                                     <tr className="bg-white border border-solid text-[14px] border-zinc-300 max-sm:text-[12px] max-sm:p-1">
-                                        <td className="border-0 rounded-[4px] py-2" data-label="código">{index}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="produto">{item.name}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="categoria">{item.categoria}</td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="tamanho">
@@ -159,8 +157,7 @@ export function Dashboard() {
                                             )}
                                         </td>
                                         <td className="border-0 rounded-[4px] py-2" data-label="ações">
-                                            <button>
-                                                <div className="flex gap-3">
+                                                <div className="flex gap-3 justify-center">
                                                     <Link to={`/dashboard/new/new?id=${item.id}`}>
                                                         <FiEdit2 size={17} color="#000" />
                                                     </Link>
@@ -168,7 +165,7 @@ export function Dashboard() {
                                                         <FaTrashCan size={17} color="#000" />
                                                     </button>
                                                 </div>
-                                            </button>
+
                                         </td>
                                     </tr>
                                 </tbody>
