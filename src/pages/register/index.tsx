@@ -12,6 +12,8 @@ import { createUserWithEmailAndPassword, updateProfile,  } from "firebase/auth";
 import { AuthContext } from "../../contexts/AuthContext";
 import { toast } from "react-hot-toast";
 
+import logo from '../../assets/logo.png'
+
 const schema = z.object({
   name: z.string().min(4, "O Campo nome é obrigatorio!"),
   email: z.string().email("Insira um email valido").min(0, "O campo email é obrigatorio!"),
@@ -55,7 +57,7 @@ export function Register() {
     return (
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img className="mx-auto w-12 rounded-full md:w-24 lg:w-36" src="/src/assets/logo.png" alt="logo" />
+        <img className="mx-auto w-12 rounded-full md:w-24  lg:w-36 " src={logo} alt="logo" />
         <h2 className="mt-10 text-center text-sm font-semibold leading-9 tracking-tight text-gray-900 md:text-lg lg:text-xl">Cadastrar Dashboard Gabi Raposo</h2>
       </div>
 
