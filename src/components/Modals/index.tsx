@@ -4,6 +4,7 @@ import Modal from '@mui/material/Modal';
 import { FaShoppingBag, FaTrash } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { Link } from 'react-router-dom';
+import './index.css'
 
 import DropdownModal from '../dropdownModal';
 import { Fade } from '@mui/material';
@@ -180,19 +181,28 @@ export default function NestedModal() {
                 key={item.id}
                 className="flex flex-row justify-between items-center w-full my-5">
                 <div className="flex justify-between w-full items-center">
-                  <div className="flex items-center">
+                  <div className="flex items-center flex-wrap">
                     <Link
-                      className="w-[40px] h-[40px] max-md:w-[40px] max-md:h-[40px] max-md:mr-2 rounded-full"
+                      className="w-[40px] h-[40px] max-md:w-[30px] max-md:h-[30px] mr-2 rounded-full flex items-center justify-center"
                       onClick={() => setOpen(false)}
                       to={`/product/details?id=${item.id}`}
                     >
-                      <img className="rounded-full" src={item.image} alt="" />
+                      <img
+                        className="rounded-full object-cover w-full h-full"
+                        src={item.image}
+                        alt={item.name}
+                      />
                     </Link>
-                    <span className="font-semibold ml-2">{item.stock}x</span>
-                    <span className="font-semibold ml-2 max-md:text-xs">
-                      {item.name}{" "}
+                    <span className="font-semibold ml-2 text-sm max-md:text-x whitespace-nowrap">
+                      {item.stock}x
                     </span>
-                    <span className="font-semibold ml-2 text-xs max-md:text-xs">
+                    <span
+                      className="font-semibold ml-2 text-xs max-md:text-xs whitespace-nowrap truncate-name"
+                      title={item.name} // Tooltip com o nome completo
+                    >
+                      {item.name}
+                    </span>
+                    <span className="font-semibold ml-12 text-xs max-md:text-[10px] whitespace-nowrap">
                       ({item.color.name} - {item.size})
                     </span>
                   </div>

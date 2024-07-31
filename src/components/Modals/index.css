@@ -1,0 +1,20 @@
+.truncate-name {
+    display: inline-block;
+    max-width: 20vw; /* Largura máxima padrão */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  @media (max-width: 768px) {
+    .truncate-name {
+      max-width: 100px; /* Largura máxima para tablets */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .truncate-name {
+      max-width: 90px; /* Largura máxima para celulares */
+    }
+  }
+  

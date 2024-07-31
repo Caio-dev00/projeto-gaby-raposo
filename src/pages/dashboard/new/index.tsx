@@ -390,10 +390,10 @@ export function New() {
         status: status,
         created: new Date(),
         owner: user?.name,
-        size: sizesArray, // Armazena os tamanhos únicos
+        size: sizesArray, 
         id: user?.uid,
         images: productImage,
-        variations: variations // Salvar variações diretamente
+        variations: variations
       };
   
       await addDoc(collection(db, "Produtos"), newProduct);
@@ -589,56 +589,51 @@ export function New() {
     }
   };
 
+  
+
   const handleSaveVariation = () => {
     if (!selectedSize || !colorSelected || estoque <= 0) {
       return;
     }
   
     const selectedColorObj = color.find((c) => c.name === colorSelected);
+    const selectedColorImage = selectedColorObj && selectedColorObj.images.length > 0 
+      ? selectedColorObj.images[0] 
+      : null; // Pode ser null se não houver imagem
   
-    if (selectedColorObj && selectedColorObj.images.length > 0) {
-      const selectedColorImage = selectedColorObj.images[0];
+    // Verificar se já existe uma variação com o tamanho selecionado
+    const existingVariationIndex = variations.findIndex((variation) => variation.size === selectedSize);
   
-      // Verificar se já existe uma variação com o tamanho selecionado
-      const existingVariationIndex = variations.findIndex((variation) => variation.size === selectedSize);
+    const newColor = {
+      uid: uuidV4(),
+      name: colorSelected,
+      imageUrl: selectedColorImage ? selectedColorImage.url : "",
+      previewUrl: selectedColorImage ? selectedColorImage.previewUrl : "",
+      url: selectedColorImage ? selectedColorImage.url : "",
+      estoque: estoque,
+    };
   
-      if (existingVariationIndex >= 0) {
-        // Se a variação com o tamanho já existe, adicionar a nova cor a essa variação
-        variations[existingVariationIndex].colors.push({
-          uid: uuidV4(),
-          name: colorSelected,
-          imageUrl: selectedColorImage.url,
-          previewUrl: selectedColorImage.previewUrl,
-          url: selectedColorImage.url,
-          estoque: estoque,
-        });
-      } else {
-        // Se a variação com o tamanho não existe, criar uma nova variação
-        const newVariation = {
-          size: selectedSize,
-          colors: [{
-            uid: uuidV4(),
-            name: colorSelected,
-            imageUrl: selectedColorImage.url,
-            previewUrl: selectedColorImage.previewUrl,
-            url: selectedColorImage.url,
-            estoque: estoque,
-          }]
-        };
-  
-        setVariations([...variations, newVariation]);
-      }
-  
-      // Limpar estado de seleção de variação e estoque
-      setSelectedVariation({ size: "", colors: [] });
-      setDefaultSize("Selecione o Tamanho");
-      setDefaultColor("Selecione a cor");
-      setSelectedSize("");
-      setColorSelected("");
-      setEstoque(0);
+    if (existingVariationIndex >= 0) {
+      // Se a variação com o tamanho já existe, adicionar a nova cor a essa variação
+      variations[existingVariationIndex].colors.push(newColor);
     } else {
-      console.error(`Imagem não encontrada para a cor ${colorSelected}`);
+      // Se a variação com o tamanho não existe, criar uma nova variação
+      const newVariation = {
+        size: selectedSize,
+        colors: [newColor],
+      };
+  
+      setVariations([...variations, newVariation]);
     }
+  
+    // Limpar estado de seleção de variação e estoque
+    setSelectedVariation({ size: "", colors: [] });
+    setDefaultSize("Selecione o Tamanho");
+    setDefaultColor("Selecione a cor");
+    setSelectedSize("");
+    setColorSelected("");
+    setEstoque(0);
+    setColorSelected(null);
   };
 
   const handleSaveVariationEdit = async () => {
