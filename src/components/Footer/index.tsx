@@ -56,6 +56,7 @@ const Footer = () => {
         <div className='flex flex-col items-center'>
           <span className='text-xs font-medium text-black text-center'>Gabi Raposo Moda Íntima & Cia</span>
           <span className='text-xs font-medium text-black text-center'>CNPJ: 19.907.291/0001-24</span>
+          <div>
           <a
             href="https://maps.app.goo.gl/AUxnBQJ5rUxG9ZxD9"
             target="_blank"
@@ -63,6 +64,7 @@ const Footer = () => {
             <FaMapMarkerAlt size={24} color="#000" />
             Av. Dom Antonio, 754, Assis-SP
           </a>
+          </div>
         </div>
       </Container >
     </footer >

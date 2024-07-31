@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { auth } from "../../services/firebaseConnection";
 import { signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-hot-toast";
+import logoFooter from '/src/assets/logoFooter.png';
 
 const schema = z.object({
   email: z.string().email("Insira um email valido").min(0, "O campo email é obrigatorio!"),
@@ -46,7 +47,7 @@ export function Login() {
     return (
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img className="mx-auto w-12 rounded-full md:w-24 lg:w-36" src="/src/assets/logo.png" alt="logo" />
+        <img className="mx-auto w-12 rounded-full md:w-24 lg:w-36" src={logoFooter} alt="logo" />
         <h2 className="mt-10 text-center text-sm font-semibold leading-9 tracking-tight text-gray-900 md:text-lg lg:text-xl">Login Dashboard Gabi Raposo</h2>
       </div>
 
