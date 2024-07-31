@@ -35,6 +35,7 @@ const getAvailableColors = (variations: Variations[], selectedSize: string) => {
     }
   });
   return colors;
+  
 };
 
 export function ProductDetail() {
