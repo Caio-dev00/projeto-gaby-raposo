@@ -22,7 +22,13 @@ import toast from 'react-hot-toast';
 
 const schema = z.object({
   name: z.string().min(1, "O campo é obrigatório"),
-})
+  categotyImage: z.object({
+    name: z.string(),
+    uid: z.string(),
+    previewUrl: z.string(),
+    url: z.string()
+  }).optional()
+});
 
 type FormData = z.infer<typeof schema>
 
@@ -81,12 +87,17 @@ export function CadastrarCategoria() {
   }, [categoryId, navigate])
 
   function onSubmit(data: FormData) {
+    if (!categoryImage) {
+      toast.error(" É necessário cadastrar uma imagem para categoria. ");
+      return;
+    }
+
     addDoc(collection(db, "categorias"), {
       name: data.name.toLowerCase(),
       created: new Date(),
       owner: user?.name,
       uid: user?.uid,
-      images: categoryImage ? [categoryImage] : [],
+      images: [categoryImage],
     })
       .then(() => {
         reset();
@@ -376,7 +387,11 @@ async function handleFileEdit(e: ChangeEvent<HTMLInputElement>) {
                   error={errors.name?.message}
                   type="text"
                 />
-                <button type='submit' className="w-full max-w-[250px] mt-10 self-center bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Salvar Categoria</button>
+                {categoryImage ? (
+                  <button type='submit' className="w-full max-w-[250px] mt-10 self-center bg-wine-light border-2 rounded-2xl p-2 border-wine-light text-white font-semibold hover:bg-opacity-90" >Cadastrar categoria</button>
+                ) : (
+                  <p className='text-red-500 mt-1'> É necessário cadastrar uma imagem para categoria.</p>
+                )}
               </form>
               <div className="flex w-full justify-around mt-5 p-2">
                 <div>
